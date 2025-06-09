@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { createUser, findAllUsers, findUserById } from "../controlers/user.controler.js";
+import { createUser, findAllUsers, findUserById, blockUser, updateUser } from "../controlers/user.controler.js";
 import { protect, requireHandleUsers } from "../middlewares/auth.middleware.js";
 const userRouter = Router();
 
 userRouter.get("/", protect, requireHandleUsers, findAllUsers);
 userRouter.get("/:id", protect, requireHandleUsers, findUserById);
 userRouter.post("/", protect, requireHandleUsers, createUser);
-userRouter.put("/:id", (req, res) => { res.send({ title: "update user" })});
-userRouter.delete("/:id", (req, res) => { res.send({ title: "delete user" })});
+
+userRouter.put("/block-user",protect, requireHandleUsers, blockUser);
+userRouter.put("/update-user",protect, requireHandleUsers, updateUser);
 
 export default userRouter

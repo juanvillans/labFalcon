@@ -67,6 +67,18 @@ async function createTables(client) {
             CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)
         `);
 
+    // create exams table
+
+    await client.query(`
+        CREATE TABLE IF NOT EXIST examinations_types (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(100) NOT NULL UNIQUE,
+            tests JSONB NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )  
+    `)
+
     console.log("✅ Database tables created/verified successfully");
   } catch (error) {
     console.error("❌ Error creating tables:", error.message);

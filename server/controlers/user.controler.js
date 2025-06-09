@@ -131,3 +131,37 @@ export const findUserById = catchAsync(async (req, res, next) => {
     next(error);
   }
 });
+
+export const blockUser = catchAsync(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      throw commonErrors.notFound("User");
+    }
+    await User.updateById(req.params.id, { status: "bloqueado" });
+    res.status(200).json({
+      status: "success",
+      message: "Usuario eliminado con éxito",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export const updateUser = catchAsync(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      throw commonErrors.notFound("User");
+    }
+    await User.updateById(req.params.id, req.body);
+    res.status(200).json({
+      status: "success",
+      message: "Usuario actualizado con éxito",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
