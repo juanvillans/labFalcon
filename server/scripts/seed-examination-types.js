@@ -1,19 +1,15 @@
-import pg from "pg";
-import { NODE_ENV } from "../config/env.js";
+import { pool } from "../database/postgre.js";
+import dotenv from "dotenv";
 
-const { Pool } = pg;
+// Load environment variables based on NODE_ENV
+const envFile = process.env.NODE_ENV === "production" 
+  ? ".env.production" 
+  : ".env.development.local";
 
-// Get PostgreSQL connection details from environment variables
-const {
-  POSTGRES_URL,
-  POSTGRES_HOST,
-  POSTGRES_PASSWORD,
-  POSTGRES_DATABASE,
-  POSTGRES_USER = "postgres",
-  POSTGRES_PORT = 5432,
-} = process.env;
+dotenv.config({ path: envFile });
 
-const type_examinations_seed = [
+// Examination types seed data
+const examinationTypesSeed = [
   {
     name: "hematologia",
     tests: [
@@ -177,85 +173,38 @@ const type_examinations_seed = [
     ],  
   }
 ];
-// Create connection pool
-const pool = new Pool({
-  connectionString: POSTGRES_URL,
-  host: POSTGRES_HOST,
-  port: POSTGRES_PORT,
-  database: POSTGRES_DATABASE,
-  user: POSTGRES_USER,
-  password: POSTGRES_PASSWORD,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
-});
 
-// Test the connection
-async function connectToDB() {
+async function seedExaminationTypes() {
   try {
-    const client = await pool.connect();
-    console.log(`✅ Connected to PostgreSQL database: ${POSTGRES_DATABASE}`);
-
-    // Create tables if they don't exist
-    await createTables(client);
-
-    client.release();
-    return pool;
+    // Check if examination types already exist
+    const { rows } = await pool.query("SELECT COUNT(*) FROM examination_types");
+    const count = parseInt(rows[0].count);
+    
+    if (count > 0) {
+      console.log("Examination types already exist in the database. Seeding skipped.");
+      return;
+    }
+    
+    console.log("Starting to seed examination types...");
+    
+    // Insert each examination type
+    for (const examType of examinationTypesSeed) {
+      await pool.query(
+        `INSERT INTO examination_types (name, tests) VALUES ($1, $2)`,
+        [examType.name, JSON.stringify(examType.tests)]
+      );
+      console.log(`Added examination type: ${examType.name}`);
+    }
+    
+    console.log("✅ Examination types seeded successfully!");
+    
   } catch (error) {
-    console.error("❌ Error connecting to PostgreSQL:", error.message);
-    throw error;
+    console.error("❌ Error seeding examination types:", error.message);
+  } finally {
+    // Close the database connection
+    await pool.end();
   }
 }
 
-// Create necessary tables
-async function createTables(client) {
-  try {
-    // Create users table
-    await client.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(50) NOT NULL CHECK (LENGTH(name) >= 2),
-                email VARCHAR(255) UNIQUE NOT NULL,
-                last_name VARCHAR(50) NOT NULL,
-                allow_validate_exam BOOLEAN DEFAULT FALSE,
-                allow_handle_users BOOLEAN DEFAULT FALSE,
-                password VARCHAR(255),
-                status VARCHAR(20) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) 
-        `);
-
-    // Create index on email for faster lookups
-    await client.query(`
-            CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)
-        `);
-
-    // create exams table
-    await client.query(`
-        CREATE TABLE IF NOT EXISTS examination_types (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(100) NOT NULL UNIQUE,
-            tests JSONB NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )  
-    `);
-
-    console.log("✅ Database tables created/verified successfully");
-  } catch (error) {
-    console.error("❌ Error creating tables:", error.message);
-    throw error;
-  }
-}
-
-// Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("🔄 Closing PostgreSQL connection pool...");
-  await pool.end();
-  console.log("✅ PostgreSQL connection pool closed");
-  process.exit(0);
-});
-
-export default connectToDB;
-export { pool };
+// Run the seeder
+seedExaminationTypes();

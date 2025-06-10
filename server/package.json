@@ -6,13 +6,15 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "seed-examination-types": "node scripts/seed-examination-types.js"
   },
   "dependencies": {
     "@arcjet/inspect": "^1.0.0-beta.8",
     "@arcjet/node": "^1.0.0-beta.8",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^16.5.0",
     "express": "~4.16.1",
@@ -29,4 +31,3 @@
     "nodemon": "^3.1.10"
   }
 }
-

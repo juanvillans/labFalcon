@@ -1,39 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useFeedback } from '../context/FeedbackContext';
+import { authAPI } from '../services/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showError, showSuccess } = useFeedback();
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/sign-in', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Use the authAPI.login method instead of fetch
+      const data = await authAPI.login({ email, password });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-      
+      // Login successful
       login(data.data.user, data.data.token);
+      showSuccess('Login successful!');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
+      console.log(err);
+      
     } finally {
       setLoading(false);
     }
@@ -43,12 +37,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">LabFalcon Login</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

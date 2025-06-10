@@ -1,9 +1,9 @@
 /**
- * Error handling middleware for Express application
- * Handles common errors including MongoDB, validation, and HTTP errors
+ * Middleware de manejo de errores para aplicación Express
+ * Maneja errores comunes incluyendo MongoDB, validación y errores HTTP
  */
 
-// Custom error class for application-specific errors
+// Clase de error personalizada para errores específicos de la aplicación
 export class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
@@ -15,35 +15,35 @@ export class AppError extends Error {
     }
 }
 
-// Handle MongoDB Cast Error (Invalid ObjectId)
+// Manejar Error de Cast de MongoDB (ObjectId inválido)
 const handleCastErrorDB = (err) => {
-    const message = `Invalid ${err.path}: ${err.value}`;
+    const message = `Valor inválido para ${err.path}: ${err.value}`;
     return new AppError(message, 400);
 };
 
-// Handle MongoDB Duplicate Field Error
+// Manejar Error de Campos Duplicados en MongoDB
 const handleDuplicateFieldsDB = (err) => {
     const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-    const message = `Duplicate field value: ${value}. Please use another value!`;
+    const message = `Valor duplicado: ${value}. ¡Por favor use otro valor!`;
     return new AppError(message, 400);
 };
 
-// Handle Mongoose Validation Error
+// Manejar Error de Validación de Mongoose
 const handleValidationErrorDB = (err) => {
     const errors = Object.values(err.errors).map(el => el.message);
-    const message = `Invalid input data. ${errors.join('. ')}`;
+    const message = `Datos de entrada inválidos. ${errors.join('. ')}`;
     return new AppError(message, 400);
 };
 
-// Handle JSON Web Token Error
+// Manejar Error de Token JWT
 const handleJWTError = () =>
-    new AppError('Invalid token. Please log in again!', 401);
+    new AppError('Token inválido. ¡Por favor inicie sesión nuevamente!', 401);
 
-// Handle JWT Expired Error
+// Manejar Error de Token JWT Expirado
 const handleJWTExpiredError = () =>
-    new AppError('Your token has expired! Please log in again.', 401);
+    new AppError('¡Su token ha expirado! Por favor inicie sesión nuevamente.', 401);
 
-// Send error response in development
+// Enviar respuesta de error en desarrollo
 const sendErrorDev = (err, res) => {
     res.status(err.statusCode).json({
         status: err.status,
@@ -53,25 +53,25 @@ const sendErrorDev = (err, res) => {
     });
 };
 
-// Send error response in production
+// Enviar respuesta de error en producción
 const sendErrorProd = (err, res) => {
-    // Operational, trusted error: send message to client
+    // Error operacional, confiable: enviar mensaje al cliente
     if (err.isOperational) {
         res.status(err.statusCode).json({
             status: err.status,
             message: err.message
         });
     } else {
-        // Programming or other unknown error: don't leak error details
+        // Error de programación u otro error desconocido: no filtrar detalles
         console.error('ERROR 💥', err);
         res.status(500).json({
             status: 'error',
-            message: 'Something went wrong!'
+            message: '¡Algo salió mal!'
         });
     }
 };
 
-// Main error handling middleware
+// Middleware principal de manejo de errores
 const errorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
@@ -82,7 +82,7 @@ const errorHandler = (err, req, res, next) => {
         let error = { ...err };
         error.message = err.message;
 
-        // Handle specific error types
+        // Manejar tipos específicos de errores
         if (error.name === 'CastError') error = handleCastErrorDB(error);
         if (error.code === 11000) error = handleDuplicateFieldsDB(error);
         if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
@@ -93,40 +93,40 @@ const errorHandler = (err, req, res, next) => {
     }
 };
 
-// Middleware to handle 404 errors for undefined routes
+// Middleware para manejar errores 404 en rutas no definidas
 export const notFound = (req, res, next) => {
-    const err = new AppError(`Can't find ${req.originalUrl} on this server!`, 404);
+    const err = new AppError(`No se encontró ${req.originalUrl} en este servidor!`, 404);
     next(err);
 };
 
-// Async error wrapper to catch errors in async functions
+// Wrapper para manejar errores en funciones asíncronas
 export const catchAsync = (fn) => {
     return (req, res, next) => {
         fn(req, res, next).catch(next);
     };
 };
 
-// Common error responses
+// Respuestas de error comunes
 export const commonErrors = {
-    // Authentication errors
-    unauthorized: () => new AppError('You are not logged in! Please log in to get access.', 401),
-    forbidden: () => new AppError('You do not have permission to perform this action', 403),
-    botDetected: () => new AppError('Bots are not allowed', 403),
+    // Errores de autenticación
+    unauthorized: () => new AppError('¡No ha iniciado sesión! Por favor ingrese para obtener acceso.', 401),
+    forbidden: () => new AppError('No tiene permiso para realizar esta acción', 403),
+    botDetected: () => new AppError('Los bots no están permitidos', 403),
 
-    // Resource errors
-    notFound: (resource = 'Resource') => new AppError(`${resource} not found`, 404),
-    alreadyExists: (resource = 'Resource') => new AppError(`${resource} already exists`, 409),
+    // Errores de recursos
+    notFound: (resource = 'Recurso') => new AppError(`${resource} no encontrado`, 404),
+    alreadyExists: (resource = 'Recurso') => new AppError(`${resource} ya existe`, 409),
 
-    // Validation errors
-    invalidInput: (message = 'Invalid input data') => new AppError(message, 400),
-    missingFields: (fields) => new AppError(`Missing required fields: ${fields.join(', ')}`, 400),
+    // Errores de validación
+    invalidInput: (message = 'Datos de entrada inválidos') => new AppError(message, 400),
+    missingFields: (fields) => new AppError(`Campos requeridos faltantes: ${fields.join(', ')}`, 400),
 
-    // Server errors
-    serverError: (message = 'Internal server error') => new AppError(message, 500),
-    databaseError: () => new AppError('Database connection error', 500),
+    // Errores del servidor
+    serverError: (message = 'Error interno del servidor') => new AppError(message, 500),
+    databaseError: () => new AppError('Error de conexión a la base de datos', 500),
 
-    // Rate limiting
-    tooManyRequests: () => new AppError('Too many requests from this IP, please try again later.', 429)
+    // Límite de tasa
+    tooManyRequests: () => new AppError('Demasiadas solicitudes desde esta IP, por favor intente nuevamente más tarde.', 429)
 };
 
 export default errorHandler;
