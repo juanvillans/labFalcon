@@ -109,7 +109,7 @@ export const catchAsync = (fn) => {
 // Respuestas de error comunes
 export const commonErrors = {
     // Errores de autenticación
-    unauthorized: () => new AppError('¡No ha iniciado sesión! Por favor ingrese para obtener acceso.', 401),
+    unauthorized: (message = 'No autorizado') => new AppError(message || '¡No ha iniciado sesión! Por favor ingrese para obtener acceso.', 401),
     forbidden: () => new AppError('No tiene permiso para realizar esta acción', 403),
     botDetected: () => new AppError('Los bots no están permitidos', 403),
 

@@ -16,7 +16,8 @@ export const protect = catchAsync(async (req, res, next) => {
     }
 
     if (!token) {
-      throw commonErrors.unauthorized();
+
+      throw commonErrors.unauthorized("No se encontró token");
     }
 
     // Check if token is blacklisted (logged out)
@@ -27,7 +28,7 @@ export const protect = catchAsync(async (req, res, next) => {
     // 2) Verification token
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.purpose !== 'login') {
-      throw commonErrors.invalidInput("Invalid token type");
+      throw commonErrors.invalidInput( `token invalido ${decoded.purpose}`);
     }
     // 3) Check if user still exists
     const currentUser = await User.findById(decoded.userId);

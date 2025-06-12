@@ -59,12 +59,12 @@ export const authAPI = {
 
 // Users API endpoints
 export const usersAPI = {
-  getProfile: () => api.get('/user/profile'),
-  updateProfile: (userData) => api.put('/user/profile', userData),
-  getUsers: () => api.get('/user'),
-  createUser: (userData) => api.post('/user', userData),
-  updateUser: (id, userData) => api.put(`/user/${id}`, userData),
-  deleteUser: (id) => api.delete(`/user/${id}`),
+  getProfile: () => api.get('/users/profile'),
+  updateProfile: (userData) => api.put('/users/profile', userData),
+  getUsers: (params) => api.get('/users', {params: params}),
+  createUser: (userData) => api.post('/users', userData),
+  updateUser: (id, userData) => api.put(`/users/${id}`, userData),
+  deleteUser: (id) => api.delete(`/users/${id}`),
 };
 
 // Export the api instance for direct use if needed

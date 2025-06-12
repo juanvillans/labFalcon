@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Animation for feedback messages */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,100..900&family=Inter:ital,opsz,wght@1,14..32,100..900&display=swap');
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -23,6 +24,27 @@
     transform: translateX(100%);
     opacity: 0;
   }
+}
+body, 
+.MuiDataGrid-root, 
+.MuiDataGrid-columnHeader, 
+.MuiDataGrid-cell, 
+.MuiDataGrid-toolbarContainer {
+  font-family: "Inter", sans-serif !important;
+  font-optical-sizing: auto;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: "Exo 2", sans-serif !important;
+  font-optical-sizing: auto;
+}
+.font-exo2 {
+  font-family: "Exo 2", sans-serif !important;
+  font-optical-sizing: auto;
+}
+.font-inter {
+  font-family: "Inter", sans-serif !important;
+  font-optical-sizing: auto;
 }
 
 .animate-slideIn {
@@ -50,4 +72,96 @@
 .MuiDataGrid-root {
   border-radius: 20px !important;
   overflow: hidden !important;
+  border-color: white !important;
+}
+.MuiDataGrid-row, .MuiDataGrid-cell, .MuiDataGrid-virtualScrollerContent .css-aymtem-MuiDataGrid-virtualScrollerContent{
+  border-color: white !important;
+}
+.kave-btn {
+  position: relative;
+  border: solid 1px #6595BF;
+  background: none;
+  color: #011140;
+  font-family: "Exo 2", sans-serif !important;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 1.8px;
+  width: 170px;
+  border-radius: 5px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.kave-btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 60px;
+  height: 1px;
+  transform: translateY(-1px);
+  background: #6595BF;
+  transition: all 0.25s ease;
+}
+
+.kave-btn:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 10%;
+  width: 60px;
+  height: 1px;
+  transform: translateY(1px);
+  background: #6595BF;
+  transition: all 0.25s ease;
+}
+
+.kave-btn:hover {
+  box-shadow: 1px 1px 8px rgba(0, 214, 252, 0.3);
+  color: #6595BF;
+  text-shadow: 0 0 8px rgba(0, 214, 252, 0.4);
+}
+
+.kave-btn:hover:before {
+  left: 0;
+  width: 20px;
+}
+
+.kave-btn:hover:after {
+  right: 0;
+  width: 20px;
+}
+
+.kave-btn:hover .kave-line:before {
+  bottom: 0;
+}
+
+.kave-btn:hover .kave-line:after {
+  top: 0;
+}
+
+.kave-line:before {
+  content: "";
+  position: absolute;
+  bottom: 30%;
+  right: 0;
+  width: 1px;
+  height: 20px;
+  transform: translateX(1px);
+  background: rgba(0, 214, 252, 1);
+  transition: all 0.25s ease;
+}
+
+.kave-line:after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  left: 0;
+  width: 1px;
+  height: 20px;
+  transform: translateX(-1px);
+  background: rgba(0, 214, 252, 1);
+  transition: all 0.25s ease;
 }

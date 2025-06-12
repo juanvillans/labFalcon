@@ -38,7 +38,7 @@ export const signIn = catchAsync(async (req, res, next) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user.id, pourpose: "login" }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id, purpose: "login" }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
 

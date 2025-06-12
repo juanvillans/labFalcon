@@ -139,12 +139,21 @@ class User {
 
     // Find all users
     static async findAll() {
-        const query = 'SELECT * FROM users ORDER BY created_at DESC';
-        const result = await pool.query(query);
-
-        return result.rows.map(row => new User(row));
+        const query = `
+        SELECT *, 
+        (SELECT COUNT(*) FROM users) AS total_count
+        FROM users 
+        ORDER BY created_at DESC
+      `;
+      const result = await pool.query(query);
+      
+      return {
+        users: result.rows.map(row => new User(row)),
+        totalCount: result.rows[0]?.total_count || 0
+      };
     }
 
+    
     // Static method to update user by ID
     static async updateById(id, updateData) {
         const allowedFields = ['name', 'last_name', 'email', 'password', 'status', 'allow_validate_exam', 'allow_handle_users'];

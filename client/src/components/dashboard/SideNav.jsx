@@ -16,7 +16,7 @@ export default function SideNav() {
   return (
     <nav className="flex bg-color1 h-full flex-col px-3 py-4 md:px-4">
       <Link
-        className="mb-4 flex h-20 items-end justify-end rounded-md bg-white bg-opacity-5 p-4 md:h-28"
+        className="mb-4 font-exo2 flex h-20 items-end justify-end rounded-md bg-white bg-opacity-5 p-4 md:h-28"
         href="/"
       >
         <div className="w-32  text-white md:w-40 flex flex-row justify-between items-end">

@@ -22,7 +22,6 @@ export default function LoginPage() {
       
       // Login successful
       login(data.data.user, data.data.token);
-      showSuccess('Login successful!');
       navigate('/dashboard');
     } catch (err) {
       showError(err.message);
