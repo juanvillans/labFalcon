@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { FeedbackProvider } from './context/FeedbackContext';
@@ -8,6 +7,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/dashboard/HomePage';
+import ExamenesPage from './pages/dashboard/ExamenesPage'
+import UsuariosPage from './pages/dashboard/UsuariosPage'
 
 function App() {
   return (
@@ -29,8 +30,8 @@ function App() {
             >
               <Route index element={<HomePage />} />
               {/* Add more dashboard routes here */}
-              <Route path="examinations" element={<div>Examinations Page</div>} />
-              <Route path="users" element={<div>Users Management</div>} />
+              <Route path="examenes" element={<ExamenesPage />} />
+              <Route path="usuarios" element={<UsuariosPage />} />
             </Route>
             
             {/* Fallback route */}

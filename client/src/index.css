@@ -32,3 +32,22 @@
 .animate-slideOut {
   animation: slideOut 0.3s ease-in forwards;
 }
+
+.activeLink:after {
+  content: "";
+  position: absolute;
+  right: -16px;
+  top: -18.5px;
+  width: 28px;
+  height: 83px;
+  /* background-color: #397373; */
+  background-image: url("./assets/linkCurve.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right center;
+  border-radius: 0 2px 2px 0;
+}
+.MuiDataGrid-root {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}

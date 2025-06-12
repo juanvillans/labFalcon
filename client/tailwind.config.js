@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import colors from 'tailwindcss/colors'; // Add this import
+import colors, { blue } from 'tailwindcss/colors'; // Add this import
 
 export default {
   content: [
@@ -16,10 +16,12 @@ export default {
       "black": "#000000",
       "dark": "#161616",
       "white": "#FFFFFF",
-      "red": "#BF0404",
-      "green": "#02731E",
       "grayBlue": "#c7d2da",
+      "red": colors.red,
+      "green": colors.green,
       "gray": colors.gray,
+      "blue": colors.blue,
+      "yellow": colors.yellow,
       "ligthGreen": "#54ffaf",
       "redLight": "#ff6464",
       "background": "#ececec",
