@@ -1,6 +1,4 @@
 import { db } from "../database/postgre.js";
-import knex from 'knex';
-
 
 class User {
   constructor(userData) {
@@ -95,9 +93,10 @@ class User {
     const { sort = 'created_at:desc', page = 1, pageSize = 10 } = params;
     const [sortField, sortDirection] = sort.split(':');
   
-    const query = knex('users')
+    // Use the existing db connection instead of creating a new knex instance
+    const query = db('users')
       .select('*')
-      .select(knex.raw('(SELECT COUNT(*) FROM users) AS total_count'))
+      .select(db.raw('(SELECT COUNT(*) FROM users) AS total_count'))
       .orderBy(sortField, sortDirection)
       .limit(pageSize)
       .offset((page - 1) * pageSize);
