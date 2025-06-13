@@ -71,11 +71,18 @@ export default function Page() {
     () => ({
       getRows: async (params) => {
         try {
+          console.log({
+            page: params.paginationModel.page,
+            pageSize: params.paginationModel.pageSize,
+            filters: JSON.stringify(params.filterModel.items[0]), // Spread filter fields
+            // Spread filter fields
+            sort: params.sortModel.map((s) => `${s.field}:${s.sort}`).join(","),
+          })
           // Call your actual API endpoint with Axios
           const response = await usersAPI.getUsers({
             page: params.paginationModel.page,
             pageSize: params.paginationModel.pageSize,
-            ...params.filterModel, // Spread filter fields
+            filters: JSON.stringify(params.filterModel.items[0]), // Spread filter fields
             sort: params.sortModel.map((s) => `${s.field}:${s.sort}`).join(","),
           });
 
@@ -106,7 +113,7 @@ export default function Page() {
         pagination
         initialState={{
           pagination: {
-            paginationModel: { pageSize: 25, page: 0 },
+            paginationModel: { pageSize: 25, page: 1 },
             rowCount: 0,
           },
         }}

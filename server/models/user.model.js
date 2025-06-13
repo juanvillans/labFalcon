@@ -1,5 +1,40 @@
 import { db } from "../database/postgre.js";
 
+const example_usersJson = [
+  {
+    name: "Admin Juan",
+    last_name: "Villasmil",
+    email: "juanvillasmil@gmail.com",
+    password: "123456",
+    allow_validate_exam: true,
+    allow_handle_users: true,
+    status: "active",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
+    name: "User Test",
+    last_name: "Test",
+    email: "usertest@gmail.com",
+    password: "123456",
+    allow_validate_exam: false,
+    allow_handle_users: true,
+    status: "active",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
+    name: "User Test 2",
+    last_name: "Test 2",
+    email: "usertest2@gmail.com",
+    password: "123456",
+    allow_validate_exam: false,
+    allow_handle_users: false,
+    status: "active",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+];
 class User {
   constructor(userData) {
     this.id = userData.id;
@@ -90,18 +125,79 @@ class User {
   }
 
   static async findUsers(params) {
-    const { sort = 'created_at:desc', page = 1, pageSize = 10 } = params;
-    const [sortField, sortDirection] = sort.split(':');
-  
-    // Use the existing db connection instead of creating a new knex instance
-    const query = db('users')
-      .select('*')
-      .select(db.raw('(SELECT COUNT(*) FROM users) AS total_count'))
-      .orderBy(sortField, sortDirection)
-      .limit(pageSize)
-      .offset((page - 1) * pageSize);
-  
-    return query;
+    // Default to page 1 if page is 0 or not provided
+    const page = params.page <= 0 ? 1 : parseInt(params.page) || 1;
+    const pageSize = parseInt(params.pageSize) || 10;
+    console.log({ params });
+    // Default sort if not provided
+    const sort = params.sort || "created_at:desc";
+    const [sortField, sortDirection] = sort.split(":");
+
+    // Use default sort field/direction if parsing failed
+    const validSortField = sortField || "created_at";
+    const validSortDirection = ["asc", "desc"].includes(
+      sortDirection?.toLowerCase()
+    )
+      ? sortDirection.toLowerCase()
+      : "desc";
+
+    const baseQuery = db("users");
+
+    if (params.filters) {
+      try {
+        const filters = JSON.parse(params.filters);
+        console.log({ filters });
+
+        const { field, operator, value } = filters;
+
+        // Skip if any required property is missing
+        if (!field || !operator || value === undefined) return;
+
+        // Apply different operators
+        switch (operator) {
+          case "contains":
+            baseQuery.whereILike(field, `%${value}%`);
+            break;
+          case "doesNotContain":
+            baseQuery.whereNotILike(field, `%${value}%`);
+            break;
+          case "equals":
+            baseQuery.where(field, value);
+            break;
+          case "startsWith":
+            baseQuery.whereILike(field, `${value}%`);
+            break;
+          case "endsWith":
+            baseQuery.whereILike(field, `%${value}`);
+            break;
+          // Add more operators as needed
+        }
+      } catch (e) {
+        console.error("Invalid filters JSON:", e);
+      }
+    }
+
+    try {
+      const countQuery = baseQuery.clone().count("* as count").first();
+
+      // Add pagination and sorting to the main query
+      const usersQuery = baseQuery
+        .select("*")
+        .orderBy(sortField, sortDirection)
+        .limit(pageSize)
+        .offset((page - 1) * pageSize);
+
+      // Execute both queries in parallel
+      const [users, countResult] = await Promise.all([usersQuery, countQuery]);
+
+      return {
+        users: users.map((user) => new User(user)),
+        totalCount: parseInt(countResult.count),
+      };
+    } catch (error) {
+      console.error("Error in findUsers:", error);
+      throw error;
+    }
   }
   // Static method to update user by ID
   static async updateById(id, updateData) {
