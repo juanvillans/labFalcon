@@ -20,6 +20,12 @@ export const {
   MAIL_ENCRYPTION,
   MAIL_FROM_ADDRESS,
   MAIL_FROM_NAME,
+  POSTGRES_URL,
+  POSTGRES_HOST,
+  POSTGRES_PASSWORD,
+  POSTGRES_DATABASE,
+  POSTGRES_USER,
+  POSTGRES_PORT,
 } = process.env;
 
 // Validate critical environment variables

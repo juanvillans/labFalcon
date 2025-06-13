@@ -111,10 +111,6 @@ export default function Page() {
           },
         }}
         pageSizeOptions={[10, 25, 50, 100]}
-        sx={{
-        
-          
-        }}
       />
     </div>
   );
