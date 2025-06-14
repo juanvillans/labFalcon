@@ -1,33 +1,63 @@
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, getGridStringOperators } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import React, { useMemo } from "react";
-import { authAPI, usersAPI } from "../../services/api";
+import { usersAPI } from "../../services/api";
 import { Icon } from "@iconify/react";
 import FuturisticButton from "../../components/FuturisticButton";
 
+// Función reutilizable para crear operadores de filtro para columnas de texto
+const getStringFilterOperators = () => [
+  {
+    value: 'contains',
+    getApplyFilterFn: () => () => true, // La lógica real se maneja en el servidor
+    InputComponent: getGridStringOperators().find(op => op.value === 'contains').InputComponent
+  },
+  {
+    value: 'equals',
+    getApplyFilterFn: () => () => true,
+    InputComponent: getGridStringOperators().find(op => op.value === 'equals').InputComponent
+  },
+  {
+    value: 'startsWith',
+    getApplyFilterFn: () => () => true,
+    InputComponent: getGridStringOperators().find(op => op.value === 'startsWith').InputComponent
+  },
+  {
+    value: 'endsWith',
+    getApplyFilterFn: () => () => true,
+    InputComponent: getGridStringOperators().find(op => op.value === 'endsWith').InputComponent
+  },
+  {
+    value: 'doesNotContain',
+    getApplyFilterFn: () => () => true,
+    InputComponent: getGridStringOperators().find(op => op.value === 'doesNotContain').InputComponent
+  }
+];
+
+
+
 const columns = [
   { field: "id", headerName: "ID", width: 60 },
-  // {
-  //   field: "role",
-  //   headerName: "Rol ó Cargo",
-  //   width: 150,
-  //   filterable: false,
-  // },
   {
     field: "name",
     headerName: "Nombre",
     width: 150,
+    type: "string",
+    filterOperators: getStringFilterOperators()
   },
   {
     field: "last_name",
     headerName: "Apellido",
     width: 150,
+    type: "string",
+    filterOperators: getStringFilterOperators()
   },
   {
     field: "email",
     headerName: "Correo Electrónico",
     width: 200,
+    type: "string",
+    filterOperators: getStringFilterOperators()
   },
   {
     field: "allow_validate_exam",
