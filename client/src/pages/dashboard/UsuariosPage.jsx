@@ -73,48 +73,61 @@ const columns = [
 ];
 
 export default function Page() {
+
+  const [colDefs, setColDefs] = useState([
+    { field: "id", headerName: "ID", width: 60 },
+    {
+      field: "name",
+      headerName: "Nombre",
+      width: 150,
+      type: "string",
+    },
+    {
+      field: "last_name",
+      headerName: "Apellido",
+      width: 150,
+      type: "string",
+    },
+    {
+      field: "email",
+      headerName: "Correo Electrónico",
+      width: 200,
+      type: "string",
+    },
+    {
+      field: "allow_validate_exam",
+      headerName: "Puede Validar",
+      type: "boolean",
+      width: 130,
+    },
+    {
+      field: "allow_handle_users",
+      headerName: "Gestión de Usuarios",
+      type: "boolean",
+      width: 180,
+    },
+  ]);
   const [rowData, setRowData] = useState([]);
   const [pageSize] = useState(10);
   const [rowCount, setRowCount] = useState(null);
   const [gridApi, setGridApi] = useState(null);
 
-  const fetchData = useCallback(
-    async (params) => {
-      const sortModel = params.sortModel?.[0] || {};
-      const { colId, sort } = sortModel;
-      const page = params.api.paginationGetCurrentPage();
-      try {
-        const res = await usersAPI.getUsers({
-          page: page + 1,
-          limit: pageSize,
-          sortField: colId,
-          sortOrder: sort,
-          filter: "", // add filters if needed
-        });
-
-        setRowData(res.data.data);
-        setRowCount(res.data.total);
-      } catch (e) {
-        console.error("Failed to fetch data", e);
-      }
-    },
-    [pageSize]
-  );
-  
-  const onGridReady = (params) => {
-    setGridApi(params.api);
-    fetchData(params);
-  };
-
-  const onSortChanged = () => {
-    fetchData({ api: gridApi, sortModel: gridApi.getSortModel() });
-  };
-
-  const onPaginationChanged = () => {
-    if (gridApi) {
-      fetchData({ api: gridApi, sortModel: gridApi.getSortModel() });
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await usersAPI.getAllUsers();
+      console.log(res.data);
+      setRowData(res.data.users);
+    } catch (e) {
+      console.error("Failed to fetch data", e);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+
+  
   return (
     <div style={{ height: 580, width: "100%" }}>
       <div className="flex justify-between items-center mb-4">
@@ -128,12 +141,7 @@ export default function Page() {
         <AgGridReact
           columnDefs={columns}
           rowData={rowData}
-          pagination={true}
-          paginationPageSize={pageSize}
-          rowModelType="clientSide" // must use clientSide for free version
-          onGridReady={onGridReady}
-          onSortChanged={onSortChanged}
-          onPaginationChanged={onPaginationChanged}
+          
         />
       </div>
     </div>

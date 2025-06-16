@@ -205,6 +205,12 @@ class User {
       return { users: [], totalCount: 0 };
     }
   }
+
+  static async getAllUsers() {
+    const users = await db("users").select("*");
+    return users.map((user) => new User(user));
+  }
+
   // Static method to update user by ID
   static async updateById(id, updateData) {
     // Define updatable fields and their sanitizers
