@@ -6,6 +6,7 @@ import authRouter from "./routers/auth.routes.js";
 import connectToDB from "./database/postgre.js";
 import errorHandler, { notFound } from "./middlewares/error.middleware.js";
 import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
+import examinationTypesRouter from "./routers/examamination_types.routers.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(arcjetMiddleware);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/examination-types", examinationTypesRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Subscription API");

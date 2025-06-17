@@ -55,6 +55,10 @@ export const authAPI = {
   logout: () => api.post('/auth/sign-out'),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
+  
+  // Nuevos métodos para activación de cuenta
+  verifyInvitationToken: (token) => api.get(`/auth/verify-invitation?token=${token}`),
+  activateAccount: (token, password) => api.post('/auth/activate-account', { token, password }),
 };
 
 // Users API endpoints
@@ -65,6 +69,10 @@ export const usersAPI = {
   createUser: (userData) => api.post('/users', userData),
   updateUser: (id, userData) => api.put(`/users/${id}`, userData),
   deleteUser: (id) => api.delete(`/users/${id}`),
+};
+
+export const examinationTypesAPI = {
+  getExaminationTypes: () => api.get('/examination-types'),
 };
 
 // Export the api instance for direct use if needed

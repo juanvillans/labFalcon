@@ -1,7 +1,6 @@
-export default function FuturisticButton({ children }, props) {
+export default function FuturisticButton({ children, onClick }) {
   return (
-    <button className="kave-btn" onClick={()=> props.onClick()}>
-      <span className="kave-line"></span>
+    <button type="button" className="button" onClick={onClick}>
       {children}
     </button>
   );
