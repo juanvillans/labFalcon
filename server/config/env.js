@@ -1,9 +1,13 @@
-import { config } from "dotenv";
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Load environment variables
-const envFile = `.env.${process.env.NODE_ENV || "development"}.local`;
-config({ path: envFile });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Load from project root always
+dotenv.config({
+  path: path.resolve(__dirname, '../.env.development.local')
+});
 export const {
   PORT,
   NODE_ENV,
@@ -27,12 +31,12 @@ export const {
   POSTGRES_USER,
   POSTGRES_PORT,
 } = process.env;
-
+ 
 // Validate critical environment variables
-if (!JWT_SECRET) {
+if (!JWT_SECRET && NODE_ENV !== 'migration') {
   throw new Error("JWT_SECRET environment variable is required but not set");
 }
 
-if (!DB_URI) {
+if (!DB_URI && NODE_ENV !== 'migration') {
   throw new Error("DB_URI environment variable is required but not set");
 }

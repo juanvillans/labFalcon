@@ -53,7 +53,7 @@ export default function FormField({
       <TextField
         type={type}
         name={name}
-        label={label || name}
+        label={label}
         value={value || ''}
         onChange={onChange}
         error={!!error}

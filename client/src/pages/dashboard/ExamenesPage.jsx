@@ -5,8 +5,7 @@ import { examinationTypesAPI } from "../../services/api";
 import { Icon } from "@iconify/react";
 import Modal from "../../components/Modal";
 import FuturisticButton from "../../components/FuturisticButton";
-
-import { ReusableForm } from "../../components/forms";
+import FormField from "../../components/forms/FormField";
 
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -48,17 +47,84 @@ const ActionCellRenderer = (props) => {
   );
 };
 export default function Page() {
+  const [loading, setLoading] = useState(false);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    allow_validate_exam: false,
-    allow_handle_users: false,
-  });
   const [examinationTypes, setExaminationTypes] = useState([]);
   const [typeExaminationSelected, setTypeExaminationSelected] = useState("");
+
   // Form configuration for ReusableForm
+  const patientFormFields = [
+    {
+      name: "ci",
+      label: "Cédula de Identidad",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "first_name",
+      label: "Nombre",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "last_name",
+      label: "Apellido",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "date_birth",
+      label: "Fecha de Nacimiento",
+      type: "date",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "email",
+      label: "Correo Electrónico",
+      type: "email",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "phone_number",
+      label: "Teléfono",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "address",
+      label: "Dirección",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+    {
+      name: "sex",
+      label: "Género",
+      type: "text",
+      required: true,
+      className: "col-span-1",
+    },
+  ];
+  const [formData, setFormData] = useState({
+    patient: {
+      ci: "",
+      first_name: "",
+      last_name: "",
+      date_birth: "",
+      email: "",
+      phone_number: "",
+      address: "",
+      gender: "",
+    },
+    testsValues: {},
+  });
   const [typeExaminationFields, setTypeExaminationFields] = useState([
     {
       name: "email",
@@ -75,7 +141,6 @@ export default function Page() {
       required: true,
       className: "col-span-1",
     },
-   
   ]);
 
   const validationRules = {
@@ -116,7 +181,7 @@ export default function Page() {
     setIsModalOpen(false);
     fetchData();
   };
-
+  console.log(formData);
   const [colDefs] = useState([
     { field: "id", headerName: "ID", width: 75 },
     {
@@ -213,6 +278,30 @@ export default function Page() {
     getExaminationTypes();
   }, [getExaminationTypes]);
 
+  function handleTestInputChange(event) {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      testsValues: {
+        ...formData.testsValues,
+        [name]: {
+          ...formData.testsValues[name],
+          value,
+        },
+      },
+    });
+  }
+
+  function handlePatientInputChange(event) {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      patient: {
+        ...formData.patient,
+        [name]: value,
+      },
+    });
+  }
   return (
     <div style={{ height: 580, width: "100%" }}>
       <div className="flex justify-between items-center mb-4">
@@ -227,53 +316,92 @@ export default function Page() {
           setIsModalOpen(false);
         }}
         title="Registrar exámen"
-        size="md"
+        size="xl"
       >
-        {typeExaminationSelected && (
-          <div className="flex gap-2">
-            <button onClick={() => setTypeExaminationSelected("")}>
+       
+
+        <form className={`grid grid-cols-2 gap-10 w-full `}>
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
+            <div className="grid grid-cols-2 gap-4">
+
+            {patientFormFields.map((field) => (
+              <FormField
+                key={field.name}
+                {...field}
+                value={formData.patient?.[field.name]}
+                onChange={handlePatientInputChange}
+              />
+            ))}
+            </div>
+
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold">Resultados del Exámen</h2>
+            {typeExaminationSelected && (
+          <div className="flex gap-2 pb-2 items-center">
+            <button
+              onClick={() => setTypeExaminationSelected("")}
+              className="hover:bg-gray-200 p-2 rounded-full"
+            >
               <Icon icon="ep:back" width={20} height={20} />
             </button>
             <p>{typeExaminationSelected}</p>
           </div>
         )}
-       
-        {typeExaminationSelected == "" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {examinationTypes.map((examType) => {
-              return (
-                <button
-                  key={examType.id}
-                  className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
-                  onClick={() => {
-                    console.log(examType.tests);
-                    setTypeExaminationSelected(examType.name);
-                    setTypeExaminationFields(examType.tests);
-                  }}
-                >
-                  {examType.name}
-                </button>
-              );
-            })}
-          </div>
-        )}
-        {typeExaminationSelected && (
-          <ReusableForm
-                      fields={typeExaminationFields}
-                      onSubmit={handleCreateUser}
-                      onCancel={() => {
-                        
-                        setIsModalOpen(false);
+            {typeExaminationSelected == "" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {examinationTypes.map((examType) => {
+                  return (
+                    <button
+                      key={examType.id}
+                      className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
+                      onClick={() => {
+                        console.log(examType.tests);
+                        setTypeExaminationFields(examType.tests);
+                        const formFieldsStructure = examType.tests.reduce(
+                          (acc, test) => {
+                            acc[test.name] = {
+                              ...test,
+                              value: "", // Add empty value field
+                            };
+                            return acc;
+                          },
+                          {}
+                        );
+                        setFormData((prev) => ({
+                          testsValues: formFieldsStructure,
+                          testTypeName: examType.name,
+                          testTypeId: examType.id,
+                        }));
+                        setTypeExaminationSelected(examType.name);
+                        setTimeout(() => {
+                          document
+                            .querySelector(
+                              `input[name=${examType.tests[0].name}]`
+                            )
+                            .focus();
+                        }, 120);
                       }}
-                      submitText="Registrar Examen"
-                      cancelText="Cancelar"
-                      validationRules={validationRules}
-                      className="col-span-2"
-                      formData={formData}
-                      onFormDataChange={setFormData}
-                    />
-
-        )}
+                    >
+                      {examType.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              Object.entries(formData.testsValues).map(([name, field]) => (
+                <FormField
+                  key={name}
+                  {...field}
+                  value={formData.testsValues[name].value}
+                  onChange={handleTestInputChange}
+                />
+              ))
+              
+            )}
+          </div>
+        </form>
       </Modal>
       <div
         className="ag-theme-alpine ag-grid-no-border"

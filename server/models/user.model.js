@@ -1,40 +1,6 @@
 import { db } from "../database/postgre.js";
 
-const example_usersJson = [
-  {
-    name: "Admin Juan",
-    last_name: "Villasmil",
-    email: "juanvillasmil@gmail.com",
-    password: "123456",
-    allow_validate_exam: true,
-    allow_handle_users: true,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    name: "User Test",
-    last_name: "Test",
-    email: "usertest@gmail.com",
-    password: "123456",
-    allow_validate_exam: false,
-    allow_handle_users: true,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    name: "User Test 2",
-    last_name: "Test 2",
-    email: "usertest2@gmail.com",
-    password: "123456",
-    allow_validate_exam: false,
-    allow_handle_users: false,
-    status: "active",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
+
 class User {
   constructor(userData) {
     this.id = userData.id;

@@ -102,7 +102,7 @@ export default function ReusableForm({
     
     try {
       await onSubmit(currentFormData);
-      showSuccess('Operation completed successfully');
+      showSuccess('Operación completada con éxito');
 
       // Reset form if no onCancel (meaning it's not a modal)
       if (!onCancel && !isControlled) {

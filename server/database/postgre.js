@@ -1,6 +1,6 @@
 import knex from 'knex';
 import { NODE_ENV } from '../config/env.js';
-import knexConfig from '../config/knex.js';
+import knexConfig from '../config/knexfile.js';
 
 const {
   POSTGRES_URL,

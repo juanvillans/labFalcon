@@ -1,4 +1,4 @@
-import { pool } from "../database/postgre.js";
+
 import dotenv from "dotenv";
 
 // Load environment variables based on NODE_ENV
@@ -14,7 +14,8 @@ const examinationTypesSeed = [
     name: "hematologia",
     tests: [
       {
-        name: "Cuenta blanca",
+        label: "Cuenta blanca",
+        name: "cuenta_blanca",
         type: "number",
         unit: "x10³",
         reference_range: {
@@ -23,7 +24,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Linfocitos",
+        label: "Linfocitos",
+        name: "linfocitos",
         type: "number",
         unit: "%",
         reference_range: {
@@ -32,7 +34,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "MID",
+        label: "MID",
+        name: "mid",
         type: "number",
         unit: "%",
         reference_range: {
@@ -41,7 +44,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Neutrofilos",
+        label: "Neutrofilos",
+        name: "neutrofilos",
         type: "number",
         unit: "%",
         reference_range: {
@@ -50,7 +54,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Hemoglobina",
+        label: "Hemoglobina",
+        name: "hemoglobina",
         type: "number",
         unit: "gr/dl",
         reference_range: {
@@ -59,7 +64,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Hematocrito",
+        label: "Hematocrito",
+        name: "hematocrito",
         type: "number",
         unit: "%",
         reference_range: {
@@ -68,6 +74,7 @@ const examinationTypesSeed = [
         },
       },
       {
+        label: "Plaquetas",
         name: "Plaquetas",
         type: "number",
         unit: "x10³",
@@ -79,10 +86,11 @@ const examinationTypesSeed = [
     ],
   },
   {
-    name: "Química sangupinea",
+    name: "Química sanguinea",
     tests: [
       {
-        name: "Glucosa",
+        label: "Glucosa",
+        name: "glucosa",
         type: "number",
         unit: "mg/dl",
         reference_range: {
@@ -91,7 +99,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Urea",
+        label: "Urea",
+        name: "urea",
         type: "number",
         unit: "mg/dl",
         reference_range: {
@@ -100,7 +109,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Creatinina",
+        label: "Creatinina",
+        name: "creatinina",
         type: "number",
         unit: "mg/dl",
         reference_range: {
@@ -114,7 +124,8 @@ const examinationTypesSeed = [
     name: "Prueba de coagulación",
     tests: [
       {
-        name: "TP",
+        label: "TP",
+        name: "tp",
         type: "number",
         unit: "seg",
         reference_range: {
@@ -123,7 +134,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "TPT",
+        label: "TPT",
+        name: "tpt",
         type: "number",
         unit: "seg",
         reference_range: {
@@ -137,12 +149,14 @@ const examinationTypesSeed = [
     name: "Serología",
     tests: [
       {
-        name: "HIV",
+        label: "HIV",
+        name: "hiv",
         type: "boolean",
         labels: {true: "Reactivo", false: "No reactivo"},
       },
       {
-        name: "VDRL",
+        label: "VDRL",
+        name: "vdrl",
         type: "boolean",
         labels: {true: "Reactivo", false: "No reactivo"},
       },
@@ -152,7 +166,8 @@ const examinationTypesSeed = [
     name: "Análisis de heces",
     tests: [
       {
-        name: "Color",
+        label: "Color",
+        name: "color",
         type: "string",
         labels: {
           "Negro": "Negro",
@@ -162,7 +177,8 @@ const examinationTypesSeed = [
         },
       },
       {
-        name: "Aspecto",
+        label: "Aspecto",
+        name: "aspecto",
         type: "string",
         labels: {
           "Fresco": "Fresco",
@@ -174,37 +190,18 @@ const examinationTypesSeed = [
   }
 ];
 
-async function seedExaminationTypes() {
-  try {
-    // Check if examination types already exist
-    const { rows } = await pool.query("SELECT COUNT(*) FROM examination_types");
-    const count = parseInt(rows[0].count);
-    
-    if (count > 0) {
-      console.log("Examination types already exist in the database. Seeding skipped.");
-      return;
-    }
-    
-    console.log("Starting to seed examination types...");
-    
-    // Insert each examination type
-    for (const examType of examinationTypesSeed) {
-      await pool.query(
-        `INSERT INTO examination_types (name, tests) VALUES ($1, $2)`,
-        [examType.name, JSON.stringify(examType.tests)]
-      );
-      console.log(`Added examination type: ${examType.name}`);
-    }
-    
-    console.log("✅ Examination types seeded successfully!");
-    
-  } catch (error) {
-    console.error("❌ Error seeding examination types:", error.message);
-  } finally {
-    // Close the database connection
-    await pool.end();
+export async function seed(knex) {
+  const count = await knex('examination_types').count('id');
+  if (parseInt(count[0].count) > 0) {
+    console.log("Examination types already exist. Seeding skipped.");
+    return;
+  }
+
+  for (const examType of examinationTypesSeed) {
+    await knex('examination_types').insert({
+      name: examType.name,
+      tests: JSON.stringify(examType.tests),
+    });
+    console.log(`Seeded: ${examType.name}`);
   }
 }
-
-// Run the seeder
-seedExaminationTypes();

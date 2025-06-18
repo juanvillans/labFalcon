@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "create-admin": "node scripts/create-admin.js",
-    "seed-examination-types": "node scripts/seed-examination-types.js"
+    "seed": "NODE_ENV=development knex seed:run",
+    "migrate": "NODE_ENV=development knex migrate:latest",
+    "migrate:rollback": "NODE_ENV=development knex migrate:rollback"
+
   },
   "dependencies": {
     "@arcjet/inspect": "^1.0.0-beta.8",
