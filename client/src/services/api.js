@@ -75,5 +75,14 @@ export const examinationTypesAPI = {
   getExaminationTypes: () => api.get('/examination-types'),
 };
 
+export const exams = {
+  createExam: (examData) => api.post('/exams', examData),
+  getExams: () => api.get('/exams'),
+  getExamById: (id) => api.get(`/exams/${id}`),
+  updateExam: (id, examData) => api.put(`/exams/${id}`, examData),
+  deleteExam: (id) => api.delete(`/exams/${id}`),
+  validateExam: (id) => api.put('/exams/validate-exam', { id }),
+};
+
 // Export the api instance for direct use if needed
 export default api;

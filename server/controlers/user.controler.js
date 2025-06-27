@@ -1,5 +1,4 @@
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { commonErrors, catchAsync } from "../middlewares/error.middleware.js";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";

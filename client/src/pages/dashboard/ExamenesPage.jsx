@@ -6,7 +6,9 @@ import { Icon } from "@iconify/react";
 import Modal from "../../components/Modal";
 import FuturisticButton from "../../components/FuturisticButton";
 import FormField from "../../components/forms/FormField";
-
+import { CircularProgress } from "@mui/material";
+import { exams } from "../../services/api";
+import { useFeedback } from "../../context/FeedbackContext";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -48,6 +50,7 @@ const ActionCellRenderer = (props) => {
 };
 export default function Page() {
   const [loading, setLoading] = useState(false);
+  const { showError, showSuccess } = useFeedback();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [examinationTypes, setExaminationTypes] = useState([]);
@@ -107,7 +110,11 @@ export default function Page() {
     {
       name: "sex",
       label: "Género",
-      type: "text",
+      type: "select",
+      options: [
+        { value: "male", label: "Masculino" },
+        { value: "female", label: "Femenino" },
+      ],
       required: true,
       className: "col-span-1",
     },
@@ -123,6 +130,9 @@ export default function Page() {
       address: "",
       gender: "",
     },
+    validated: false,
+    testTypeId: "",
+    testTypeName: "",
     testsValues: {},
   });
   const [typeExaminationFields, setTypeExaminationFields] = useState([
@@ -156,6 +166,25 @@ export default function Page() {
       minLength: 2,
       maxLength: 50,
     },
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      await exams.createExam(formData);
+      showSuccess("Operación completada con éxito");
+
+      // Reset form if no onCancel (meaning it's not a modal)
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
+      showError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateUser = async (submittedFormData) => {
@@ -318,88 +347,118 @@ export default function Page() {
         title="Registrar exámen"
         size="xl"
       >
-       
-
-        <form className={`grid grid-cols-2 gap-10 w-full `}>
+        <form
+          className={`grid grid-cols-2 gap-10 w-full `}
+          onSubmit={onSubmit}
+        >
           <div className="space-y-3">
             <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
             <div className="grid grid-cols-2 gap-4">
-
-            {patientFormFields.map((field) => (
-              <FormField
-                key={field.name}
-                {...field}
-                value={formData.patient?.[field.name]}
-                onChange={handlePatientInputChange}
-              />
-            ))}
+              {patientFormFields.map((field) => (
+                <FormField
+                  key={field.name}
+                  {...field}
+                  value={formData.patient?.[field.name]}
+                  onChange={handlePatientInputChange}
+                />
+              ))}
             </div>
-
           </div>
           <div className="space-y-3">
             <h2 className="text-xl font-bold">Resultados del Exámen</h2>
             {typeExaminationSelected && (
-          <div className="flex gap-2 pb-2 items-center">
-            <button
-              onClick={() => setTypeExaminationSelected("")}
-              className="hover:bg-gray-200 p-2 rounded-full"
-            >
-              <Icon icon="ep:back" width={20} height={20} />
-            </button>
-            <p>{typeExaminationSelected}</p>
-          </div>
-        )}
-            {typeExaminationSelected == "" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {examinationTypes.map((examType) => {
-                  return (
-                    <button
-                      key={examType.id}
-                      className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
-                      onClick={() => {
-                        console.log(examType.tests);
-                        setTypeExaminationFields(examType.tests);
-                        const formFieldsStructure = examType.tests.reduce(
-                          (acc, test) => {
-                            acc[test.name] = {
-                              ...test,
-                              value: "", // Add empty value field
-                            };
-                            return acc;
-                          },
-                          {}
-                        );
-                        setFormData((prev) => ({
-                          testsValues: formFieldsStructure,
-                          testTypeName: examType.name,
-                          testTypeId: examType.id,
-                        }));
-                        setTypeExaminationSelected(examType.name);
-                        setTimeout(() => {
-                          document
-                            .querySelector(
-                              `input[name=${examType.tests[0].name}]`
-                            )
-                            .focus();
-                        }, 120);
-                      }}
-                    >
-                      {examType.name}
-                    </button>
-                  );
-                })}
+              <div className="flex gap-2 pb-2 items-center">
+                <button
+                  onClick={() => setTypeExaminationSelected("")}
+                  className="hover:bg-gray-200 p-2 rounded-full"
+                >
+                  <Icon icon="ep:back" width={20} height={20} />
+                </button>
+                <p>{typeExaminationSelected}</p>
               </div>
-            ) : (
-              Object.entries(formData.testsValues).map(([name, field]) => (
-                <FormField
-                  key={name}
-                  {...field}
-                  value={formData.testsValues[name].value}
-                  onChange={handleTestInputChange}
-                />
-              ))
-              
             )}
+            {typeExaminationSelected == "" ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {examinationTypes.map((examType) => {
+                    return (
+                      <button
+                        key={examType.id}
+                        className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
+                        onClick={() => {
+                          console.log(examType.tests);
+                          setTypeExaminationFields(examType.tests);
+                          const formFieldsStructure = examType.tests.reduce(
+                            (acc, test) => {
+                              acc[test.name] = {
+                                ...test,
+                                value: "", // Add empty value field
+                              };
+                              return acc;
+                            },
+                            {}
+                          );
+                          setFormData((prev) => ({
+                            ...prev,
+                            testsValues: formFieldsStructure,
+                            testTypeName: examType.name,
+                            testTypeId: examType.id,
+                          }));
+                          setTypeExaminationSelected(examType.name);
+                          setTimeout(() => {
+                            document
+                              .querySelector(
+                                `input[name=${examType.tests[0].name}]`
+                              )
+                              .focus();
+                          }, 120);
+                        }}
+                      >
+                        {examType.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                {Object.entries(formData.testsValues).map(([name, field]) => (
+                  <FormField
+                    key={name}
+                    {...field}
+                    value={formData.testsValues[name].value}
+                    onChange={handleTestInputChange}
+                  />
+                ))}
+                <div className="ml-auto w-fit flex gap-3">
+                  <input
+                    type="checkbox"
+                    name="validated"
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        validated: e.target.checked,
+                      }));
+                    }}
+                    checked={formData.validated}
+                    id=""
+                  />
+                  <label htmlFor="validated">Validado</label>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="col-span-2">
+            <div className="flex justify-end space-x-4 pt-4">
+              <button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} /> : null}
+              >
+                {loading ? "Procesando..." : "Registrar"}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>

@@ -2,15 +2,18 @@ import { db } from "../database/postgre.js";
 
 class Exam {
   constructor(data) {
-    this.id = data.id;
-    this.ci = data.ci;
-    this.last_name = data.last_name;
-    this.first_name = data.first_name;
-    this.age = data.age;
-    this.test_type = data.test_type;
-    this.origin_service = data.origin_service;
-    this.date = data.date;
-    this.time = data.time;
+    this.id = data.patient.id;
+    this.ci = data.patient.ci;
+    this.last_name = data.patient.last_name;
+    this.first_name = data.patient.first_name;
+    this.date_birth = data.patient.date_birth;
+    this.email = data.patient.email;
+    this.phone_number = data.patient.phone_number;
+    this.address = data.patient.address;
+    this.gender = data.patient.gender;
+    this.test_type_id = data.testTypeId;
+    this.test_values = data.testsValues;
+    this.test_type_name = data.testTypeName;
     this.validated = data.validated;
   }
 
@@ -21,12 +24,14 @@ class Exam {
           ci: examData.ci,
           last_name: examData.last_name,
           first_name: examData.first_name,
-          age: examData.age,
-          test_type: examData.test_type,
-          origin_service: examData.origin_service,
-          date: examData.date,
-          time: examData.time,
-          validated: false,
+          date_birth: examData.date_birth,
+          email: examData.email,
+          phone_number: examData.phone_number,
+          address: examData.address,
+          gender: examData.gender,
+          examination_type_id: examData.testTypeId,
+          test_values: JSON.stringify(examData.testsValues),
+          validated: examData.validated,
           created_at: db.fn.now(),
           updated_at: db.fn.now(),
         })

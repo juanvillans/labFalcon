@@ -1,7 +1,16 @@
-import { TextField, Checkbox, FormHelperText, InputAdornment } from '@mui/material';
+import {
+  TextField,
+  Checkbox,
+  FormHelperText,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 
 export default function FormField({
-  type = 'text',
+  type = "text",
   name,
   label,
   value,
@@ -12,12 +21,12 @@ export default function FormField({
   disabled = false,
   placeholder,
   fullWidth = true,
-  variant = 'outlined',
-  className = '',
+  variant = "outlined",
+  className = "",
   unit,
   ...props
 }) {
-  if (type === 'checkbox') {
+  if (type === "checkbox") {
     return (
       <div className={`flex items-start gap-3 ${className}`}>
         <Checkbox
@@ -46,6 +55,27 @@ export default function FormField({
         </div>
       </div>
     );
+  } else if (type === "select") {
+    return (
+      <div className={className}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+          <Select
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            disabled={disabled}
+            {...props}
+          >
+            {props.options.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+    );
   }
 
   return (
@@ -54,7 +84,7 @@ export default function FormField({
         type={type}
         name={name}
         label={label}
-        value={value || ''}
+        value={value || ""}
         onChange={onChange}
         error={!!error}
         helperText={error || helperText}

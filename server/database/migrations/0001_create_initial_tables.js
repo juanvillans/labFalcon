@@ -26,6 +26,26 @@
         table.timestamp('updated_at').defaultTo(knex.fn.now());
       });
     }
+
+    const examsableExists = await knex.schema.hasTable('exams');
+    if (!examsableExists) {
+      await knex.schema.createTable('exams', (table) => {
+        table.increments('id').primary();
+        table.string('ci').notNullable().unique();
+        table.string('last_name').notNullable();
+        table.string('first_name').notNullable();
+        table.date('date_birth').notNullable();
+        table.string('email');
+        table.string('phone_number');
+        table.string('address');
+        table.string('gender');
+        table.integer('examination_type_id').notNullable();
+        table.jsonb('test_values').notNullable();
+        table.boolean('validated').defaultTo(false);
+        table.timestamp('created_at').defaultTo(knex.fn.now());
+        table.timestamp('updated_at').defaultTo(knex.fn.now());
+      });
+    }
   }
 
   export async function down(knex) {

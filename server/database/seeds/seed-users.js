@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+
 
 // Load environment variables based on NODE_ENV
 const envFile = process.env.NODE_ENV === "production" 
@@ -45,11 +47,13 @@ const usersSeed = [
     }
   
     for (const user of usersSeed) {
+      const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(user.password, salt);
       await knex('users').insert({
         name: user.name,
         last_name: user.last_name,
         email: user.email,
-        password: user.password,
+        password: hashedPassword,
         allow_validate_exam: user.allow_validate_exam,
         allow_handle_users: user.allow_handle_users,
         status: user.status,
