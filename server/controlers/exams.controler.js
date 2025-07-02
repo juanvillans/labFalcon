@@ -15,6 +15,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       validated,
     } = req.body;
 
+
     // Validate required fields
     if (!patient.ci) {
       throw commonErrors.missingFields(["Cédula de Identidad"]);
@@ -32,7 +33,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       throw commonErrors.missingFields(["Fecha de Nacimiento"]);
     }
     
-    if (testTypeId) {
+    if (! testTypeId) {
       throw commonErrors.missingFields(["Tipo de examen"]);
     }
     
@@ -60,13 +61,31 @@ export const createExam = catchAsync(async (req, res, next) => {
 
 export const getExams = catchAsync(async (req, res, next) => {
   try {
-    const exams = await Exam.getAllExams();
+    const exams = await Exam.getAll();
     const totalCount = exams.length;
+
+    // Helper to calculate age from date of birth
+    const calculateAge = (dateOfBirth) => {
+      const dob = new Date(dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      return age;
+    };
+
+    // Add age to each exam
+    const examsWithAge = exams.map((exam) => ({
+      ...exam,
+      age: calculateAge(exam.date_birth), // Assumes `date_birth` exists in each exam
+    }));
 
     res.status(200).json({
       status: "success",
       data: {
-        exams,
+        exams: examsWithAge,
         totalCount,
       },
     });
@@ -77,6 +96,7 @@ export const getExams = catchAsync(async (req, res, next) => {
 
 export const findExamById = catchAsync(async (req, res, next) => {
   try {
+    console.log(req.params.id);
     const exam = await Exam.findById(req.params.id);
     if (!exam) {
       throw commonErrors.notFound("Exam");
@@ -98,7 +118,7 @@ export const updateExam = catchAsync(async (req, res, next) => {
     if (!exam) {
       throw commonErrors.notFound("Exam");
     }
-    await Exam.updateById(req.params.id, req.body);
+    await Exam.update(req.params.id, req.body);
     res.status(200).json({
       status: "success",
       message: "Examen actualizado con éxito",
@@ -114,7 +134,7 @@ export const deleteExam = catchAsync(async (req, res, next) => {
     if (!exam) {
       throw commonErrors.notFound("Exam");
     }
-    await Exam.deleteById(req.params.id);
+    await Exam.delete(req.params.id);
     res.status(200).json({
       status: "success",
       message: "Examen eliminado con éxito",

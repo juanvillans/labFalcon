@@ -4,7 +4,7 @@
     if (!usersTableExists) {
       await knex.schema.createTable('users', (table) => {
         table.increments('id').primary();
-        table.string('name').notNullable();
+        table.string('first_name').notNullable();
         table.string('email').notNullable().unique();
         table.string('last_name').notNullable();
         table.boolean('allow_validate_exam').defaultTo(false);
@@ -30,15 +30,15 @@
     const examsableExists = await knex.schema.hasTable('exams');
     if (!examsableExists) {
       await knex.schema.createTable('exams', (table) => {
-        table.increments('id').primary();
-        table.string('ci').notNullable().unique();
+        table.increments('id').primary().unique();
+        table.string('ci').notNullable();
         table.string('last_name').notNullable();
         table.string('first_name').notNullable();
         table.date('date_birth').notNullable();
         table.string('email');
         table.string('phone_number');
         table.string('address');
-        table.string('gender');
+        table.string('sex');
         table.integer('examination_type_id').notNullable();
         table.jsonb('test_values').notNullable();
         table.boolean('validated').defaultTo(false);
@@ -51,4 +51,5 @@
   export async function down(knex) {
     await knex.schema.dropTableIfExists('examination_types');
     await knex.schema.dropTableIfExists('users');
+    await knex.schema.dropTableIfExists('exams');
   }

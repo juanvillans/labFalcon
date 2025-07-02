@@ -84,7 +84,11 @@ export default function FormField({
         type={type}
         name={name}
         label={label}
-        value={value || ""}
+        value={
+          type === "date" && typeof value === "string"
+            ? value.split("T")[0]
+            : value || ""
+        }
         onChange={onChange}
         error={!!error}
         helperText={error || helperText}
@@ -93,7 +97,12 @@ export default function FormField({
         placeholder={placeholder}
         fullWidth={fullWidth}
         variant={variant}
+        InputLabelProps={type === "date" ? { shrink: true } : undefined}
         InputProps={{
+          onWheel:
+            type === "number"
+              ? (e) => e.target.blur() // 👈 disables scroll-change
+              : undefined,
           endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
         }}
         {...props}

@@ -8,14 +8,14 @@ export const createUser = catchAsync(async (req, res, next) => {
   try {
     const {
       email,
-      name,
+      first_name,
       last_name,
       allow_validate_exam,
       allow_handle_users,
     } = req.body;
 
     // Validate required fields
-    if (!name) {
+    if (!first_name) {
       throw commonErrors.missingFields(["name"]);
     }
     
@@ -24,11 +24,11 @@ export const createUser = catchAsync(async (req, res, next) => {
     }
 
     // Validate name length
-    if (name.trim().length < 2) {
+    if (first_name.trim().length < 2) {
       throw commonErrors.invalidInput("Username must be at least 2 characters");
     }
     
-    if (name.trim().length > 50) {
+    if (first_name.trim().length > 50) {
       throw commonErrors.invalidInput("Username must be less than 50 characters");
     }
     
@@ -50,7 +50,7 @@ export const createUser = catchAsync(async (req, res, next) => {
     
     // Create the user (always in pending status, no password)
     const user = await User.create({
-      name,
+      first_name,
       last_name,
       allow_validate_exam: allow_validate_exam || false,
       allow_handle_users: allow_handle_users || false,
@@ -72,7 +72,7 @@ export const createUser = catchAsync(async (req, res, next) => {
       
       
       await sendInvitationEmail(
-        { name: user.name, email: user.email },
+        { first_name: user.first_name, email: user.email },
         invitationToken,
         "http://localhost:3000/"
       );

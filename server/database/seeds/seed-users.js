@@ -11,31 +11,31 @@ dotenv.config({ path: envFile });
 
 const usersSeed = [
     {
-      name: "Admin Juan",
+      first_name: "Admin Juan",
       last_name: "Villasmil",
       email: "juanvillasmil@gmail.com",
       password: "123456",
       allow_validate_exam: true,
       allow_handle_users: true,
-      status: "active",
+      status: "activo",
     },
     {
-      name: "User Test",
+      first_name: "User Test",
       last_name: "Test",
       email: "usertest@gmail.com",
       password: "123456",
       allow_validate_exam: false,
       allow_handle_users: true,
-      status: "active",
+      status: "activo",
     },
     {
-      name: "User Test 2",
+      first_name: "User Test 2",
       last_name: "Test 2",
       email: "usertest2@gmail.com",
       password: "123456",
       allow_validate_exam: false,
       allow_handle_users: false,
-      status: "active",
+      status: "activo",
     },
   ];
 
@@ -50,7 +50,7 @@ const usersSeed = [
       const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(user.password, salt);
       await knex('users').insert({
-        name: user.name,
+        first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
         password: hashedPassword,

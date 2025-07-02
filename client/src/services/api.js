@@ -75,7 +75,7 @@ export const examinationTypesAPI = {
   getExaminationTypes: () => api.get('/examination-types'),
 };
 
-export const exams = {
+export const examsAPI = {
   createExam: (examData) => api.post('/exams', examData),
   getExams: () => api.get('/exams'),
   getExamById: (id) => api.get(`/exams/${id}`),

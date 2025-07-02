@@ -1,4 +1,6 @@
 import labFalconLogo from "../../assets/logoRed.png";
+import { useAuth } from '../../context/AuthContext';
+
 import { NavLink, Link } from "react-router-dom";
 import { Icon } from "@iconify/react"; 
 
@@ -13,6 +15,9 @@ const links = [
 ];
 
 export default function SideNav() {
+
+  const { user } = useAuth();
+
   return (
     <nav className="flex bg-color1 h-full flex-col px-3 py-4 md:px-4">
       <Link
@@ -53,6 +58,7 @@ export default function SideNav() {
         })}
         <div className="hidden h-auto w-full grow rounded-md md:block"></div>
         <form>
+          <p>{user?.name}</p>
           <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
             <div className="hidden md:block">Cerrar sesión</div>
           </button>

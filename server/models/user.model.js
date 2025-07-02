@@ -4,7 +4,7 @@ import { db } from "../database/postgre.js";
 class User {
   constructor(userData) {
     this.id = userData.id;
-    this.name = userData.name;
+    this.first_name = userData.first_name;
     this.last_name = userData.last_name;
     this.email = userData.email;
     this.password = userData.password;
@@ -53,7 +53,7 @@ class User {
     try {
       const [user] = await db("users")
         .insert({
-          name: userData.name.trim(),
+          first_name: userData.first_name.trim(),
           last_name: userData.last_name ? userData.last_name.trim() : null,
           email: userData.email.toLowerCase().trim(),
           status: "pendiente", // Default status
@@ -175,13 +175,13 @@ class User {
   static async updateById(id, updateData) {
     // Define updatable fields and their sanitizers
     const fieldSanitizers = {
-      name: (val) => val.trim(),
+      first_name: (val) => val.trim(),
       last_name: (val) => val?.trim() || null,
       email: (val) => val.toLowerCase().trim(),
       password: (val) => val, // Note: You should hash this before updating
       status: (val) => val,
-      allow_validate_exam: (val) => convertToBoolean(val),
-      allow_handle_users: (val) => convertToBoolean(val),
+      allow_validate_exam: (val) => val,
+      allow_handle_users: (val) => val,
     };
 
     // Build safe updates

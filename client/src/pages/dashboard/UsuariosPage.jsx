@@ -16,46 +16,18 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 // La versión Community ya incluye el ClientSideRowModel por defecto
 
 // Función reutilizable para crear operadores de filtro para columnas de texto
-const ActionCellRenderer = (props) => {
-  const handleEdit = () => {
-    console.log("Edit clicked", props.data);
-    // implement your logic here
-  };
 
-  const handleDelete = () => {
-    console.log("Delete clicked", props.data);
-    // implement your logic here
-  };
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        gap: "5px",
-        justifyContent: "center",
-        gap: "10px",
-      }}
-      className="flex  h-full justify-center items-center"
-    >
-      <button onClick={handleEdit}>
-        <Icon icon="hugeicons:edit-02" width={20} height={20} />
-      </button>
-      <button onClick={handleDelete}>
-        {" "}
-        <Icon icon="hugeicons:delete-02" width={20} height={20} />
-      </button>
-    </div>
-  );
-};
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const defaultFormData = {
     email: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     allow_validate_exam: false,
     allow_handle_users: false,
-  });
+  };
+  const [formData, setFormData] = useState(structuredClone(defaultFormData));
+  const [submitString, setSubmitString] = useState("Crear");
 
   // Form configuration for ReusableForm
   const userFormFields = [
@@ -68,14 +40,14 @@ export default function Page() {
       className: 'col-span-2'
     },
     {
-      name: 'firstName',
+      name: 'first_name',
       label: 'Nombre',
       type: 'text',
       required: true,
       className: 'col-span-1'
     },
     {
-      name: 'lastName',
+      name: 'last_name',
       label: 'Apellido',
       type: 'text',
       required: true,
@@ -101,38 +73,36 @@ export default function Page() {
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       message: 'Please enter a valid email address'
     },
-    firstName: {
+    first_name: {
       minLength: 2,
       maxLength: 50
     },
-    lastName: {
+    last_name: {
       minLength: 2,
       maxLength: 50
     }
   };
 
-  const handleCreateUser = async (submittedFormData) => {
-    const userData = {
-      name: submittedFormData.firstName,
-      last_name: submittedFormData.lastName,
-      email: submittedFormData.email,
-      allow_validate_exam: submittedFormData.allow_validate_exam || false,
-      allow_handle_users: submittedFormData.allow_handle_users || false,
-    };
-
-    await usersAPI.createUser(userData);
-
-    // Reset form data after successful submission
-    setFormData({
-      email: '',
-      firstName: '',
-      lastName: '',
-      allow_validate_exam: false,
-      allow_handle_users: false,
-    });
-
-    setIsModalOpen(false);
-    fetchData();
+  const onSubmit = async (submittedFormData) => {
+    console.log(submittedFormData);
+    try {
+      
+      if (submitString === "Actualizar") {
+        await usersAPI.updateUser(formData.id, submittedFormData);
+        setSubmitString("Crear");
+      } else {
+        await usersAPI.createUser(submittedFormData);
+      }
+  
+      // Reset form data after successful submission
+      setFormData(structuredClone(defaultFormData));
+  
+  
+      setIsModalOpen(false);
+      fetchData();
+    } catch (error) {
+      throw new Error(error?.response?.data?.message || `Error al ${submitString.toLowerCase()} el usuario.`);
+    }
   };
 
   const [colDefs] = useState([
@@ -143,7 +113,7 @@ export default function Page() {
       filter: "agNumberColumnFilter",
     },
     {
-      field: "name",
+      field: "first_name",
       headerName: "Nombre",
       width: 150,
       type: "string",
@@ -189,7 +159,21 @@ export default function Page() {
       headerName: "Acciones",
       field: "actions",
       flex: 1,
-      cellRenderer: ActionCellRenderer,
+      cellRenderer: (params) => (
+        <div className="flex h-full gap-2 justify-center items-center">
+          <button
+            onClick={(e) => {
+              setIsModalOpen(true);
+              console.log(params.data);
+              setFormData({...params.data});
+              setSubmitString("Actualizar");
+            }}
+            title="Editar"
+          >
+            <Icon icon="hugeicons:edit-02" width={20} height={20} />
+          </button>
+        </div>
+      ),
       filter: false,
       sortable: false,
     },
@@ -214,7 +198,12 @@ export default function Page() {
     <div style={{ height: 580, width: "100%" }}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-        <FuturisticButton onClick={() => setIsModalOpen(true)}>
+        <FuturisticButton onClick={() => {
+            if (submitString === "Actualizar") {
+              setSubmitString("Crear");
+            }
+            setIsModalOpen(true)}
+          }>
           Crear usuario
         </FuturisticButton>
       </div>
@@ -230,18 +219,18 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ReusableForm
             fields={userFormFields}
-            onSubmit={handleCreateUser}
+            onSubmit={onSubmit}
             onCancel={() => {
               setFormData({
                 email: '',
-                firstName: '',
-                lastName: '',
+                first_name: '',
+                last_name: '',
                 allow_validate_exam: false,
                 allow_handle_users: false,
               });
               setIsModalOpen(false);
             }}
-            submitText="Crear Usuario"
+            submitText={submitString}
             cancelText="Cancelar"
             validationRules={validationRules}
             className="col-span-2"

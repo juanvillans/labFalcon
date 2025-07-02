@@ -164,15 +164,15 @@ export default function ReusableForm({
           </Button>
         )}
         
-        <Button
+        <button
           type="submit"
-          variant="contained"
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : null}
           {...submitButtonProps}
+          className={`px-5 rounded hover:opacity-80 font-bold ${submitText == "Actualizar" ? "bg-color4 text-color1" : "bg-color1 text-color4"}`}
         >
           {loading ? 'Procesando...' : submitText}
-        </Button>
+        </button>
       </div>
     </form>
   );

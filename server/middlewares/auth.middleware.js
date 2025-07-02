@@ -160,3 +160,15 @@ export const validateResetToken = catchAsync(async (req, res, next) => {
   }
 });
 
+export const requireValidateExam = (req, res, next) => {
+  try {
+    // Check if user has permission to validate exams
+    if (!req.user || !req.user.allow_validate_exam) {
+      throw commonErrors.forbidden();
+    }
+    
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
