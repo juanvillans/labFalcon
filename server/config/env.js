@@ -30,6 +30,7 @@ export const {
   POSTGRES_DATABASE,
   POSTGRES_USER,
   POSTGRES_PORT,
+  APP_URL,
 } = process.env;
  
 // Validate critical environment variables

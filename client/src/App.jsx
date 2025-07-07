@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { FeedbackProvider } from './context/FeedbackContext';
@@ -7,10 +5,14 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/dashboard/HomePage';
-import ExamenesPage from './pages/dashboard/ExamenesPage'
-import UsuariosPage from './pages/dashboard/UsuariosPage'
-  
+import ExamenesPage from './pages/dashboard/ExamenesPage';
+import UsuariosPage from './pages/dashboard/UsuariosPage';
+import ActivateAccountPage from './pages/ActivateAccountPage';
+
 function App() {
+  // Get user from localStorage (instead of useAuth)
+  const user = JSON.parse(localStorage.getItem('user'));
+
   return (
     <AuthProvider>
       <FeedbackProvider>
@@ -18,7 +20,8 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<LoginPage />} />
-            
+            <Route path="/activar-cuenta" element={<ActivateAccountPage />} />
+
             {/* Protected dashboard routes */}
             <Route 
               path="/dashboard" 
@@ -29,13 +32,13 @@ function App() {
               }
             >
               <Route index element={<HomePage />} />
-              {/* Add more dashboard routes here */}
               <Route path="examenes" element={<ExamenesPage />} />
-              <Route path="usuarios" element={<UsuariosPage />} />
+              {/* Only show "usuarios" if user has permission */}
+              {user?.allow_handle_users && (
+                <Route path="usuarios" element={<UsuariosPage />} />
+              )}
+              {/* Fallback route */}
             </Route>
-            
-            {/* Fallback route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </FeedbackProvider>

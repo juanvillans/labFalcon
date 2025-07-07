@@ -90,6 +90,7 @@ export default function Page() {
       if (submitString === "Actualizar") {
         await usersAPI.updateUser(formData.id, submittedFormData);
         setSubmitString("Crear");
+        setFormData(structuredClone(defaultFormData));
       } else {
         await usersAPI.createUser(submittedFormData);
       }

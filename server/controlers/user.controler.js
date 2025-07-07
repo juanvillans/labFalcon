@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { commonErrors, catchAsync } from "../middlewares/error.middleware.js";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+import { JWT_EXPIRES_IN, JWT_SECRET, APP_URL } from "../config/env.js";
 import { sendInvitationEmail } from "./mailjet.controler.js";
 
 export const createUser = catchAsync(async (req, res, next) => {
@@ -64,6 +64,7 @@ export const createUser = catchAsync(async (req, res, next) => {
         {
           email: user.email,
           userId: user.id,
+          first_name: user.first_name,
           purpose: "invitation",
         },
         JWT_SECRET,
@@ -74,7 +75,7 @@ export const createUser = catchAsync(async (req, res, next) => {
       await sendInvitationEmail(
         { first_name: user.first_name, email: user.email },
         invitationToken,
-        "http://localhost:3000/"
+        APP_URL
       );
       
       res.status(201).json({

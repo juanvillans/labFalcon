@@ -5,19 +5,25 @@ import { NavLink, Link } from "react-router-dom";
 import { Icon } from "@iconify/react"; 
 
 const links = [
-  { name: 'Inicio', href: '/dashboard', icon: "hugeicons:home-09" },
+  { permission: true, name: 'Inicio', href: '/dashboard', icon: "hugeicons:home-09" },
   {
+    permission: true,
     name: 'Exámenes',
     href: '/dashboard/examenes',
     icon: "hugeicons:labs",
   },
-  { name: 'Usuarios', href: '/dashboard/usuarios', icon: "solar:user-linear" },
+  { permission: 'allow_handle_users', name: 'Usuarios', href: '/dashboard/usuarios', icon: "solar:user-linear" },
 ];
 
+
 export default function SideNav() {
+  const { logout } = useAuth();
+ function handleLogout() {
+    logout();
+ }
 
   const { user } = useAuth();
-
+ console.log(user)
   return (
     <nav className="flex bg-color1 h-full flex-col px-3 py-4 md:px-4">
       <Link
@@ -37,6 +43,7 @@ export default function SideNav() {
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
         {links.map(eachLink => {
+          if (eachLink.permission === true || user?.[eachLink?.permission]) {
           return (
           <NavLink
             to={eachLink.href}
@@ -55,14 +62,18 @@ export default function SideNav() {
           </NavLink>
 
           )
+        }
         })}
         <div className="hidden h-auto w-full grow rounded-md md:block"></div>
-        <form>
-          <p>{user?.name}</p>
-          <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-            <div className="hidden md:block">Cerrar sesión</div>
+        <div>
+          <p className="text-xs text-opacity-55 text-white ml-2.5">{user?.first_name}</p>
+          <button 
+            onClick={handleLogout}
+            className="flex text-white text-opacity-50 h-[48px] w-full grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-100 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3">
+              <Icon icon="tabler:logout" width="24" height="24" /> 
+            <div className="hidden md:block " >Cerrar sesión</div>
           </button>
-        </form>
+        </div>
       </div>
     </nav>
   );

@@ -78,7 +78,7 @@ export const verifyInvitationToken = catchAsync(async(req, res, next) => {
       message: "Token de invitación válido",
       data: {
         user: {
-          name: req.tokenUser.name,
+          name: req.tokenUser.first_name,
           email: req.tokenUser.email
         }
       }

@@ -76,7 +76,8 @@ class Exam {
         "exams.examination_type_id",
         "examination_types.id"
       )
-      .select("exams.*", "examination_types.name as examination_type_name", );
+      .select("exams.*", "examination_types.name as examination_type_name",  db.raw("to_char(exams.date_birth, 'YYYY-MM-DD') as date_birth")
+    );
 
     return exams.map((exam) => new Exam(exam));
   }

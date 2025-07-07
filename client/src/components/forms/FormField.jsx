@@ -8,8 +8,10 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import React from "react"; // Import React for React.memo
 
-export default function FormField({
+const FormField = React.memo(function FormField({
+
   type = "text",
   name,
   label,
@@ -109,4 +111,6 @@ export default function FormField({
       />
     </div>
   );
-}
+});
+
+export default FormField;

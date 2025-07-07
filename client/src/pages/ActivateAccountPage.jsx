@@ -31,7 +31,8 @@ export default function ActivateAccountPage() {
 
       try {
         const response = await authAPI.verifyInvitationToken(token);
-        setUserData(response.data.data.user);
+        console.log(response.data)
+        setUserData(response.data.user);
         setVerifying(false);
         setLoading(false);
       } catch (error) {
@@ -107,7 +108,7 @@ export default function ActivateAccountPage() {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="w-full py-2 px-4 bg-color1 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
           >
             Volver al inicio
           </button>
@@ -126,7 +127,7 @@ export default function ActivateAccountPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-800">Activar Cuenta</h1>
           <p className="text-gray-600 mt-2">
-            Hola {userData.name}, establece tu contraseña para activar tu cuenta.
+            !Hola {userData.name}!, establece tu contraseña para activar tu cuenta.
           </p>
         </div>
 
@@ -181,7 +182,7 @@ export default function ActivateAccountPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2 px-4 bg-color1 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Activando...' : 'Activar Cuenta'}
             </button>

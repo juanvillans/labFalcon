@@ -36,14 +36,14 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-export const sendInvitationEmail = function (recipient, invitationToken, frontendUrl) {
-    const activationLink = `${frontendUrl}/activate-account?token=${invitationToken}`;
-    
+export const sendInvitationEmail = function (recipient, invitationToken, url) {
+    const activationLink = `${url}/activar-cuenta?token=${invitationToken}`;
+    console.log(activationLink);
     const mailOptions = {
         to: recipient.email,
         subject: "Bienvenido a labFalcón - Activa tu cuenta",
         html: `
-            <h3>Bienvenido a nuestra plataforma, ${recipient.name}!</h3>
+            <h3>Bienvenido a nuestra plataforma, ${recipient.first_name}!</h3>
             <p>Tu cuenta ha sido creada. Por favor haz clic en el enlace a continuación para establecer tu contraseña y activar tu cuenta:</p>
             <p><a href="${activationLink}">Activar cuenta</a></p>
             <p>Este enlace caducará en 48 horas. Si no activas tu cuenta antes de que expire el enlace, se eliminará tu usuario.</p>
@@ -54,8 +54,8 @@ export const sendInvitationEmail = function (recipient, invitationToken, fronten
     return sendMail(mailOptions);
 }
 
-export const sendPasswordResetEmail = function (recipient, resetToken, frontendUrl) {
-    const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+export const sendPasswordResetEmail = function (recipient, resetToken, url) {
+    const resetLink = `${url}/reset-password?token=${resetToken}`;
     
     const mailOptions = {
         to: recipient.email,
