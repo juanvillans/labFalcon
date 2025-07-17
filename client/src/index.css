@@ -58,7 +58,7 @@ h1, h2, h3, h4, h5 {
 .activeLink:after {
   content: "";
   position: absolute;
-  right: -16px;
+  right: -17px;
   top: -18.5px;
   width: 28px;
   height: 83px;
