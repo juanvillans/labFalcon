@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 import { examinationTypesAPI, examsAPI } from "../../services/api";
 import externalApi from "../../services/saludfalcon.api";
 import { Icon } from "@iconify/react";
@@ -9,22 +7,17 @@ import FuturisticButton from "../../components/FuturisticButton";
 import FormField from "../../components/forms/FormField";
 import { CircularProgress } from "@mui/material";
 import { useFeedback } from "../../context/FeedbackContext";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
-import { useAuth } from "../../context/AuthContext";
 import PrintPage from "../../components/PrintableExamResult";
+import { MaterialReactTable } from "material-react-table";
+
 import debounce from "lodash.debounce";
 import axios from "axios";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
-
 export default function Page() {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [examinationTypes, setExaminationTypes] = useState([]);
-  const [typeExaminationSelected, setTypeExaminationSelected] = useState("");
 
   // Form configuration for ReusableForm
   const patientFormFields = useMemo(() => [
@@ -102,13 +95,13 @@ export default function Page() {
       patient_id: null,
     },
     validated: false,
-    testTypeId: null,
-    testTypeName: "",
-    testsValues: {},
-  };
-  const [formData, setFormData] = useState(structuredClone(defaultFormData));
 
+    tests: {},
+  };
+
+  const [formData, setFormData] = useState(structuredClone(defaultFormData));
   const [submitString, setSubmitString] = useState("Registrar");
+  console.log({ formData });
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -146,7 +139,7 @@ export default function Page() {
       if (submitString === "Actualizar") {
         setSubmitString("Registrar");
       }
-      
+
       showSuccess("Operación completada con éxito");
       setFormData(structuredClone(defaultFormData));
       setIsModalOpen(false);
@@ -169,128 +162,143 @@ export default function Page() {
     }
   };
 
-  const [colDefs] = useState([
-    { field: "id", headerName: "Cód", width: 60 },
-    {
-      field: "first_name",
-      headerName: "Nombre",
-      width: 110,
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "last_name",
-      headerName: "Apellido",
-      width: 120,
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "age",
-      headerName: "Edad",
-      type: "number",
-      width: 83,
-      filter: "agNumberColumnFilter",
-    },
-    {
-      field: "ci",
-      headerName: "C.I",
-      width: 100,
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "examination_type_name",
-      headerName: "Tipo de Examen",
-      width: 175,
-    },
-
-    {
-      field: "created_date",
-      headerName: "Fecha",
-      filter: "agDateColumnFilter",
-      filterParams: {
-        comparator: (filterLocalDate, cellValue) => {
-          // Custom date comparison logic
-          return new Date(cellValue) - filterLocalDate;
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "id",
+        header: "Cód",
+        size: 60,
+      },
+      {
+        accessorKey: "first_name",
+        header: "Nombre",
+        size: 110,
+        filterFn: "includesString",
+      },
+      {
+        accessorKey: "last_name",
+        header: "Apellido",
+        size: 120,
+        filterFn: "includesString",
+      },
+      {
+        accessorKey: "age",
+        header: "Edad",
+        size: 83,
+        filterFn: "between",
+      },
+      {
+        accessorKey: "ci",
+        header: "C.I",
+        size: 100,
+        filterFn: "includesString",
+      },
+      {
+        accessorKey: "examination_type_name",
+        header: "Tipo de Examen",
+        size: 175,
+      },
+      {
+        accessorKey: "created_date",
+        header: "Fecha",
+        size: 125,
+        filterFn: "equals",
+        Cell: ({ cell }) => {
+          const value = cell.getValue();
+          return new Date(value).toLocaleDateString();
         },
       },
-      width: 125,
-    },
-    {
-      field: "created_time",
-      filter: "agTextColumnFilter",
-      headerName: "Hora",
-      width: 100,
-    },
-    {
-      field: "validated",
-      headerName: "Validado",
-      type: "boolean",
-      width: 100,
-      filter: "agSetColumnFilter",
-    },
-    {
-      field: "validated",
-      headerName: "Recibido",
-      width: 90,
-      cellRenderer: (params) => {
-        if (params.value) {
-          return <Icon icon="bitcoin-icons:check-outline" width={20} height={20} />;
-        }
-      }
-    },
-    {
-      headerName: "Acciones",
-      field: "actions",
-      cellRenderer: (params) => (
-        <div className="flex relative -top-1.5  h-full gap-2 justify-center items-center">
-          <button
-            onClick={(e) => {
-              setIsModalOpen(true);
-              console.log(params.data);
-              setFormData({
-                patient: {
-                  ci: params.data.ci,
-                  first_name: params.data.first_name,
-                  last_name: params.data.last_name,
-                  date_birth: params.data.date_birth,
-                  email: params.data.email,
-                  phone_number: params.data.phone_number,
-                  address: params.data.address,
-                  sex: params.data.sex,
-                },
-                id: params.data.id,
-                validated: params.data.validated,
-                testTypeId: params.data.examination_type_id,
-                testTypeName: params.data.examination_type_name,
-                testsValues: params.data.test_values,
-              });
-              setSubmitString("Actualizar");
-            }}
-            title="Editar"
-          >
-            <Icon icon="hugeicons:edit-02" width={20} height={20} />
-          </button>
+      {
+        accessorKey: "created_time",
+        header: "Hora",
+        size: 100,
+        filterFn: "includesString",
+      },
+      {
+        accessorKey: "validated",
+        header: "Validado",
+        size: 100,
+        filterFn: "equals",
+        Cell: ({ cell }) => (cell.getValue() ? "Sí" : "No"),
+      },
+      {
+        accessorKey: "validated",
+        header: "Recibido",
+        id: "recibido",
+        size: 90,
+        Cell: ({ cell }) =>
+          cell.getValue() ? (
+            <Icon icon="bitcoin-icons:check-outline" width={20} height={20} />
+          ) : null,
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        header: "Acciones",
+        id: "actions",
+        size: 220,
+        enableColumnFilter: false,
+        enableSorting: false,
+        Cell: ({ row }) => {
+          const data = row.original;
+          return (
+            <div className="flex gap-2 justify-center items-center">
+              <button
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setFormData({
+                    patient: {
+                      ci: data.ci,
+                      first_name: data.first_name,
+                      last_name: data.last_name,
+                      date_birth: data.date_birth,
+                      email: data.email,
+                      phone_number: data.phone_number,
+                      address: data.address,
+                      sex: data.sex,
+                    },
+                    id: data.id,
+                    validated: data.validated,
+                    testTypeId: data.examination_type_id,
+                    testTypeName: data.examination_type_name,
+                    testValues: data.test_values,
+                  });
+                  setSubmitString("Actualizar");
+                }}
+                title="Editar"
+              >
+                <Icon icon="hugeicons:edit-02" width={20} height={20} />
+              </button>
 
-          <PrintPage data={params.data} />
-          <button
-            title="Enviar mensaje"
-            className="mx-1 p-1 hover:bg-blue-100 rounded-full"
-          >
-            <Icon icon="carbon:send-alt" className="w-6 h-6 text-gray-500" />
-          </button>
-          <button
-            onClick={() => handleDelete(params.data.id)}
-            title="Eliminar"
-            className="ml-auto"
-          >
-            <Icon icon="heroicons:trash" className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-      ),
-      flex: 1,
-      sortable: false,
-      filterable: false,
-    },
-  ]);
+              <PrintPage data={data} />
+
+              <button
+                title="Enviar mensaje"
+                className="mx-1 p-1 hover:bg-blue-100 rounded-full"
+              >
+                <Icon
+                  icon="carbon:send-alt"
+                  className="w-6 h-6 text-gray-500"
+                />
+              </button>
+
+              <button
+                onClick={() => handleDelete(data.id)}
+                title="Eliminar"
+                className="ml-auto"
+              >
+                <Icon
+                  icon="heroicons:trash"
+                  className="w-5 h-5 text-gray-500"
+                />
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    []
+  );
 
   const handleDelete = async (id) => {
     try {
@@ -310,19 +318,40 @@ export default function Page() {
     // Call your delete API or show a confirmation dialog
   };
 
-  console.log(formData)
+  console.log(formData);
 
-  const [rowData, setRowData] = useState([]);
+  const [data, setData] = useState([]);
+  const [rowCount, setRowCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Server-side state
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
-      const res = await examsAPI.getExams();
-      console.log(res.data);
-      setRowData(res.data.exams);
+      const res = await examsAPI.getExams({
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        sortField: sorting[0]?.id || "id",
+        sortOrder: sorting[0]?.desc ? "desc" : "asc",
+        filters: JSON.stringify(
+          columnFilters.reduce((acc, curr) => {
+            acc[curr.id] = curr.value;
+            return acc;
+          }, {})
+        ),
+      });
+      console.log({ res });
+      setData(res.data.exams);
+      setRowCount(res.data.totalCount);
     } catch (e) {
       console.error("Failed to fetch data", e);
     }
-  }, []);
+    setIsLoading(false);
+  }, [pagination, sorting, columnFilters]);
 
   const getExaminationTypes = useCallback(async () => {
     try {
@@ -342,17 +371,24 @@ export default function Page() {
     fetchData();
   }, [fetchData]);
 
-  const handleTestInputChange = useCallback((event) => {
+  const handleTestInputChange = useCallback((examination_type_id, event) => {
     const { name, value } = event.target;
+    console.log({ examination_type_id, name, value });
     setFormData((prev) => ({
       ...prev,
-      testsValues: {
-        ...prev.testsValues,
-        [name]: {
-          ...prev.testsValues[name],
-          value,
+      tests: {
+        ...prev.tests,
+        [examination_type_id]: {
+          ...prev.tests[examination_type_id],
+          testValues: {
+            ...prev.tests[examination_type_id].testValues,
+            [name]: {
+              ...prev.tests[examination_type_id].testValues[name],
+              value,
+            },
+          },
         },
-      },
+        },
     }));
   }, []);
 
@@ -373,7 +409,7 @@ export default function Page() {
 
     try {
       const res = await externalApi.get(`/patients?ci=${ci}`);
-      if (res.data.data.data.length === 0 ) {
+      if (res.data.data.data.length === 0) {
         console.log("No se encontró el paciente");
         setFormData((prev) => ({
           ...prev,
@@ -426,14 +462,17 @@ export default function Page() {
         title="Registrar exámen"
         size="xl"
       >
-        <form className={`grid grid-cols-2 gap-10 w-full relative`} onSubmit={onSubmit}>
+        <form
+          className={`grid grid-cols-2 gap-7 w-full relative`}
+          onSubmit={onSubmit}
+        >
           <div className="space-y-3 z-10">
             <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
             <div className="grid grid-cols-2 gap-4">
               {patientFormFields.map((field) => {
                 if (field.name === "ci") {
                   return (
-                    <>
+                    <div key={field.name}>
                       {formData?.patient.ci.length >= 6 && (
                         <div
                           key={field.name}
@@ -468,19 +507,19 @@ export default function Page() {
                         value={formData.patient?.[field.name]}
                         onPaste={(e) => {
                           // Manejar pegado específicamente
-                          const pastedValue = e.clipboardData.getData('text');
+                          const pastedValue = e.clipboardData.getData("text");
                           formData.patient.patient_id = null;
-                          
+
                           // Actualizar el valor del campo
                           const syntheticEvent = {
                             target: {
                               name: field.name,
-                              value: pastedValue
-                            }
+                              value: pastedValue,
+                            },
                           };
-                          
+
                           handlePatientInputChange(syntheticEvent);
-                          
+
                           if (pastedValue.length >= 6) {
                             setProsecingSearchPatient(true);
                             searchPatient(pastedValue);
@@ -495,7 +534,7 @@ export default function Page() {
                           }
                         }}
                       />
-                    </>
+                    </div>
                   );
                 } else {
                   return (
@@ -510,95 +549,124 @@ export default function Page() {
               })}
             </div>
           </div>
-          <div className="space-y-3 z-10">
+          <div className="space-y-3 z-10 ">
             <h2 className="text-xl font-bold">Resultados del Exámen</h2>
-            {formData.testTypeId !== null && (
-              <div className="flex gap-2 pb-2 items-center">
-                <button
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      testTypeId: null,
-                      testTypeName: "",
-                      testsValues: {},
-                    }))
-                  }
-                  className="hover:bg-gray-200 p-2 rounded-full"
-                >
-                  <Icon icon="ep:back" width={20} height={20} />
-                </button>
-                <p>{formData.testTypeName}</p>
-              </div>
-            )}
-            {formData.testTypeId == null ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {examinationTypes.map((examType) => {
-                    return (
-                      <button
-                        type="button"
-                        key={examType.id}
-                        className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
-                        onClick={() => {
-                          const formFieldsStructure = examType.tests.reduce(
-                            (acc, test) => {
-                              acc[test.name] = {
-                                ...test,
-                                value: "", // Add empty value field
-                              };
-                              return acc;
-                            },
-                            {}
-                          );
+
+            {Object.entries(formData.tests || {}).length === 0 ? (
+              <p>Seleccione al menos un tipo de exámen</p>
+            ) : (
+              Object.keys(formData?.tests || {})?.map((key) => (
+                <div key={key} className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5">
+                  <div className="flex justify-between items-center ">
+                    <h3 className="text-lg font-bold text-color1 mb-4">
+                      {formData.tests[key]?.testTypeName}
+                    </h3>
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                      aria-label="Close"
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const { [key]: value, ...rest } = prev.tests;
+                          return {
+                            ...prev,
+                            tests: rest,
+                          };
+                        });
+                      }}
+                    >
+                      <span className="sr-only">Close</span>
+                      <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(formData.tests[key]?.testValues || {})?.map(
+                      ([name, field]) => (
+                        <FormField
+                          key={name}
+                          {...field}
+                          value={formData.tests[key]?.testValues?.[name]?.value || ""}
+                          onChange={(e) => handleTestInputChange(key, e)}
+                        />
+                      )
+                    )}
+                    <div className="ml-auto w-fit flex gap-3">
+                      <input
+                        type="checkbox"
+                        name="validated"
+                        onChange={(e) => {
                           setFormData((prev) => ({
                             ...prev,
-                            testsValues: formFieldsStructure,
-                            testTypeName: examType.name,
-                            testTypeId: examType.id,
+                            validated: e.target.checked,
                           }));
-                          setTypeExaminationSelected(examType.name);
-                          setTimeout(() => {
-                            document
-                              .querySelector(
-                                `input[name=${examType.tests[0].name}]`
-                              )
-                              .focus();
-                          }, 120);
                         }}
-                      >
-                        {examType.name}
-                      </button>
-                    );
-                  })}
+                        checked={formData.validated || false}
+                        id="validated"
+                      />
+                      <label htmlFor="validated">Validado</label>
+                    </div>
+                  </div>
                 </div>
-              </>
-            ) : (
-              <>
-                {Object.entries(formData.testsValues).map(([name, field]) => (
-                  <FormField
-                    key={name}
-                    {...field}
-                    value={formData.testsValues[name].value}
-                    onChange={handleTestInputChange}
-                  />
-                ))}
-                <div className="ml-auto w-fit flex gap-3">
-                  <input
-                    type="checkbox"
-                    name="validated"
-                    onChange={(e) => {
+              ))
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {examinationTypes.map((examType) => {
+                if (formData.tests[examType.id]) {
+                  return null;
+                }
+                return (
+                  <button
+                    type="button"
+                    key={examType.id}
+                    className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
+                    onClick={() => {
+                      const newtestValues = examType.tests.reduce(
+                        (acc, test) => {
+                          acc[test.name] = {
+                            ...test,
+                            value: "", // Add empty value field
+                          };
+                          return acc;
+                        },
+                        {}
+                      );
                       setFormData((prev) => ({
                         ...prev,
-                        validated: e.target.checked,
+                        tests: {
+                          [examType.id]: {
+                            testValues: newtestValues,
+                            testTypeName: examType.name,
+                            testTypeId: examType.id,
+                          },
+                          ...prev.tests,
+                        },
                       }));
+                      setTimeout(() => {
+                        document
+                          .querySelector(
+                            `input[name=${examType.tests[0].name}]`
+                          )
+                          .focus();
+                      }, 120);
                     }}
-                    checked={formData.validated}
-                    id=""
-                  />
-                  <label htmlFor="validated">Validado</label>
-                </div>
-              </>
-            )}
+                  >
+                    {examType.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="col-span-2">
             <div className="flex justify-end space-x-4 pt-4">
@@ -625,7 +693,24 @@ export default function Page() {
         className="ag-theme-alpine ag-grid-no-border"
         style={{ height: 500 }}
       >
-        <AgGridReact enableCellTextSelection={true} columnDefs={colDefs} rowData={rowData} theme="legacy" />
+        <MaterialReactTable
+          columns={columns}
+          data={data}
+          rowCount={rowCount}
+          manualPagination
+          initialState={{ density: "compact" }}
+          manualSorting
+          manualFiltering
+          state={{ pagination, sorting, columnFilters, isLoading }}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          onColumnFiltersChange={setColumnFilters}
+          muiTablePaginationProps={{
+            rowsPerPageOptions: [10, 25, 50, 100],
+            showFirstButton: true,
+            showLastButton: true,
+          }}
+        />
       </div>
     </div>
   );

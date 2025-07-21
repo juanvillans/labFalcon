@@ -38,6 +38,7 @@ function App() {
                 <Route path="usuarios" element={<UsuariosPage />} />
               )}
               {/* Fallback route */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Routes>
         </BrowserRouter>

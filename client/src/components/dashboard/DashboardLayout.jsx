@@ -13,7 +13,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden bg-color1 ">
-      <div className="w-full flex-none md:w-48" style={{width: isSidebarOpen ? '200px' : '72px'}}>
+      <div className="w-full flex-none md:w-48 duration-100" style={{width: isSidebarOpen ? '200px' : '72px'}}>
         <Sidebar  isSidebarOpen={isSidebarOpen} handleSidebarToggle={handleSidebarToggle} />
       </div>
       <div className="flex-grow p-6 md:overflow-y-auto md:p-12 md:pt-8 bg-gray-50 rounded-2xl">

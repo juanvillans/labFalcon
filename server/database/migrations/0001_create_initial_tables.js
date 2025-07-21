@@ -27,9 +27,9 @@
       });
     }
 
-    const examsableExists = await knex.schema.hasTable('exams');
-    if (!examsableExists) {
-      await knex.schema.createTable('exams', (table) => {
+    const analysisTableExists = await knex.schema.hasTable('analysis');
+    if (!analysisTableExists) {
+      await knex.schema.createTable('analysis', (table) => {
         table.increments('id').primary().unique();
         table.string('ci').notNullable();
         table.string('last_name').notNullable();
@@ -39,8 +39,6 @@
         table.string('phone_number');
         table.string('address');
         table.string('sex');
-        table.integer('examination_type_id').notNullable();
-        table.jsonb('test_values').notNullable();
         table.boolean('validated').defaultTo(false);
         table.timestamp('created_at').defaultTo(knex.fn.now());
         table.timestamp('updated_at').defaultTo(knex.fn.now());
@@ -48,8 +46,27 @@
     }
   }
 
+  const analysis_examsTableExists = await knex.schema.hasTable('analysis_exams');
+  if (!analysis_examsTableExists) {
+    await knex.schema.createTable('analysis_exams', (table) => {
+      table.increments('id').primary().unique();
+      table.integer('analysis_id').notNullable();
+      table.integer('id_exams').notNullable();
+     
+    });
+  }
+  const examsTableExist = await knex.schema.hasTable('exams');
+  if (!examsTableExist) {
+    await knex.schema.createTable('exams', (table) => {
+      table.increments('id').primary().unique();
+      table.integer('examination_type_id').notNullable();
+      table.jsonb('test_values').notNullable();
+    
+    });
+  }
+
   export async function down(knex) {
     await knex.schema.dropTableIfExists('examination_types');
     await knex.schema.dropTableIfExists('users');
-    await knex.schema.dropTableIfExists('exams');
+    await knex.schema.dropTableIfExists('analysis');
   }

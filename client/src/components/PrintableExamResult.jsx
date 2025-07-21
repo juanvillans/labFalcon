@@ -4,8 +4,8 @@ import { Icon } from "@iconify/react";
 import SecretrariaLogo from "../assets/secretaria_logo.png";
 import Latidos from "../assets/latidos.png";
 
-const PrintableContent = React.forwardRef((props, ref) => {
-  console.log(props);
+const PrintableContent = React.memo(React.forwardRef((props, ref) => {
+  console.log("PrintableContent rendered with props:", props);
   return (
     <div ref={ref} className="w-full" >
       <header style={{marginBlock: "50px !important", marginBottom: "50px !important"}} className="my-2 relative flex justify-center items-center py-4">
@@ -70,9 +70,9 @@ const PrintableContent = React.forwardRef((props, ref) => {
       </table>
     </div>
   );
-});
+}));
 
-export default function PrintPage(data) {
+const PrintPage = React.memo(function PrintPage(data) {
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
@@ -105,4 +105,6 @@ export default function PrintPage(data) {
       </button>
     </div>
   );
-}
+});
+
+export default PrintPage;

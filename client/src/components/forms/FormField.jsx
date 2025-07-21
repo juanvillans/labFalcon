@@ -68,6 +68,7 @@ const FormField = React.memo(function FormField({
             onChange={onChange}
             disabled={disabled}
             {...props}
+            size="small"
           >
             {props.options.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -98,6 +99,7 @@ const FormField = React.memo(function FormField({
         disabled={disabled}
         placeholder={placeholder}
         fullWidth={fullWidth}
+        size="small"
         variant={variant}
         InputLabelProps={type === "date" ? { shrink: true } : undefined}
         InputProps={{

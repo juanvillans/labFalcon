@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { usersAPI } from "../../services/api";
 import { Icon } from "@iconify/react";
 import Modal from "../../components/Modal";
 import FuturisticButton from "../../components/FuturisticButton";
-
+import {MaterialReactTable} from 'material-react-table';
 import { ReusableForm } from "../../components/forms";
 
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 // En las versiones más recientes, no necesitas registrar módulos para funcionalidades básicas
 // La versión Community ya incluye el ClientSideRowModel por defecto
@@ -20,9 +15,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const defaultFormData = {
-    email: '',
-    first_name: '',
-    last_name: '',
+    email: "",
+    first_name: "",
+    last_name: "",
     allow_validate_exam: false,
     allow_handle_users: false,
   };
@@ -32,61 +27,60 @@ export default function Page() {
   // Form configuration for ReusableForm
   const userFormFields = [
     {
-      name: 'email',
-      label: 'Correo Electrónico',
-      type: 'email',
+      name: "email",
+      label: "Correo Electrónico",
+      type: "email",
       required: true,
-      placeholder: 'usuario@hospital.com',
-      className: 'col-span-2'
+      placeholder: "usuario@hospital.com",
+      className: "col-span-2",
     },
     {
-      name: 'first_name',
-      label: 'Nombre',
-      type: 'text',
+      name: "first_name",
+      label: "Nombre",
+      type: "text",
       required: true,
-      className: 'col-span-1'
+      className: "col-span-1",
     },
     {
-      name: 'last_name',
-      label: 'Apellido',
-      type: 'text',
+      name: "last_name",
+      label: "Apellido",
+      type: "text",
       required: true,
-      className: 'col-span-1'
+      className: "col-span-1",
     },
     {
-      name: 'allow_validate_exam',
-      label: 'Puede Validar Exámenes',
-      type: 'checkbox',
-      helperText: 'Permite al usuario validar y aprobar resultados de exámenes médicos'
+      name: "allow_validate_exam",
+      label: "Puede Validar Exámenes",
+      type: "checkbox",
+      helperText:
+        "Permite al usuario validar y aprobar resultados de exámenes médicos",
     },
     {
-      name: 'allow_handle_users',
-      label: 'Puede Gestionar Usuarios',
-      type: 'checkbox',
-      helperText: 'Permite crear, editar y eliminar usuarios del sistema'
-    }
-    
+      name: "allow_handle_users",
+      label: "Puede Gestionar Usuarios",
+      type: "checkbox",
+      helperText: "Permite crear, editar y eliminar usuarios del sistema",
+    },
   ];
 
   const validationRules = {
     email: {
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: 'Please enter a valid email address'
+      message: "Please enter a valid email address",
     },
     first_name: {
       minLength: 2,
-      maxLength: 50
+      maxLength: 50,
     },
     last_name: {
       minLength: 2,
-      maxLength: 50
-    }
+      maxLength: 50,
+    },
   };
 
   const onSubmit = async (submittedFormData) => {
     console.log(submittedFormData);
     try {
-      
       if (submitString === "Actualizar") {
         await usersAPI.updateUser(formData.id, submittedFormData);
         setSubmitString("Crear");
@@ -94,79 +88,70 @@ export default function Page() {
       } else {
         await usersAPI.createUser(submittedFormData);
       }
-  
+
       // Reset form data after successful submission
       setFormData(structuredClone(defaultFormData));
-  
-  
+
       setIsModalOpen(false);
       fetchData();
     } catch (error) {
-      throw new Error(error?.response?.data?.message || `Error al ${submitString.toLowerCase()} el usuario.`);
+      throw new Error(
+        error?.response?.data?.message ||
+          `Error al ${submitString.toLowerCase()} el usuario.`
+      );
     }
   };
 
-  const [colDefs] = useState([
+  const columns = useMemo( () => [
     {
-      field: "id",
-      headerName: "ID",
-      width: 75,
-      filter: "agNumberColumnFilter",
+      accessorKey: "id",
+      header: "ID",
+      size: 75,
     },
     {
-      field: "first_name",
-      headerName: "Nombre",
-      width: 150,
-      type: "string",
-      filter: "agTextColumnFilter",
+      accessorKey: "first_name",
+      header: "Nombre",
+      size: 150,
     },
     {
-      field: "last_name",
-      headerName: "Apellido",
-      width: 150,
-      type: "string",
-      filter: "agTextColumnFilter",
+      accessorKey: "last_name",
+      header: "Apellido",
+      size: 150,
     },
     {
-      field: "email",
-      headerName: "Correo Electrónico",
-      width: 200,
-      type: "string",
-      filter: "agTextColumnFilter",
+      accessorKey: "email",
+      header: "Correo Electrónico",
+      size: 200,
     },
     {
-      field: "allow_validate_exam",
-      headerName: "Puede Validar",
-      type: "boolean",
-      width: 130,
-      filter: "agSetColumnFilter",
+      accessorKey: "allow_validate_exam",
+      header: "Puede Validar",
+      size: 130,
+      Cell: ({ cell }) => cell.getValue() ? "Sí" : "No",
     },
     {
-      field: "allow_handle_users",
-      headerName: "Gestión de Usuarios",
-      type: "boolean",
-      width: 180,
-      filter: "agSetColumnFilter",
+      accessorKey: "allow_handle_users",
+      header: "Gestión de Usuarios",
+      size: 180,
+      Cell: ({ cell }) => cell.getValue() ? "Sí" : "No",
     },
     {
-      field: "status",
-      headerName: "Estado",
-      type: "string",
-      width: 180,
-      filter: 'agSetColumnFilter', // 👈 dropdown checkbox filter
-   
+      accessorKey: "status",
+      header: "Estado",
+      size: 180,
     },
     {
-      headerName: "Acciones",
-      field: "actions",
-      flex: 1,
-      cellRenderer: (params) => (
-        <div className="flex h-full gap-2 justify-center items-center">
+      header: "Acciones",
+      id: "actions", // ← obligatorio cuando no usas accessorKey
+      size: 100,
+      enableColumnFilter: false,
+      enableSorting: false,
+      Cell: ({ row }) => (
+        <div className="flex gap-2 justify-center items-center">
           <button
-            onClick={(e) => {
+            onClick={() => {
               setIsModalOpen(true);
-              console.log(params.data);
-              setFormData({...params.data});
+              setFormData({ ...row.original });
               setSubmitString("Actualizar");
             }}
             title="Editar"
@@ -175,9 +160,8 @@ export default function Page() {
           </button>
         </div>
       ),
-      filter: false,
-      sortable: false,
-    },
+    }
+
   ]);
   const [rowData, setRowData] = useState([]);
 
@@ -199,19 +183,20 @@ export default function Page() {
     <div style={{ height: 580, width: "100%" }}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-        <FuturisticButton onClick={() => {
+        <FuturisticButton
+          onClick={() => {
             if (submitString === "Actualizar") {
               setSubmitString("Crear");
             }
-            setIsModalOpen(true)}
-          }>
+            setIsModalOpen(true);
+          }}
+        >
           Crear usuario
         </FuturisticButton>
       </div>
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
-         
           setIsModalOpen(false);
         }}
         title="Crear Nuevo Usuario"
@@ -223,9 +208,9 @@ export default function Page() {
             onSubmit={onSubmit}
             onCancel={() => {
               setFormData({
-                email: '',
-                first_name: '',
-                last_name: '',
+                email: "",
+                first_name: "",
+                last_name: "",
                 allow_validate_exam: false,
                 allow_handle_users: false,
               });
@@ -256,11 +241,22 @@ export default function Page() {
           </p>
         </div>
       </Modal>
-      <div className="ag-theme-alpine ag-grid-no-border" style={{ height: 500 }}>
-        <AgGridReact
-          columnDefs={colDefs}
-          rowData={rowData}
-          theme="legacy"
+      <div
+        className="ag-theme-alpine ag-grid-no-border"
+        style={{ height: 500 }}
+      >
+        <MaterialReactTable
+          columns={columns}
+          data={rowData}
+          enableColumnFilters
+          enableSorting
+          enablePagination
+          initialState={{ pagination: { pageSize: 5 } }}
+          muiTablePaginationProps={{
+            rowsPerPageOptions: [5, 10, 20],
+            showFirstButton: true,
+            showLastButton: true,
+          }}
         />
       </div>
     </div>
