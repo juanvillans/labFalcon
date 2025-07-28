@@ -51,7 +51,7 @@
     await knex.schema.createTable('analysis_exams', (table) => {
       table.increments('id').primary().unique();
       table.integer('analysis_id').notNullable();
-      table.integer('id_exams').notNullable();
+      table.integer('id_exam').notNullable();
      
     });
   }
@@ -60,8 +60,7 @@
     await knex.schema.createTable('exams', (table) => {
       table.increments('id').primary().unique();
       table.integer('examination_type_id').notNullable();
-      table.jsonb('test_values').notNullable();
-    
+      table.jsonb('tests').notNullable();
     });
   }
 

@@ -13,6 +13,22 @@ import { MaterialReactTable } from "material-react-table";
 import debounce from "lodash.debounce";
 import axios from "axios";
 
+// Memoized component for test fields to prevent unnecessary re-renders
+const MemoizedTestField = React.memo(({ field, value, onChange, testKey, fieldName }) => {
+  const handleChange = useCallback((e) => {
+    onChange(testKey, e);
+  }, [onChange, testKey]);
+
+  return (
+    <FormField
+      key={fieldName}
+      {...field}
+      value={value || ""}
+      onChange={handleChange}
+    />
+  );
+});
+
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useFeedback();
@@ -94,14 +110,15 @@ export default function Page() {
       sex: "",
       patient_id: null,
     },
-    validated: false,
-
+    allValidated: false,
     tests: {},
   };
 
   const [formData, setFormData] = useState(structuredClone(defaultFormData));
   const [submitString, setSubmitString] = useState("Registrar");
-  console.log({ formData });
+
+  console.log({formData});
+
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -258,10 +275,15 @@ export default function Page() {
                       sex: data.sex,
                     },
                     id: data.id,
-                    validated: data.validated,
-                    testTypeId: data.examination_type_id,
-                    testTypeName: data.examination_type_name,
-                    testValues: data.test_values,
+                    allValidated: data.validated,
+                    tests: {
+                      [data.examination_type_id]: {
+                        testTypeId: data.examination_type_id,
+                        testTypeName: data.examination_type_name,
+                        testValues: data.test_values,
+                        validated: data.validated,
+                      }
+                    },
                   });
                   setSubmitString("Actualizar");
                 }}
@@ -270,7 +292,7 @@ export default function Page() {
                 <Icon icon="hugeicons:edit-02" width={20} height={20} />
               </button>
 
-              <PrintPage data={data} />
+            {/* <PrintPage data={data} />  */ }
 
               <button
                 title="Enviar mensaje"
@@ -318,7 +340,6 @@ export default function Page() {
     // Call your delete API or show a confirmation dialog
   };
 
-  console.log(formData);
 
   const [data, setData] = useState([]);
   const [rowCount, setRowCount] = useState(0);
@@ -371,25 +392,41 @@ export default function Page() {
     fetchData();
   }, [fetchData]);
 
+  // Debounced version of setFormData for better performance
+  const debouncedSetFormData = useMemo(
+    () => debounce((updateFn) => {
+      setFormData(updateFn);
+    }, 50),
+    []
+  );
+
   const handleTestInputChange = useCallback((examination_type_id, event) => {
     const { name, value } = event.target;
-    console.log({ examination_type_id, name, value });
-    setFormData((prev) => ({
-      ...prev,
-      tests: {
-        ...prev.tests,
-        [examination_type_id]: {
-          ...prev.tests[examination_type_id],
-          testValues: {
-            ...prev.tests[examination_type_id].testValues,
-            [name]: {
-              ...prev.tests[examination_type_id].testValues[name],
-              value,
+
+    // Use immediate update for better UX, but debounce heavy operations
+    setFormData((prev) => {
+      // Early return if value hasn't changed
+      if (prev.tests?.[examination_type_id]?.testValues?.[name]?.value === value) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        tests: {
+          ...prev.tests,
+          [examination_type_id]: {
+            ...prev.tests[examination_type_id],
+            testValues: {
+              ...prev.tests[examination_type_id].testValues,
+              [name]: {
+                ...prev.tests[examination_type_id].testValues[name],
+                value,
+              },
             },
           },
         },
-        },
-    }));
+      };
+    });
   }, []);
 
   const handlePatientInputChange = useCallback((e) => {
@@ -402,6 +439,30 @@ export default function Page() {
       },
     }));
   }, []);
+
+  const handleValidatedChange = useCallback((examTypeId, e) => {
+    const checked = e.target.checked;
+    setFormData((prev) => {
+      const newTests = {
+        ...prev.tests,
+        [examTypeId]: {
+          ...prev.tests[examTypeId],
+          validated: checked,
+        },
+      };
+
+      // Check if all exam types are validated
+      const allValidated = Object.values(newTests).every(test => test.validated === true);
+
+      return {
+        ...prev,
+        tests: newTests,
+        allValidated: allValidated,
+      };
+    });
+  }, []);
+
+
 
   const [prosecingSearchPatient, setProsecingSearchPatient] = useState(false);
   const searchPatient = debounce(async (ci) => {
@@ -469,39 +530,33 @@ export default function Page() {
           <div className="space-y-3 z-10">
             <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
             <div className="grid grid-cols-2 gap-4">
+              {formData?.patient.ci.length >= 6 && (
+                <div className="w-full col-span-2 h-6 overflow-hidden text-center">
+                  {prosecingSearchPatient ? (
+                    <Icon
+                      icon="eos-icons:three-dots-loading"
+                      className="text-3xl"
+                    />
+                  ) : formData?.patient.patient_id !== null ? (
+                    <span className="flex items-center gap-2 text-center mx-auto justify-center">
+                      <Icon
+                        icon="iconoir:settings-profiles"
+                        className="text-2xl text-color3"
+                      />
+                      <small>Paciente Registrado con historia</small>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2 text-center mx-auto justify-center">
+                      <Icon icon="clarity:new-line" className="text-3xl" />
+                      <small>Nuevo paciente sin historia</small>
+                    </span>
+                  )}
+                </div>
+              )}
               {patientFormFields.map((field) => {
                 if (field.name === "ci") {
                   return (
                     <div key={field.name}>
-                      {formData?.patient.ci.length >= 6 && (
-                        <div
-                          key={field.name}
-                          className="w-full col-span-2 h-6 overflow-hidden text-center"
-                        >
-                          {prosecingSearchPatient ? (
-                            <Icon
-                              icon="eos-icons:three-dots-loading"
-                              className="text-3xl"
-                            />
-                          ) : formData?.patient.patient_id !== null ? (
-                            <span className="flex items-center gap-2 text-center mx-auto justify-center">
-                              <Icon
-                                icon="iconoir:settings-profiles"
-                                className="text-2xl text-color3"
-                              />
-                              <small>Paciente Registrado con historia</small>
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2 text-center mx-auto justify-center">
-                              <Icon
-                                icon="clarity:new-line"
-                                className="text-3xl"
-                              />
-                              <small>Nuevo paciente sin historia</small>
-                            </span>
-                          )}
-                        </div>
-                      )}
                       <FormField
                         {...field}
                         value={formData.patient?.[field.name]}
@@ -556,7 +611,10 @@ export default function Page() {
               <p>Seleccione al menos un tipo de exámen</p>
             ) : (
               Object.keys(formData?.tests || {})?.map((key) => (
-                <div key={key} className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5">
+                <div
+                  key={key}
+                  className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
+                >
                   <div className="flex justify-between items-center ">
                     <h3 className="text-lg font-bold text-color1 mb-4">
                       {formData.tests[key]?.testTypeName}
@@ -568,6 +626,7 @@ export default function Page() {
                       onClick={() => {
                         setFormData((prev) => {
                           const { [key]: value, ...rest } = prev.tests;
+
                           return {
                             ...prev,
                             tests: rest,
@@ -594,28 +653,25 @@ export default function Page() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(formData.tests[key]?.testValues || {})?.map(
                       ([name, field]) => (
-                        <FormField
+                        <MemoizedTestField
                           key={name}
-                          {...field}
-                          value={formData.tests[key]?.testValues?.[name]?.value || ""}
-                          onChange={(e) => handleTestInputChange(key, e)}
+                          field={field}
+                          value={formData.tests[key]?.testValues?.[name]?.value}
+                          onChange={handleTestInputChange}
+                          testKey={key}
+                          fieldName={name}
                         />
                       )
                     )}
-                    <div className="ml-auto w-fit flex gap-3">
+                    <div className="ml-auto col-span-2 flex items-center gap-3">
                       <input
                         type="checkbox"
-                        name="validated"
-                        onChange={(e) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            validated: e.target.checked,
-                          }));
-                        }}
-                        checked={formData.validated || false}
-                        id="validated"
+                        name={`validated-${key}`}
+                        onChange={(e) => handleValidatedChange(key, e)}
+                        checked={formData.tests[key]?.validated || false}
+                        id={`validated-${key}`}
                       />
-                      <label htmlFor="validated">Validado</label>
+                      <label htmlFor={`validated-${key}`}>Validado</label>
                     </div>
                   </div>
                 </div>
@@ -644,11 +700,13 @@ export default function Page() {
                       );
                       setFormData((prev) => ({
                         ...prev,
+                        allValidated: false,
                         tests: {
                           [examType.id]: {
                             testValues: newtestValues,
                             testTypeName: examType.name,
                             testTypeId: examType.id,
+                            validated: false,
                           },
                           ...prev.tests,
                         },

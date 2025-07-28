@@ -3,16 +3,16 @@ import jwt from "jsonwebtoken";
 import { commonErrors, catchAsync } from "../middlewares/error.middleware.js";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import { sendInvitationEmail } from "./mailjet.controler.js";
-import Exam from "../models/exams.model.js";
+import Analysis from "../models/analysis.model.js";
+import Exams from "../models/exams.model.js"; 
+import AnalysisExams from "../models/analysis_exams.model.js";
 
 export const createExam = catchAsync(async (req, res, next) => {
   try {
     const {
       patient,
-      testsValues,
-      testTypeId,
-      testTypeName,
-      validated,
+      tests,
+      allValidated,
     } = req.body;
 
 
@@ -39,19 +39,25 @@ export const createExam = catchAsync(async (req, res, next) => {
     
     
     // Create the exam
-    const exam = await Exam.create({
+    const analysis = await Analysis.create({
       patient,
-      testsValues,
-      testTypeId,
-      testTypeName,
-      validated,
+      
+      allValidated,
     });
-    
+    const analysisId = analysis.id;
+    const exmasIdArray = [];
+    for (const testKey in tests) {
+      const test = tests[testKey];
+      const exam = await Exams.create({test_values: test.testValues, testTypeId: test.testTypeId, validated: test.validated})
+      exmasIdArray.push(exam.id);
+    }
+
+    await AnalysisExams.create(analysisId, exmasIdArray);
     res.status(201).json({
       status: "success",
       message: "Examen creado con éxito",
       data: {
-        exam,
+        analysis,
       },
     });
   } catch (error) {
@@ -150,7 +156,7 @@ export const validateExam = catchAsync(async (req, res, next) => {
     if (!id) {
       throw commonErrors.missingFields(["id"]);
     }
-    await Exam.updateById(id, { validated: true });
+    await Exam.updateById(id, { allValidated: true });
     res.status(200).json({
       status: "success",
       message: "Examen validado con éxito",
