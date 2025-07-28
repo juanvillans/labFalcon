@@ -41,18 +41,23 @@ export const createExam = catchAsync(async (req, res, next) => {
     // Create the exam
     const analysis = await Analysis.create({
       patient,
-      
       allValidated,
     });
     const analysisId = analysis.id;
-    const exmasIdArray = [];
+    const examIdArray = [];
+
     for (const testKey in tests) {
       const test = tests[testKey];
-      const exam = await Exams.create({test_values: test.testValues, testTypeId: test.testTypeId, validated: test.validated})
-      exmasIdArray.push(exam.id);
+      const exam = await Exams.create({
+        test_values: test.testValues, 
+        testTypeId: test.testTypeId, 
+        validated: test.validated
+      });
+      examIdArray.push(exam.id);
     }
 
-    await AnalysisExams.create(analysisId, exmasIdArray);
+    // Create all analysis_exams relationships at once
+    await AnalysisExams.create(analysisId, examIdArray);
     res.status(201).json({
       status: "success",
       message: "Examen creado con éxito",

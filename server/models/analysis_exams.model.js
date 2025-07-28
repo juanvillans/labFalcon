@@ -5,19 +5,27 @@ class AnalysisExams {
   constructor(data) {
     this.id = data.id || null;
     this.analysis_id = data.analysis_id;
-    this.id_exams= data.id_exams;
+    this.id_exam = data.id_exam;
   }
 
-  static async create(analysisId, examId) {
+  static async create(analysisId, examIds) {
     try {
-      const [analysisExam] = await db("analysis_exams")
-        .insert({
-          analysis_id: analysisId,
-          id_exam: examId,
-        })
+      // Handle both single examId and array of examIds
+      const idsArray = Array.isArray(examIds) ? examIds : [examIds];
+      
+      // Create array of objects to insert
+      const insertData = idsArray.map(examId => ({
+        analysis_id: analysisId,
+        id_exam: examId,
+      }));
+
+      // Insert all records at once
+      const analysisExams = await db("analysis_exams")
+        .insert(insertData)
         .returning("*");
 
-      return new AnalysisExams(analysisExam);
+      // Return array of AnalysisExams instances
+      return analysisExams.map(record => new AnalysisExams(record));
     } catch (error) {
       throw error;
     }
