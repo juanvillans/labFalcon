@@ -18,57 +18,63 @@ const PrintableContent = React.memo(React.forwardRef((props, ref) => {
 
         <img src={Latidos} alt="" className="absolute right-4 w-24" />
       </header>
-      <p>Nombres y apellidos: {props.data.first_name + " " + props.data.last_name}</p>
-      <p>C.I: {props.data.ci}</p>
-      <p>Fecha de Nacimiento: {props.data.date_birth}</p>
-      <p>Sexo: {props.data.sex}</p>
-      <h1 className="font-semibold uppercase text-lg text-center">{props.data.examination_type_name}</h1>
-      <p className="text-center ">Realizada el {props.data.created_date}</p>
+      <p>Nombres y apellidos: {props.data.patient.first_name + " " + props.data.patient.last_name}</p>
+      <p>C.I: {props.data.patient.ci}</p>
+      <p>Fecha de Nacimiento: {props.data.patient.date_birth}</p>
+      <p>Sexo: {props.data.patient.sex}</p>
+      {
+        Object.entries(props.data.tests).map(([key, value]) => (
+          <div key={key}>
+            <h1 className="font-semibold uppercase text-lg text-center">{value.testTypeName}</h1>
 
-      <table className="mt-7">
-        <thead
-          style={{
-            WebkitPrintColorAdjust: "exact",
-            printColorAdjust: "exact", // Firefox support
-          }}
-          className="bg-gray-200 text-black"
-        >
-          <tr className="py-1">
-            <th className="px-3">Prueba</th>
-            <th className="px-3">Resultado</th>
-            <th className="px-3">Rango de Referencia</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(props.data.test_values).map((key) => (
-            <tr key={key} className="py-5">
-              <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
-                {props.data.test_values[key].label}
-              </td>
-              <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
-                {props.data.test_values[key].value}{" "}
-                {props.data.test_values[key].unit ? (
-                  <span className="text-sm">
-                    {" "}
-                    {props.data.test_values[key].unit}
-                  </span>
-                ) : null}
-              </td>
-              <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
-                {props.data.test_values[key].reference_range?.min || ""} -{" "}
-                {props.data.test_values[key].reference_range?.max || ""}
-                {props.data.test_values[key].unit ? (
-                  <span className="text-sm">
-                    {" "}
-                    {props.data.test_values[key].unit}
-                  </span>
-                ) : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            <table className="mt-2 mb-4">
+              <thead
+                style={{
+                  WebkitPrintColorAdjust: "exact",
+                  printColorAdjust: "exact", // Firefox support
+                }}
+                className="bg-gray-200 w-full text-black"
+              >
+                <tr className="py-1">
+                  <th className="px-3">Prueba</th>
+                  <th className="px-3">Resultado</th>
+                  <th className="px-3">Rango de Referencia</th>
+                </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(value.testValues).map((key) => (
+                    <tr key={key} className="py-5">
+                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                        {value.testValues[key].label}
+                      </td>
+                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                        {value.testValues[key].value}{" "}
+                        {value.testValues[key].unit ? (
+                          <span className="text-sm">
+                            {" "}
+                            {value.testValues[key].unit}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                        {value.testValues[key].reference_range?.min || ""} -{" "}
+                        {value.testValues[key].reference_range?.max || ""}
+                        {value.testValues[key].unit ? (
+                          <span className="text-sm">
+                            {" "}
+                            {value.testValues[key].unit}
+                          </span>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+           
+          ))
+      }
+     </div>
   );
 }));
 

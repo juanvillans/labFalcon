@@ -3,29 +3,25 @@ import { db } from "../database/postgre.js";
 class Exams {
   constructor(data) {
     this.id = data.id || null;
-    this.test_values = data.test_values;
+    this.tests_values = data.tests_values;
     this.examination_type_id = data.test
     this.validated = data.validated;
-
   }
-
-  static async create(examData) {
+  static async createWithTransaction(trx, examData) {
     try {
-
-      const [exam] = await db("Exams")
+      const [exam] = await trx("exams")
         .insert({
           examination_type_id: examData.testTypeId,
           validated: examData.validated,
-          test_values: JSON.stringify(examData.testsValues),
-         
+          tests_values: JSON.stringify(examData.tests_values),
         })
         .returning("*");
 
-      return new Exams({ ...exam, patient: examData.patient });
+      return new Exams({ ...exam});
     } catch (error) {
       if (error.code === "23505") {
         throw new Error("Exam with this CI already exists");
-      } else if (error.code === "23503") { // Foreign key violation
+      } else if (error.code === "23503") {
         throw new Error("Invalid examination type ID");
       }
       throw error;

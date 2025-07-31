@@ -11,7 +11,7 @@ dotenv.config({ path: envFile });
 // Examination types seed data
 const examinationTypesSeed = [
   {
-    name: "hematologia",
+    name: "Hematologia",
     tests: [
       {
         label: "Cuenta blanca",

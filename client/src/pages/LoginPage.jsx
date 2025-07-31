@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFeedback } from '../context/FeedbackContext';
@@ -9,8 +9,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login, loading: authLoading } = useAuth();
   const { showError, showSuccess } = useFeedback();
+
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,9 +39,22 @@ export default function LoginPage() {
     }
   };
   
+
+  // Show loading while checking authentication status
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-600">
+      <div className="loginFormContainer bg-white p-8 rounded-lg  shadow-2xl  w-fit">
         <h1 className="text-2xl font-bold mb-6 text-center">LabFalcon Login</h1>
         
         <form onSubmit={handleSubmit}>

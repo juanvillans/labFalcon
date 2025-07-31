@@ -14,20 +14,25 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 
 // Memoized component for test fields to prevent unnecessary re-renders
-const MemoizedTestField = React.memo(({ field, value, onChange, testKey, fieldName }) => {
-  const handleChange = useCallback((e) => {
-    onChange(testKey, e);
-  }, [onChange, testKey]);
+const MemoizedTestField = React.memo(
+  ({ field, value, onChange, testKey, fieldName }) => {
+    const handleChange = useCallback(
+      (e) => {
+        onChange(testKey, e);
+      },
+      [onChange, testKey]
+    );
 
-  return (
-    <FormField
-      key={fieldName}
-      {...field}
-      value={value || ""}
-      onChange={handleChange}
-    />
-  );
-});
+    return (
+      <FormField
+        key={fieldName}
+        {...field}
+        value={value || ""}
+        onChange={handleChange}
+      />
+    );
+  }
+);
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
@@ -117,8 +122,7 @@ export default function Page() {
   const [formData, setFormData] = useState(structuredClone(defaultFormData));
   const [submitString, setSubmitString] = useState("Registrar");
 
-  console.log({formData});
-
+  console.log({ formData });
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -185,41 +189,56 @@ export default function Page() {
         accessorKey: "id",
         header: "Cód",
         size: 60,
+        enableColumnFilter: true,
+        enableSorting: true,
       },
       {
-        accessorKey: "first_name",
+        accessorKey: "patient.first_name",
         header: "Nombre",
         size: 110,
         filterFn: "includesString",
+        enableColumnFilter: true,
+        enableSorting: true,
       },
       {
-        accessorKey: "last_name",
+        accessorKey: "patient.last_name",
         header: "Apellido",
         size: 120,
         filterFn: "includesString",
+        enableColumnFilter: true,
+        enableSorting: true,
       },
       {
         accessorKey: "age",
         header: "Edad",
         size: 83,
-        filterFn: "between",
+        enableColumnFilter: false,
+        enableSorting: true,
       },
       {
-        accessorKey: "ci",
+        accessorKey: "patient.sex",
+        header: "Sexo",
+        size: 100,
+        filterFn: "includesString",
+        enableColumnFilter: true,
+        enableSorting: true,
+      },
+      {
+        accessorKey: "patient.ci",
         header: "C.I",
         size: 100,
         filterFn: "includesString",
+        enableColumnFilter: true,
+        enableSorting: true,
       },
-      {
-        accessorKey: "examination_type_name",
-        header: "Tipo de Examen",
-        size: 175,
-      },
+
       {
         accessorKey: "created_date",
         header: "Fecha",
         size: 125,
         filterFn: "equals",
+        enableColumnFilter: true,
+        enableSorting: true,
         Cell: ({ cell }) => {
           const value = cell.getValue();
           return new Date(value).toLocaleDateString();
@@ -230,13 +249,22 @@ export default function Page() {
         header: "Hora",
         size: 100,
         filterFn: "includesString",
+        enableColumnFilter: true,
+        enableSorting: true,
       },
       {
-        accessorKey: "validated",
+        accessorKey: "allValidated",
         header: "Validado",
         size: 100,
         filterFn: "equals",
+        enableColumnFilter: true,
+        enableSorting: true,
         Cell: ({ cell }) => (cell.getValue() ? "Sí" : "No"),
+        filterVariant: 'select',
+        filterSelectOptions: [
+          { value: 'true', label: 'Validado' },
+          { value: 'false', label: 'No Validado' },
+        ],
       },
       {
         accessorKey: "validated",
@@ -264,26 +292,10 @@ export default function Page() {
                 onClick={() => {
                   setIsModalOpen(true);
                   setFormData({
-                    patient: {
-                      ci: data.ci,
-                      first_name: data.first_name,
-                      last_name: data.last_name,
-                      date_birth: data.date_birth,
-                      email: data.email,
-                      phone_number: data.phone_number,
-                      address: data.address,
-                      sex: data.sex,
-                    },
+                    patient: data.patient,
                     id: data.id,
                     allValidated: data.validated,
-                    tests: {
-                      [data.examination_type_id]: {
-                        testTypeId: data.examination_type_id,
-                        testTypeName: data.examination_type_name,
-                        testValues: data.test_values,
-                        validated: data.validated,
-                      }
-                    },
+                    tests: data.tests,
                   });
                   setSubmitString("Actualizar");
                 }}
@@ -292,7 +304,7 @@ export default function Page() {
                 <Icon icon="hugeicons:edit-02" width={20} height={20} />
               </button>
 
-            {/* <PrintPage data={data} />  */ }
+              <PrintPage data={data} />
 
               <button
                 title="Enviar mensaje"
@@ -340,7 +352,6 @@ export default function Page() {
     // Call your delete API or show a confirmation dialog
   };
 
-
   const [data, setData] = useState([]);
   const [rowCount, setRowCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -349,6 +360,7 @@ export default function Page() {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -358,6 +370,7 @@ export default function Page() {
         limit: pagination.pageSize,
         sortField: sorting[0]?.id || "id",
         sortOrder: sorting[0]?.desc ? "desc" : "asc",
+        search: globalFilter, // Global search
         filters: JSON.stringify(
           columnFilters.reduce((acc, curr) => {
             acc[curr.id] = curr.value;
@@ -372,7 +385,7 @@ export default function Page() {
       console.error("Failed to fetch data", e);
     }
     setIsLoading(false);
-  }, [pagination, sorting, columnFilters]);
+  }, [pagination, sorting, columnFilters, globalFilter]);
 
   const getExaminationTypes = useCallback(async () => {
     try {
@@ -392,11 +405,21 @@ export default function Page() {
     fetchData();
   }, [fetchData]);
 
+  // Debounced global filter handler
+  const debouncedGlobalFilter = useMemo(
+    () => debounce((value) => {
+      setGlobalFilter(value);
+      setPagination(prev => ({ ...prev, pageIndex: 0 })); // Reset to first page
+    }, 300),
+    []
+  );
+
   // Debounced version of setFormData for better performance
   const debouncedSetFormData = useMemo(
-    () => debounce((updateFn) => {
-      setFormData(updateFn);
-    }, 50),
+    () =>
+      debounce((updateFn) => {
+        setFormData(updateFn);
+      }, 50),
     []
   );
 
@@ -406,7 +429,9 @@ export default function Page() {
     // Use immediate update for better UX, but debounce heavy operations
     setFormData((prev) => {
       // Early return if value hasn't changed
-      if (prev.tests?.[examination_type_id]?.testValues?.[name]?.value === value) {
+      if (
+        prev.tests?.[examination_type_id]?.testValues?.[name]?.value === value
+      ) {
         return prev;
       }
 
@@ -452,7 +477,9 @@ export default function Page() {
       };
 
       // Check if all exam types are validated
-      const allValidated = Object.values(newTests).every(test => test.validated === true);
+      const allValidated = Object.values(newTests).every(
+        (test) => test.validated === true
+      );
 
       return {
         ...prev,
@@ -461,8 +488,6 @@ export default function Page() {
       };
     });
   }, []);
-
-
 
   const [prosecingSearchPatient, setProsecingSearchPatient] = useState(false);
   const searchPatient = debounce(async (ci) => {
@@ -530,7 +555,7 @@ export default function Page() {
           <div className="space-y-3 z-10">
             <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
             <div className="grid grid-cols-2 gap-4">
-              {formData?.patient.ci.length >= 6 && (
+              {formData?.patient?.ci.length >= 6 && (
                 <div className="w-full col-span-2 h-6 overflow-hidden text-center">
                   {prosecingSearchPatient ? (
                     <Icon
@@ -751,24 +776,45 @@ export default function Page() {
         className="ag-theme-alpine ag-grid-no-border"
         style={{ height: 500 }}
       >
-        <MaterialReactTable
-          columns={columns}
-          data={data}
-          rowCount={rowCount}
-          manualPagination
-          initialState={{ density: "compact" }}
-          manualSorting
-          manualFiltering
-          state={{ pagination, sorting, columnFilters, isLoading }}
-          onPaginationChange={setPagination}
-          onSortingChange={setSorting}
-          onColumnFiltersChange={setColumnFilters}
-          muiTablePaginationProps={{
-            rowsPerPageOptions: [10, 25, 50, 100],
-            showFirstButton: true,
-            showLastButton: true,
-          }}
-        />
+        {
+          <MaterialReactTable
+            columns={columns}
+            data={data}
+            rowCount={rowCount}
+            manualPagination
+            manualSorting
+            manualFiltering
+            manualGlobalFilter
+            initialState={{
+              density: "compact",
+            }}
+            state={{
+              pagination,
+              sorting,
+              columnFilters,
+              globalFilter,
+              isLoading
+            }}
+            onPaginationChange={setPagination}
+            onSortingChange={setSorting}
+            onColumnFiltersChange={setColumnFilters}
+            onGlobalFilterChange={(value) => debouncedGlobalFilter(value)}
+            enableGlobalFilter={true}
+            enableColumnFilters={true}
+            enableSorting={true}
+            enableFilters={true}
+            muiTablePaginationProps={{
+              rowsPerPageOptions: [25, 50, 100],
+              showFirstButton: true,
+              showLastButton: true,
+            }}
+            muiSearchTextFieldProps={{
+              placeholder: 'Buscar',
+              sx: { minWidth: '300px' },
+              variant: 'outlined',
+            }}
+          />
+        }
       </div>
     </div>
   );

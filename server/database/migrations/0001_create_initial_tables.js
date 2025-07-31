@@ -39,33 +39,36 @@
         table.string('phone_number');
         table.string('address');
         table.string('sex');
-        table.boolean('validated').defaultTo(false);
+        table.boolean('allValidated').defaultTo(false);
         table.timestamp('created_at').defaultTo(knex.fn.now());
         table.timestamp('updated_at').defaultTo(knex.fn.now());
       });
     }
+    const analysis_examsTableExists = await knex.schema.hasTable('analysis_exams');
+    if (!analysis_examsTableExists) {
+      await knex.schema.createTable('analysis_exams', (table) => {
+        table.increments('id').primary().unique();
+        table.integer('analysis_id').notNullable();
+        table.integer('id_exam').notNullable();
+       
+      });
+    }
+    const examsTableExist = await knex.schema.hasTable('exams');
+    if (!examsTableExist) {
+      await knex.schema.createTable('exams', (table) => {
+        table.increments('id').primary().unique();
+        table.integer('examination_type_id').notNullable();
+        table.jsonb('tests_values').notNullable();
+        table.boolean('validated').defaultTo(false);
+
+      });
+    }
   }
 
-  const analysis_examsTableExists = await knex.schema.hasTable('analysis_exams');
-  if (!analysis_examsTableExists) {
-    await knex.schema.createTable('analysis_exams', (table) => {
-      table.increments('id').primary().unique();
-      table.integer('analysis_id').notNullable();
-      table.integer('id_exam').notNullable();
-     
-    });
-  }
-  const examsTableExist = await knex.schema.hasTable('exams');
-  if (!examsTableExist) {
-    await knex.schema.createTable('exams', (table) => {
-      table.increments('id').primary().unique();
-      table.integer('examination_type_id').notNullable();
-      table.jsonb('tests').notNullable();
-    });
-  }
 
   export async function down(knex) {
     await knex.schema.dropTableIfExists('examination_types');
     await knex.schema.dropTableIfExists('users');
     await knex.schema.dropTableIfExists('analysis');
+    
   }

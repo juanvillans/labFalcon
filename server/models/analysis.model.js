@@ -26,10 +26,9 @@ class Analysis {
   
   }
 
-  static async create(examData) {
+  static async createWithTransaction(trx, examData) {
     try {
-
-      const [analysis] = await db("analysis")
+      const [analysis] = await trx("analysis")
         .insert({
           ci: examData.patient.ci,
           last_name: examData.patient.last_name,
@@ -40,8 +39,8 @@ class Analysis {
           address: examData.patient.address,
           sex: examData.patient.sex,
           allValidated: examData.allValidated || false,
-          created_at: db.fn.now(),
-          updated_at: db.fn.now(),
+          created_at: trx.fn.now(),
+          updated_at: trx.fn.now(),
         })
         .returning("*");
 
@@ -49,7 +48,7 @@ class Analysis {
     } catch (error) {
       if (error.code === "23505") {
         throw new Error("Exam with this CI already exists");
-      } else if (error.code === "23503") { // Foreign key violation
+      } else if (error.code === "23503") {
         throw new Error("Invalid examination type ID");
       }
       throw error;
