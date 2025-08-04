@@ -1,11 +1,9 @@
-import User from "../models/user.model.js";
-import jwt from "jsonwebtoken";
 import { commonErrors, catchAsync } from "../middlewares/error.middleware.js";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
-import { sendInvitationEmail } from "./mailjet.controler.js";
 import Analysis from "../models/analysis.model.js";
 import Exams from "../models/exams.model.js";
 import AnalysisExams from "../models/analysis_exams.model.js";
+import { generateToken, sendExamResults } from "./examResults.controler.js";
 import { db } from "../database/postgre.js";
 
 export const createExam = catchAsync(async (req, res, next) => {
@@ -42,7 +40,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       });
 
       const analysisId = analysis.id;
-      const examIdArray = [];
+      const analysis_exams_ids = [];
 
       // Create all exams within transaction
       for (const testKey in tests) {
@@ -52,11 +50,14 @@ export const createExam = catchAsync(async (req, res, next) => {
           testTypeId: test.testTypeId,
           validated: test.validated,
         });
-        examIdArray.push(exam.id);
+        analysis_exams_ids.push(
+          {analysis_id: analysisId, 
+          id_exam: exam.id}
+        );
       }
 
       // Create all analysis_exams relationships within transaction
-      await AnalysisExams.createWithTransaction(trx, analysisId, examIdArray);
+      await AnalysisExams.createWithTransaction(trx, analysis_exams_ids);
 
       return analysis;
     });
@@ -292,14 +293,92 @@ export const findExamById = catchAsync(async (req, res, next) => {
 
 export const updateExam = catchAsync(async (req, res, next) => {
   try {
-    const exam = await Exams.findById(req.params.id);
-    if (!exam) {
-      throw commonErrors.notFound("Exam");
+    const analysisId = req.params.id; // This is the analysis ID, not exam ID
+    const { patient, tests, allValidated } = req.body;
+
+    // Validate required fields
+    if (!patient.ci) {
+      throw commonErrors.missingFields(["Cédula de Identidad"]);
     }
-    await Exams.update(req.params.id, req.body);
+
+    if (!patient.last_name) {
+      throw commonErrors.missingFields(["Apellido"]);
+    }
+
+    if (!patient.first_name) {
+      throw commonErrors.missingFields(["Nombre"]);
+    }
+
+    if (!patient.date_birth) {
+      throw commonErrors.missingFields(["Fecha de Nacimiento"]);
+    }
+
+    if (!patient.email) {
+      throw commonErrors.missingFields(["Correo Electrónico"]);
+    }
+
+    // Check if analysis exists
+    const existingAnalysis = await db("analysis").where("id", analysisId).first();
+    if (!existingAnalysis) {
+      throw commonErrors.notFound("Analysis");
+    }
+
+    // Use database transaction for data integrity
+    const result = await db.transaction(async (trx) => {
+      // Step 1: Update the analysis within transaction
+      const updates = {
+        ci: patient.ci,
+        first_name: patient.first_name,
+        last_name: patient.last_name,
+        date_birth: patient.date_birth,
+        email: patient.email,
+        phone_number: patient.phone_number,
+        address: patient.address,
+        sex: patient.sex,
+        allValidated: allValidated,
+        updated_at: trx.fn.now()
+      };
+
+      const [updatedAnalysis] = await trx("analysis")
+        .where("id", analysisId)
+        .update(updates)
+        .returning("*");
+
+      // Step 2: Delete old relationships and get exam IDs to delete
+      const existingExamIds = await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
+
+      // Step 3: Delete old exams using model method
+      await Exams.deleteMultipleWithTransaction(trx, existingExamIds);
+
+      // Step 5: Create new exams using the model method
+      const analysis_exams_ids = [];
+
+      // Create all exams within transaction
+      for (const testKey in tests) {
+        const test = tests[testKey];
+        const exam = await Exams.createWithTransaction(trx, {
+          tests_values: test.testValues,
+          testTypeId: test.testTypeId,
+          validated: test.validated,
+        });
+        analysis_exams_ids.push(
+          {analysis_id: analysisId, 
+          id_exam: exam.id}
+        );
+      }
+
+      // Step 6: Create new analysis_exams relationships using the model method
+      await AnalysisExams.createWithTransaction(trx, analysis_exams_ids);
+
+      return updatedAnalysis;
+    });
+
     res.status(200).json({
       status: "success",
       message: "Examen actualizado con éxito",
+      data: {
+        analysis: result,
+      },
     });
   } catch (error) {
     next(error);
@@ -308,11 +387,28 @@ export const updateExam = catchAsync(async (req, res, next) => {
 
 export const deleteExam = catchAsync(async (req, res, next) => {
   try {
-    const exam = await Exams.findById(req.params.id);
-    if (!exam) {
-      throw commonErrors.notFound("Exam");
+    const analysisId = req.params.id; // This is the analysis ID
+
+    // Check if analysis exists
+    const existingAnalysis = await db("analysis").where("id", analysisId).first();
+    if (!existingAnalysis) {
+      throw commonErrors.notFound("Analysis");
     }
-    await Exams.delete(req.params.id);
+
+    // Use database transaction for data integrity
+    await db.transaction(async (trx) => {
+      // Step 1: Delete relationships and get exam IDs using model method
+      const existingExamIds = await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
+
+      // Step 2: Delete exams using model method
+      await Exams.deleteMultipleWithTransaction(trx, existingExamIds);
+
+      // Step 3: Delete the analysis
+      await trx("analysis")
+        .where("id", analysisId)
+        .del();
+    });
+
     res.status(200).json({
       status: "success",
       message: "Examen eliminado con éxito",
@@ -337,3 +433,7 @@ export const validateExam = catchAsync(async (req, res, next) => {
     next(error);
   }
 });
+
+// Re-export functions from examResults controller
+export const generateResultsToken = generateToken;
+export const sendResultsEmail = sendExamResults;

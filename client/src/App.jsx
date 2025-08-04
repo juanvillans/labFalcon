@@ -8,6 +8,7 @@ import HomePage from './pages/dashboard/HomePage';
 import ExamenesPage from './pages/dashboard/ExamenesPage';
 import UsuariosPage from './pages/dashboard/UsuariosPage';
 import ActivateAccountPage from './pages/ActivateAccountPage';
+import ExamResultsPage from './pages/ExamResultsPage';
 
 function App() {
   // Get user from localStorage (instead of useAuth)
@@ -21,6 +22,7 @@ function App() {
             {/* Public routes */}
             <Route path="/" element={<LoginPage />} />
             <Route path="/activar-cuenta" element={<ActivateAccountPage />} />
+            <Route path="/results/:token" element={<ExamResultsPage />} />
 
             {/* Protected dashboard routes */}
             <Route 
@@ -38,7 +40,6 @@ function App() {
                 <Route path="usuarios" element={<UsuariosPage />} />
               )}
               {/* Fallback route */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Routes>
         </BrowserRouter>

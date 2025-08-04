@@ -56,7 +56,7 @@ export const sendInvitationEmail = function (recipient, invitationToken, url) {
 
 export const sendPasswordResetEmail = function (recipient, resetToken, url) {
     const resetLink = `${url}/reset-password?token=${resetToken}`;
-    
+
     const mailOptions = {
         to: recipient.email,
         subject: "Password Reset Request",
@@ -68,12 +68,66 @@ export const sendPasswordResetEmail = function (recipient, resetToken, url) {
             <p>If you did not request a password reset, please ignore this email.</p>
         `
     };
-    
+
+    return sendMail(mailOptions);
+}
+
+export const sendResultsEmail = function ({ to, patientName, resultsUrl, labName }) {
+    const mailOptions = {
+        to: to,
+        subject: `${labName} - Resultados de Laboratorio Disponibles`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #2563eb; margin-bottom: 10px;">${labName}</h1>
+                    <h2 style="color: #374151; margin-top: 0;">Resultados de Laboratorio</h2>
+                </div>
+
+                <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="font-size: 16px; color: #374151; margin-bottom: 15px;">
+                        Estimado/a <strong>${patientName}</strong>,
+                    </p>
+
+                    <p style="font-size: 16px; color: #374151; line-height: 1.6; margin-bottom: 20px;">
+                        Sus resultados de laboratorio ya están disponibles. Puede acceder a ellos de forma segura
+                        haciendo clic en el enlace a continuación:
+                    </p>
+
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resultsUrl}"
+                           style="background-color: #2563eb; color: white; padding: 12px 30px;
+                                  text-decoration: none; border-radius: 6px; font-weight: bold;
+                                  display: inline-block; font-size: 16px;">
+                            Ver Resultados
+                        </a>
+                    </div>
+
+                    <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">
+                        <strong>Importante:</strong>
+                    </p>
+                    <ul style="font-size: 14px; color: #6b7280; line-height: 1.6;">
+                        <li>Este enlace es válido por 7 días por motivos de seguridad</li>
+                        <li>Puede descargar sus resultados en formato PDF desde la página</li>
+                        <li>Si tiene alguna pregunta sobre sus resultados, consulte con su médico</li>
+                    </ul>
+                </div>
+
+                <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
+                    <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                        Este correo fue enviado automáticamente por ${labName}.<br>
+                        Por favor, no responda a este mensaje.
+                    </p>
+                </div>
+            </div>
+        `
+    };
+
     return sendMail(mailOptions);
 }
 
 export default {
     sendMail,
     sendInvitationEmail,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendResultsEmail
 };

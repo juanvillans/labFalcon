@@ -1,8 +1,12 @@
 import axios from 'axios';
+import { API_URL } from "../config/env.js";
+
+const API_BASE_URL = `${API_URL}/api/v1`;
+
 
 // Create an Axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:5500/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -82,6 +86,16 @@ export const examsAPI = {
   updateExam: (id, examData) => api.put(`/exams/${id}`, examData),
   deleteExam: (id) => api.delete(`/exams/${id}`),
   validateExam: (id) => api.put('/exams/validate-exam', { id }),
+};
+
+// Public API for exam results (no authentication required)
+export const examResultsAPI = {
+  getByToken: (token) => axios.get(`${API_BASE_URL}/results/${token}`),
+  downloadPDF: (token) => axios.get(`${API_BASE_URL}/results/${token}/pdf`, {
+    responseType: 'blob'
+  }),
+  generateToken: (data) => api.post('/exams/generate-results-token', data),
+  sendExamResults: (data) => api.post('/exams/send-results', data),
 };
 
 // Export the api instance for direct use if needed

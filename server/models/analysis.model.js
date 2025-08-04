@@ -55,21 +55,10 @@ class Analysis {
     }
   }
 
-  static async getAll() {
-    const exams = await db("exams")
-      .join(
-        "examination_types",
-        "exams.examination_type_id",
-        "examination_types.id"
-      )
-      .select("exams.*", "examination_types.name as examination_type_name",  db.raw("to_char(exams.date_birth, 'YYYY-MM-DD') as date_birth")
-    );
 
-    return exams.map((exam) => new Analysis(exam));
-  }
 
   static async findById(id) {
-    const exam = await db("exams").where("id", id).first();
+    const exam = await db("analysis").where("id", id).first();
 
     return exam ? new Analysis(exam) : null;
   }
@@ -117,7 +106,7 @@ class Analysis {
     updates.updated_at = db.fn.now();
   
     try {
-      const [updatedExam] = await db("exams")
+      const [updatedExam] = await db("analysis")
         .where("id", id)
         .update(updates)
         .returning("*");

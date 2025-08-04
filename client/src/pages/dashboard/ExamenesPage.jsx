@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { examinationTypesAPI, examsAPI } from "../../services/api";
+import { examinationTypesAPI, examsAPI, examResultsAPI } from "../../services/api";
 import externalApi from "../../services/saludfalcon.api";
 import { Icon } from "@iconify/react";
 import Modal from "../../components/Modal";
@@ -38,6 +38,9 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [messageData, setMessageData] = useState({});
+  const [resultsToken, setResultsToken] = useState(null);
   const [examinationTypes, setExaminationTypes] = useState([]);
 
   // Form configuration for ReusableForm
@@ -304,11 +307,18 @@ export default function Page() {
                 <Icon icon="hugeicons:edit-02" width={20} height={20} />
               </button>
 
-              <PrintPage data={data} />
+              <PrintPage data={data} isHidden={true} />
 
               <button
                 title="Enviar mensaje"
-                className="mx-1 p-1 hover:bg-blue-100 rounded-full"
+                className="mx-1  hover:bg-blue-100 rounded-full"
+                onClick={async () => {
+                  setMessageData(data);
+                  setIsMessageModalOpen(true);
+                  // Generate token for WhatsApp link
+                  const token = await generateResultsToken(data.id);
+                  setResultsToken(token);
+                }}
               >
                 <Icon
                   icon="carbon:send-alt"
@@ -333,6 +343,30 @@ export default function Page() {
     ],
     []
   );
+
+  const handleMessage = async () => {
+    try {
+      await examResultsAPI.sendExamResults(messageData);
+      showSuccess("Mensaje enviado con éxito");
+      setIsMessageModalOpen(false);
+      setMessageData(null);
+      fetchData();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
+      showError(errorMessage);
+    }
+  };
+
+  const generateResultsToken = async (analysisId) => {
+    try {
+      const response = await examResultsAPI.generateToken({ analysisId });
+      return response.data.token;
+    } catch (error) {
+      console.error("Error generating token:", error);
+      return null;
+    }
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -816,6 +850,26 @@ export default function Page() {
           />
         }
       </div>
+
+
+      <Modal
+      title="Enviar mensaje"
+      isOpen={isMessageModalOpen}
+      onClose={() => setIsMessageModalOpen(false)}
+      >
+        <div className="flex gap-4">
+          <button 
+          onClick={() => handleMessage()} className="bg-gray-200 rounded-xl  p-3 px-5"><Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon></button>
+
+          <a
+            href={`https://wa.me/${messageData?.patient?.phone_number}?text=Hola ${messageData?.patient?.first_name}, en el siguiente link podrás ver los resultados de tu exámen: ${window.location.origin}/results/${resultsToken || 'cargando...'}`}
+            target="_blank"
+            className="bg-gray-200 rounded-xl p-3 px-5"
+          >
+            <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
+          </a>
+        </div>
+      </Modal>
     </div>
   );
 }

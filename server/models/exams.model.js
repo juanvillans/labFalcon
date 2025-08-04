@@ -57,6 +57,32 @@ class Exams {
       throw new Error("Failed to delete exam");
     }
   }
+
+  static async deleteMultipleWithTransaction(trx, examIds) {
+    try {
+      if (examIds.length > 0) {
+        await trx("exams")
+          .whereIn("id", examIds)
+          .del();
+      }
+      return true;
+    } catch (error) {
+      throw new Error("Failed to delete exams");
+    }
+  }
+
+  static async deleteMultiple(examIds) {
+    try {
+      if (examIds.length > 0) {
+        await db("exams")
+          .whereIn("id", examIds)
+          .del();
+      }
+      return true;
+    } catch (error) {
+      throw new Error("Failed to delete exams");
+    }
+  }
 }
 
 export default Exams;

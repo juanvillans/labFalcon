@@ -3,11 +3,12 @@ import { useReactToPrint } from "react-to-print";
 import { Icon } from "@iconify/react";
 import SecretrariaLogo from "../assets/secretaria_logo.png";
 import Latidos from "../assets/latidos.png";
+import FuturisticButton from "./FuturisticButton";
 
 const PrintableContent = React.memo(React.forwardRef((props, ref) => {
   console.log("PrintableContent rendered with props:", props);
   return (
-    <div ref={ref} className="w-full" >
+    <div ref={ref} className="w-full mx-auto bg-white border" style={{padding: "20mm", width: "210mm", height: "297mm"}}>
       <header style={{marginBlock: "50px !important", marginBottom: "50px !important"}} className="my-2 relative flex justify-center items-center py-4">
         <img src={SecretrariaLogo} alt="" className="absolute left-4 w-16" />
 
@@ -78,14 +79,17 @@ const PrintableContent = React.memo(React.forwardRef((props, ref) => {
   );
 }));
 
-const PrintPage = React.memo(function PrintPage(data) {
+const PrintPage = React.memo(function PrintPage(props) {
+  console.log("PrintPage rendered with props:", props);
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
-    documentTitle: "Examen-Medico",
+    documentTitle: `Examen-${props.data.patient.first_name}-${props.data.patient.last_name}-${props.data.patient.ci}-${props.data.created_date}`,
     pageStyle: `
       @page {
         margin: 20mm;
+        size: A4;
+
       }
       body {
         font-family: Arial, sans-serif;
@@ -96,19 +100,38 @@ const PrintPage = React.memo(function PrintPage(data) {
 
   return (
     <div>
-      <div className="hidden">
+      
+      {props.isHidden ? <button onClick={handlePrint} title="Imprimir">
+          <Icon
+            icon="material-symbols:print-rounded"
+            className="w-6 h-6 text-gray-500  ml-2"
+          />
+        </button> : (
+        <div className="flex justify-center mb-4"> 
+
+        <FuturisticButton onClick={handlePrint} title="Imprimir" className="flex gap-2 text-xl mx-auto py-1 px-2 ">
+          <Icon
+            icon="material-symbols:download-rounded"
+            className="w-6 h-6 text-gray-700  mr-3 inline "
+          />
+          <span>
+          Descargar / Imprimir
+
+          </span>
+        </FuturisticButton>
+        </div>
+      )}
+     
+
+      <div className={props.isHidden ? "hidden" : ""}>
         <PrintableContent
-          data={data.data}
+
+          data={props.data}
           ref={componentRef}
-          className="hidden"
+          className=""
+          size="A4"
         />
       </div>
-      <button onClick={handlePrint} title="Imprimir">
-        <Icon
-          icon="material-symbols:print-rounded"
-          className="w-6 h-6 text-color2 mt-3.5 ml-2"
-        />
-      </button>
     </div>
   );
 });
