@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { examinationTypesAPI, examsAPI, examResultsAPI } from "../../services/api";
+import {
+  examinationTypesAPI,
+  examsAPI,
+  examResultsAPI,
+} from "../../services/api";
 import externalApi from "../../services/saludfalcon.api";
 import { Icon } from "@iconify/react";
 import Modal from "../../components/Modal";
@@ -263,10 +267,10 @@ export default function Page() {
         enableColumnFilter: true,
         enableSorting: true,
         Cell: ({ cell }) => (cell.getValue() ? "Sí" : "No"),
-        filterVariant: 'select',
+        filterVariant: "select",
         filterSelectOptions: [
-          { value: 'true', label: 'Validado' },
-          { value: 'false', label: 'No Validado' },
+          { value: "true", label: "Validado" },
+          { value: "false", label: "No Validado" },
         ],
       },
       {
@@ -394,7 +398,7 @@ export default function Page() {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -441,10 +445,11 @@ export default function Page() {
 
   // Debounced global filter handler
   const debouncedGlobalFilter = useMemo(
-    () => debounce((value) => {
-      setGlobalFilter(value);
-      setPagination(prev => ({ ...prev, pageIndex: 0 })); // Reset to first page
-    }, 300),
+    () =>
+      debounce((value) => {
+        setGlobalFilter(value);
+        setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset to first page
+      }, 300),
     []
   );
 
@@ -806,63 +811,74 @@ export default function Page() {
           </div>
         </form>
       </Modal>
-      <div
-        className="ag-theme-alpine ag-grid-no-border"
-        style={{ height: 500 }}
-      >
-        {
-          <MaterialReactTable
-            columns={columns}
-            data={data}
-            rowCount={rowCount}
-            manualPagination
-            manualSorting
-            manualFiltering
-            manualGlobalFilter
-            initialState={{
-              density: "compact",
-            }}
-            state={{
-              pagination,
-              sorting,
-              columnFilters,
-              globalFilter,
-              isLoading
-            }}
-            onPaginationChange={setPagination}
-            onSortingChange={setSorting}
-            onColumnFiltersChange={setColumnFilters}
-            onGlobalFilterChange={(value) => debouncedGlobalFilter(value)}
-            enableGlobalFilter={true}
-            enableColumnFilters={true}
-            enableSorting={true}
-            enableFilters={true}
-            muiTablePaginationProps={{
-              rowsPerPageOptions: [25, 50, 100],
-              showFirstButton: true,
-              showLastButton: true,
-            }}
-            muiSearchTextFieldProps={{
-              placeholder: 'Buscar',
-              sx: { minWidth: '300px' },
-              variant: 'outlined',
-            }}
-          />
-        }
-      </div>
-
+      {!isModalOpen && (
+        <div
+          className="ag-theme-alpine ag-grid-no-border"
+          style={{ height: 500 }}
+        >
+          {
+            <MaterialReactTable
+              columns={columns}
+              data={data}
+              rowCount={rowCount}
+              manualPagination
+              manualSorting
+              manualFiltering
+              manualGlobalFilter
+              initialState={{
+                density: "compact",
+              }}
+              state={{
+                pagination,
+                sorting,
+                columnFilters,
+                globalFilter,
+                isLoading,
+              }}
+              onPaginationChange={setPagination}
+              onSortingChange={setSorting}
+              onColumnFiltersChange={setColumnFilters}
+              onGlobalFilterChange={(value) => debouncedGlobalFilter(value)}
+              enableGlobalFilter={true}
+              enableColumnFilters={true}
+              enableSorting={true}
+              enableFilters={true}
+              muiTablePaginationProps={{
+                rowsPerPageOptions: [25, 50, 100],
+                showFirstButton: true,
+                showLastButton: true,
+              }}
+              muiSearchTextFieldProps={{
+                placeholder: "Buscar",
+                sx: { minWidth: "300px" },
+                variant: "outlined",
+              }}
+            />
+          }
+        </div>
+      )}
 
       <Modal
-      title="Enviar mensaje"
-      isOpen={isMessageModalOpen}
-      onClose={() => setIsMessageModalOpen(false)}
+        title="Enviar mensaje"
+        isOpen={isMessageModalOpen}
+        onClose={() => setIsMessageModalOpen(false)}
       >
         <div className="flex gap-4">
-          <button 
-          onClick={() => handleMessage()} className="bg-gray-200 rounded-xl  p-3 px-5"><Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon></button>
+          <button
+            onClick={() => handleMessage()}
+            className="bg-gray-200 rounded-xl  p-3 px-5"
+          >
+            <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
+          </button>
 
           <a
-            href={`https://wa.me/${messageData?.patient?.phone_number}?text=Hola ${messageData?.patient?.first_name}, en el siguiente link podrás ver los resultados de tu exámen: ${window.location.origin}/results/${resultsToken || 'cargando...'}`}
+            href={`https://wa.me/${
+              messageData?.patient?.phone_number
+            }?text=Hola ${
+              messageData?.patient?.first_name
+            }, en el siguiente link podrás ver los resultados de tu exámen: ${
+              window.location.origin
+            }/results/${resultsToken || "cargando..."}`}
             target="_blank"
             className="bg-gray-200 rounded-xl p-3 px-5"
           >
