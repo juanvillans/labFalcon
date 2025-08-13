@@ -43,25 +43,65 @@ export const generateToken = catchAsync(async (req, res, next) => {
   }
 });
 
+// Function to update message status (internal use)
+export const updateMessageStatus = async (analysisId, status) => {
+  console.log({analysisId, status});
+  try {
+    await db("analysis")
+      .where("id", analysisId)
+      .update({ 
+        message_status: status,
+        updated_at: db.fn.now()
+      });
+    return true;
+  } catch (error) {
+    console.error("Error updating message status:", error);
+    throw error;
+  }
+};
+
+// HTTP endpoint wrapper for updating message status
+export const updateMessageStatusEndpoint = catchAsync(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = ['NO_ENVIADO', 'ENVIADO', 'LEIDO'];
+    if (!validStatuses.includes(status)) {
+      throw commonErrors.badRequest("Estado inválido");
+    }
+
+    // Use the internal function
+    await updateMessageStatus(id, status);
+
+    res.status(200).json({
+      status: "success",
+      message: "Estado actualizado exitosamente",
+      data: {
+        analysisId: id,
+        message_status: status
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Send results email with secure link
 export const sendExamResults = catchAsync(async (req, res, next) => {
   try {
-    console.log(req.body);
     const { id } = req.body;
 
-    // Get analysis data
     const analysis = await db("analysis").where("id", id).first();
     if (!analysis) {
       throw commonErrors.notFound("Analysis");
     }
 
-    // Generate secure token
     const token = generateResultsToken(id, analysis.email);
-    
-    // Create public URL
     const resultsUrl = `${APP_URL}/results/${token}`;
     
-    // Send email with link
+    // Send email
     await sendResultsEmail({
       to: analysis.email,
       patientName: `${analysis.first_name} ${analysis.last_name}`,
@@ -69,12 +109,15 @@ export const sendExamResults = catchAsync(async (req, res, next) => {
       labName: "Laboratorio Falcón"
     });
 
+    // Update status after successful send
+    await updateMessageStatus(id, 'ENVIADO');
+
     res.status(200).json({
       status: "success",
       message: "Resultados enviados por email exitosamente",
       data: {
         email: analysis.email,
-        token: token // For testing purposes, remove in production
+        message_status: 'ENVIADO'
       }
     });
   } catch (error) {

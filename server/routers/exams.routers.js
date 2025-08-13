@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { createExam, getExams, findExamById, updateExam, deleteExam, validateExam, generateResultsToken, sendResultsEmail } from "../controlers/exams.controler.js";
+import { createExam, getExams, findExamById, updateExam, deleteExam, validateExam } from "../controlers/exams.controler.js";
+import { generateToken, sendExamResults, updateMessageStatusEndpoint } from "../controlers/examResults.controler.js";
 import { protect, requireValidateExam } from "../middlewares/auth.middleware.js";
 
 const examsRouter = Router();
@@ -10,7 +11,8 @@ examsRouter.post("/", protect, createExam);
 examsRouter.put("/:id", protect, updateExam);
 examsRouter.delete("/:id", protect, deleteExam);
 examsRouter.put("/validate-exam", protect, requireValidateExam, validateExam);
-examsRouter.post("/generate-results-token", protect, generateResultsToken);
-examsRouter.post("/send-results", protect, sendResultsEmail);
+examsRouter.post("/generate-results-token", protect, generateToken);
+examsRouter.post("/send-results", protect, sendExamResults);
+examsRouter.put("/update-message-status/:id", protect, updateMessageStatusEndpoint);
 
 export default examsRouter;

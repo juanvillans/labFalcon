@@ -96,6 +96,7 @@ export const examResultsAPI = {
   }),
   generateToken: (data) => api.post('/exams/generate-results-token', data),
   sendExamResults: (data) => api.post('/exams/send-results', data),
+  updateMessageStatus: (id, status) => api.put(`/exams/update-message-status/${id}`, { status }),
 };
 
 // Export the api instance for direct use if needed

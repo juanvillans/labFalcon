@@ -3,7 +3,6 @@ import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import Analysis from "../models/analysis.model.js";
 import Exams from "../models/exams.model.js";
 import AnalysisExams from "../models/analysis_exams.model.js";
-import { generateToken, sendExamResults } from "./examResults.controler.js";
 import { db } from "../database/postgre.js";
 
 export const createExam = catchAsync(async (req, res, next) => {
@@ -235,6 +234,7 @@ export const getExams = catchAsync(async (req, res, next) => {
         patient_id: null
       },
       allValidated: analysis.allValidated,
+      message_status: analysis.message_status,
       created_date: analysis.created_date,
       created_time: analysis.created_time,
       age: calculateAge(analysis.date_birth),
@@ -434,6 +434,4 @@ export const validateExam = catchAsync(async (req, res, next) => {
   }
 });
 
-// Re-export functions from examResults controller
-export const generateResultsToken = generateToken;
-export const sendResultsEmail = sendExamResults;
+

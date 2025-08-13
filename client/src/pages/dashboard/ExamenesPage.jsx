@@ -16,6 +16,7 @@ import { MaterialReactTable } from "material-react-table";
 
 import debounce from "lodash.debounce";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 // Memoized component for test fields to prevent unnecessary re-renders
 const MemoizedTestField = React.memo(
@@ -43,10 +44,12 @@ export default function Page() {
   const { showError, showSuccess } = useFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isMessageSentModalOpen, setIsMessageSentModalOpen] = useState(false);
   const [messageData, setMessageData] = useState({});
   const [resultsToken, setResultsToken] = useState(null);
   const [examinationTypes, setExaminationTypes] = useState([]);
-
+  const { user } = useAuth();
+  console.log({user})
   // Form configuration for ReusableForm
   const patientFormFields = useMemo(() => [
     {
@@ -95,7 +98,7 @@ export default function Page() {
       name: "address",
       label: "Dirección",
       type: "text",
-      required: true,
+      required: false,
       className: "col-span-1",
     },
     {
@@ -274,14 +277,30 @@ export default function Page() {
         ],
       },
       {
-        accessorKey: "validated",
-        header: "Recibido",
-        id: "recibido",
-        size: 90,
-        Cell: ({ cell }) =>
-          cell.getValue() ? (
-            <Icon icon="bitcoin-icons:check-outline" width={20} height={20} />
-          ) : null,
+        accessorKey: "message_status",
+        header: "Estado de envio",
+        id: "enviado",
+        size: 100,
+        Cell: ({ cell }) => {
+          const value = cell.getValue();
+          if (value === "ENVIADO") {
+            return (
+              <div className="flex items-center gap-2">
+                <Icon className="text-gray-500" icon="iconamoon:check-fill" width={20} height={20} />
+                <p>Enviado</p>
+              </div>
+            );
+          } else if (value === "LEIDO") {
+            return (
+              <div className="flex items-center gap-2">
+                <Icon className="text-color3" icon={"line-md:check-all"} width={20} height={20} />
+                <p>Leído</p>
+              </div>
+            );
+          } else {
+            return null;
+          }
+        },
         enableColumnFilter: false,
         enableSorting: false,
       },
@@ -313,22 +332,24 @@ export default function Page() {
 
               <PrintPage data={data} isHidden={true} />
 
-              <button
-                title="Enviar mensaje"
-                className="mx-1  hover:bg-blue-100 rounded-full"
-                onClick={async () => {
-                  setMessageData(data);
-                  setIsMessageModalOpen(true);
-                  // Generate token for WhatsApp link
-                  const token = await generateResultsToken(data.id);
-                  setResultsToken(token);
-                }}
-              >
-                <Icon
-                  icon="carbon:send-alt"
-                  className="w-6 h-6 text-gray-500"
-                />
-              </button>
+              {data.allValidated && (
+                <button
+                  title="Enviar mensaje"
+                  className="mx-1  hover:bg-blue-100 rounded-full"
+                  onClick={async () => {
+                    setMessageData(data);
+                    setIsMessageModalOpen(true);
+                    // Generate token for WhatsApp link
+                    const token = await generateResultsToken(data.id);
+                    setResultsToken(token);
+                  }}
+                >
+                  <Icon
+                    icon="carbon:send-alt"
+                    className="w-6 h-6 text-gray-500"
+                  />
+                </button>
+              )}
 
               <button
                 onClick={() => handleDelete(data.id)}
@@ -353,6 +374,19 @@ export default function Page() {
       await examResultsAPI.sendExamResults(messageData);
       showSuccess("Mensaje enviado con éxito");
       setIsMessageModalOpen(false);
+      setMessageData(null);
+      fetchData();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
+      showError(errorMessage);
+    }
+  };
+  const handleWhatsAppMessageSent = async () => {
+    try {
+      await examResultsAPI.updateMessageStatus(messageData.id, "ENVIADO");
+      showSuccess("Mensaje marcado como enviado con éxito");
+      setIsMessageSentModalOpen(false);
       setMessageData(null);
       fetchData();
     } catch (error) {
@@ -731,7 +765,12 @@ export default function Page() {
                       <input
                         type="checkbox"
                         name={`validated-${key}`}
-                        onChange={(e) => handleValidatedChange(key, e)}
+                        readOnly={user?.allow_validate_exam === false}
+                        onChange={(e) => {
+                          if (user?.allow_validate_exam === false) return;
+                          handleValidatedChange(key, e);
+                        }}
+                        // onChange={(e) => handleValidatedChange(key, e)}
                         checked={formData.tests[key]?.validated || false}
                         id={`validated-${key}`}
                       />
@@ -865,13 +904,19 @@ export default function Page() {
       >
         <div className="flex gap-4">
           <button
+            title="Enviar por correo"
             onClick={() => handleMessage()}
-            className="bg-gray-200 rounded-xl  p-3 px-5"
+            className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
           >
             <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
+            <span className="text-sm">Enviar por correo</span>
           </button>
 
           <a
+            title="Enviar por WhatsApp"
+            onClick={() =>{ 
+              setIsMessageModalOpen(false)
+                setIsMessageSentModalOpen(true)}}
             href={`https://wa.me/${
               messageData?.patient?.phone_number
             }?text=Hola ${
@@ -880,10 +925,33 @@ export default function Page() {
               window.location.origin
             }/results/${resultsToken || "cargando..."}`}
             target="_blank"
-            className="bg-gray-200 rounded-xl p-3 px-5"
+            className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
           >
             <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
+            <span className="text-sm">Enviar por WhatsApp</span>
           </a>
+        </div>
+      </Modal>
+
+      <Modal
+        title="¿El mensaje de WhatsApp fue enviado?"
+        isOpen={isMessageSentModalOpen}
+        onClose={() => setIsMessageSentModalOpen(false)}
+      >
+        <p>A diferencia de enviar el mensaje por correo, con WhatsApp no sabemos si fue enviado o no, por lo tanto, necesitamos su confirmación.</p>
+        <div className="flex gap-4 justify-between mt-4">
+          <button
+            onClick={() => setIsMessageSentModalOpen(false)}
+            className="bg-gray-300 hover:shadow-xl hover:brightness-110 rounded-xl p-3 px-5"
+          >
+            No
+          </button>
+          <button
+            onClick={() => handleWhatsAppMessageSent()}
+            className="bg-color2 hover:shadow-xl hover:brightness-110 text-white rounded-xl p-3 px-5"
+          >
+            Sí, se envió
+          </button>
         </div>
       </Modal>
     </div>

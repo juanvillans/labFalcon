@@ -58,7 +58,7 @@ const usersSeed = [
         allow_handle_users: user.allow_handle_users,
         status: user.status,
       });
-      console.log(`Seeded: ${user.name}`);
+      console.log(`Seeded: ${user.first_name} ${user.last_name}`);
     }
   }
   

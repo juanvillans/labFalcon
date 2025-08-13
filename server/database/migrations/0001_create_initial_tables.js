@@ -1,4 +1,8 @@
   export async function up(knex) {
+    await knex.raw(`
+      CREATE TYPE message_status_enum AS ENUM ('NO_ENVIADO', 'ENVIADO', 'LEIDO')
+    `);
+
     // Check if table exists before creating
     const usersTableExists = await knex.schema.hasTable('users');
     if (!usersTableExists) {
@@ -40,6 +44,7 @@
         table.string('address');
         table.string('sex');
         table.boolean('allValidated').defaultTo(false);
+        table.enum('message_status', ['NO_ENVIADO', 'ENVIADO', 'LEIDO']).defaultTo('NO_ENVIADO');
         table.timestamp('created_at').defaultTo(knex.fn.now());
         table.timestamp('updated_at').defaultTo(knex.fn.now());
       });
@@ -70,5 +75,5 @@
     await knex.schema.dropTableIfExists('examination_types');
     await knex.schema.dropTableIfExists('users');
     await knex.schema.dropTableIfExists('analysis');
-    
+    await knex.raw('DROP TYPE IF EXISTS message_status_enum');
   }
