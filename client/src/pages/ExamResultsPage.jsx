@@ -83,9 +83,11 @@ export default function ExamResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      
-      <PrintPage isHidden={false} data={examData} />
-    </div>
+    <>
+      <title>Resultados del Examen - LabFalcón</title>
+      <div className="min-h-screen bg-gray-100 py-8">
+        <PrintPage isHidden={false} data={examData} />
+      </div>
+    </>
   );
 }

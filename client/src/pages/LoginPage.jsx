@@ -64,7 +64,8 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="min-h-screen overflow-hidden relative flex items-center justify-end  bg-gray-600 bg-cover bg-center">
+      <title>Iniciar Sesión - LabFalcón</title>
+      <div className="min-h-screen overflow-hidden relative flex items-center justify-end bg-gray-600 bg-cover bg-center">
         <img
           src={lab}
           alt="lab"
@@ -79,7 +80,7 @@ export default function LoginPage() {
           />
           <h1 className="text-white mt-7 w-2/3 max-w-[800px] text-5xl md:text-6xl lg:text-8xl font-semibold">Sistema de Laboratorio de la Secretaria de Salud de Falcón</h1>
         </div>
-        <div className="absolute md:min-w-[400px] z-50 top-6 pt-20 right-10 loginFormContainer  bg-color1 h-[94%] text-gray-50 p-8 rounded-lg  shadow-2xl ">
+        <div className="absolute md:min-w-[400px] z-50 top-6 pt-20 right-10 loginFormContainer  bg-color1 h-[94%] text-gray-50 md:p-16 rounded-lg  shadow-2xl ">
           <img
             src={labFalconLogo}
             className="logo w-16 mx-auto"

@@ -60,15 +60,15 @@ const FormField = React.memo(function FormField({
   } else if (type === "select") {
     return (
       <div className={className}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label mt-2">{label}</InputLabel>
+        <FormControl fullWidth size="small">
+          <InputLabel id="demo-simple-select-label ">{label}</InputLabel>
           <Select
             name={name}
             value={value || ""}
             onChange={onChange}
             disabled={disabled}
             {...props}
-            size="small"
+            
           >
             {props.options.map((option) => (
               <MenuItem key={option.value} value={option.value}>

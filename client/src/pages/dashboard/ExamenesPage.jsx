@@ -39,7 +39,7 @@ const MemoizedTestField = React.memo(
   }
 );
 
-export default function Page() {
+export default function ExamenesPage() {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -598,362 +598,365 @@ export default function Page() {
   }, 280);
 
   return (
-    <div style={{ height: 580, width: "100%" }}>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Exámenes médicos</h1>
-        <FuturisticButton
-          onClick={() => {
-            setIsModalOpen(true);
-            if (submitString === "Actualizar") {
-              setSubmitString("Registrar");
-              setFormData(structuredClone(defaultFormData));
-            }
+    <>
+      <title>Exámenes Médicos - LabFalcón</title>
+      <div style={{ height: 580, width: "100%" }}>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Exámenes médicos</h1>
+          <FuturisticButton
+            onClick={() => {
+              setIsModalOpen(true);
+              if (submitString === "Actualizar") {
+                setSubmitString("Registrar");
+                setFormData(structuredClone(defaultFormData));
+              }
+            }}
+          >
+            Registrar exámen
+          </FuturisticButton>
+        </div>
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
           }}
+          title="Registrar exámen"
+          size="xl"
         >
-          Registrar exámen
-        </FuturisticButton>
-      </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-        title="Registrar exámen"
-        size="xl"
-      >
-        <form
-          className={`grid grid-cols-2 gap-7 w-full relative`}
-          onSubmit={onSubmit}
-        >
-          <div className="space-y-3 z-10">
-            <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {formData?.patient?.ci.length >= 6 && (
-                <div className="w-full col-span-2 h-6 overflow-hidden text-center">
-                  {prosecingSearchPatient ? (
-                    <Icon
-                      icon="eos-icons:three-dots-loading"
-                      className="text-3xl"
-                    />
-                  ) : formData?.patient.patient_id !== null ? (
-                    <span className="flex items-center gap-2 text-center mx-auto justify-center">
+          <form
+            className={`grid grid-cols-2 gap-7 w-full relative`}
+            onSubmit={onSubmit}
+          >
+            <div className="space-y-3 z-10">
+              <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {formData?.patient?.ci.length >= 6 && (
+                  <div className="w-full col-span-2 h-6 overflow-hidden text-center">
+                    {prosecingSearchPatient ? (
                       <Icon
-                        icon="iconoir:settings-profiles"
-                        className="text-2xl text-color3"
+                        icon="eos-icons:three-dots-loading"
+                        className="text-3xl"
                       />
-                      <small>Paciente Registrado con historia</small>
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2 text-center mx-auto justify-center">
-                      <Icon icon="clarity:new-line" className="text-3xl" />
-                      <small>Nuevo paciente sin historia</small>
-                    </span>
-                  )}
-                </div>
-              )}
-              {patientFormFields.map((field) => {
-                if (field.name === "ci") {
-                  return (
-                    <div key={field.name}>
+                    ) : formData?.patient.patient_id !== null ? (
+                      <span className="flex items-center gap-2 text-center mx-auto justify-center">
+                        <Icon
+                          icon="iconoir:settings-profiles"
+                          className="text-2xl text-color3"
+                        />
+                        <small>Paciente Registrado con historia</small>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2 text-center mx-auto justify-center">
+                        <Icon icon="clarity:new-line" className="text-3xl" />
+                        <small>Nuevo paciente sin historia</small>
+                      </span>
+                    )}
+                  </div>
+                )}
+                {patientFormFields.map((field) => {
+                  if (field.name === "ci") {
+                    return (
+                      <div key={field.name}>
+                        <FormField
+                          {...field}
+                          value={formData.patient?.[field.name]}
+                          onPaste={(e) => {
+                            // Manejar pegado específicamente
+                            const pastedValue = e.clipboardData.getData("text");
+                            formData.patient.patient_id = null;
+
+                            // Actualizar el valor del campo
+                            const syntheticEvent = {
+                              target: {
+                                name: field.name,
+                                value: pastedValue,
+                              },
+                            };
+
+                            handlePatientInputChange(syntheticEvent);
+
+                            if (pastedValue.length >= 6) {
+                              setProsecingSearchPatient(true);
+                              searchPatient(pastedValue);
+                            }
+                          }}
+                          onInput={(e) => {
+                            formData.patient.patient_id = null;
+                            handlePatientInputChange(e);
+                            if (formData.patient.ci.length >= 6) {
+                              setProsecingSearchPatient(true);
+                              searchPatient(e.target.value);
+                            }
+                          }}
+                        />
+                      </div>
+                    );
+                  } else {
+                    return (
                       <FormField
+                        key={field.name}
                         {...field}
                         value={formData.patient?.[field.name]}
-                        onPaste={(e) => {
-                          // Manejar pegado específicamente
-                          const pastedValue = e.clipboardData.getData("text");
-                          formData.patient.patient_id = null;
-
-                          // Actualizar el valor del campo
-                          const syntheticEvent = {
-                            target: {
-                              name: field.name,
-                              value: pastedValue,
-                            },
-                          };
-
-                          handlePatientInputChange(syntheticEvent);
-
-                          if (pastedValue.length >= 6) {
-                            setProsecingSearchPatient(true);
-                            searchPatient(pastedValue);
-                          }
-                        }}
-                        onInput={(e) => {
-                          formData.patient.patient_id = null;
-                          handlePatientInputChange(e);
-                          if (formData.patient.ci.length >= 6) {
-                            setProsecingSearchPatient(true);
-                            searchPatient(e.target.value);
-                          }
-                        }}
+                        onChange={handlePatientInputChange}
                       />
-                    </div>
-                  );
-                } else {
-                  return (
-                    <FormField
-                      key={field.name}
-                      {...field}
-                      value={formData.patient?.[field.name]}
-                      onChange={handlePatientInputChange}
-                    />
-                  );
-                }
-              })}
+                    );
+                  }
+                })}
+              </div>
             </div>
-          </div>
-          <div className="space-y-3 z-10 ">
-            <h2 className="text-xl font-bold">Resultados del Exámen</h2>
+            <div className="space-y-3 z-10 ">
+              <h2 className="text-xl font-bold">Resultados del Exámen</h2>
 
-            {Object.entries(formData.tests || {}).length === 0 ? (
-              <p>Seleccione al menos un tipo de exámen</p>
-            ) : (
-              Object.keys(formData?.tests || {})?.map((key) => (
-                <div
-                  key={key}
-                  className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
-                >
-                  <div className="flex justify-between items-center ">
-                    <h3 className="text-lg font-bold text-color1 mb-4">
-                      {formData.tests[key]?.testTypeName}
-                    </h3>
+              {Object.entries(formData.tests || {}).length === 0 ? (
+                <p>Seleccione al menos un tipo de exámen</p>
+              ) : (
+                Object.keys(formData?.tests || {})?.map((key) => (
+                  <div
+                    key={key}
+                    className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
+                  >
+                    <div className="flex justify-between items-center ">
+                      <h3 className="text-lg font-bold text-color1 mb-4">
+                        {formData.tests[key]?.testTypeName}
+                      </h3>
+                      <button
+                        type="button"
+                        className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                        aria-label="Close"
+                        onClick={() => {
+                          setFormData((prev) => {
+                            const { [key]: value, ...rest } = prev.tests;
+
+                            return {
+                              ...prev,
+                              tests: rest,
+                            };
+                          });
+                        }}
+                      >
+                        <span className="sr-only">Close</span>
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Object.entries(formData.tests[key]?.testValues || {})?.map(
+                        ([name, field]) => (
+                          <MemoizedTestField
+                            key={name}
+                            field={field}
+                            value={formData.tests[key]?.testValues?.[name]?.value}
+                            onChange={handleTestInputChange}
+                            testKey={key}
+                            fieldName={name}
+                          />
+                        )
+                      )}
+                      <div className="ml-auto col-span-2 flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          name={`validated-${key}`}
+                          readOnly={user?.allow_validate_exam === false}
+                          onChange={(e) => {
+                            if (user?.allow_validate_exam === false) return;
+                            handleValidatedChange(key, e);
+                          }}
+                          // onChange={(e) => handleValidatedChange(key, e)}
+                          checked={formData.tests[key]?.validated || false}
+                          id={`validated-${key}`}
+                        />
+                        <label htmlFor={`validated-${key}`}>Validado</label>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {examinationTypes.map((examType) => {
+                  if (formData.tests[examType.id]) {
+                    return null;
+                  }
+                  return (
                     <button
                       type="button"
-                      className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                      aria-label="Close"
+                      key={examType.id}
+                      className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
                       onClick={() => {
-                        setFormData((prev) => {
-                          const { [key]: value, ...rest } = prev.tests;
-
-                          return {
-                            ...prev,
-                            tests: rest,
-                          };
-                        });
+                        const newtestValues = examType.tests.reduce(
+                          (acc, test) => {
+                            acc[test.name] = {
+                              ...test,
+                              value: "", // Add empty value field
+                            };
+                            return acc;
+                          },
+                          {}
+                        );
+                        setFormData((prev) => ({
+                          ...prev,
+                          allValidated: false,
+                          tests: {
+                            [examType.id]: {
+                              testValues: newtestValues,
+                              testTypeName: examType.name,
+                              testTypeId: examType.id,
+                              validated: false,
+                            },
+                            ...prev.tests,
+                          },
+                        }));
+                        setTimeout(() => {
+                          document
+                            .querySelector(
+                              `input[name=${examType.tests[0].name}]`
+                            )
+                            .focus();
+                        }, 120);
                       }}
                     >
-                      <span className="sr-only">Close</span>
-                      <svg
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      {examType.name}
                     </button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(formData.tests[key]?.testValues || {})?.map(
-                      ([name, field]) => (
-                        <MemoizedTestField
-                          key={name}
-                          field={field}
-                          value={formData.tests[key]?.testValues?.[name]?.value}
-                          onChange={handleTestInputChange}
-                          testKey={key}
-                          fieldName={name}
-                        />
-                      )
-                    )}
-                    <div className="ml-auto col-span-2 flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        name={`validated-${key}`}
-                        readOnly={user?.allow_validate_exam === false}
-                        onChange={(e) => {
-                          if (user?.allow_validate_exam === false) return;
-                          handleValidatedChange(key, e);
-                        }}
-                        // onChange={(e) => handleValidatedChange(key, e)}
-                        checked={formData.tests[key]?.validated || false}
-                        id={`validated-${key}`}
-                      />
-                      <label htmlFor={`validated-${key}`}>Validado</label>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {examinationTypes.map((examType) => {
-                if (formData.tests[examType.id]) {
-                  return null;
-                }
-                return (
-                  <button
-                    type="button"
-                    key={examType.id}
-                    className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
-                    onClick={() => {
-                      const newtestValues = examType.tests.reduce(
-                        (acc, test) => {
-                          acc[test.name] = {
-                            ...test,
-                            value: "", // Add empty value field
-                          };
-                          return acc;
-                        },
-                        {}
-                      );
-                      setFormData((prev) => ({
-                        ...prev,
-                        allValidated: false,
-                        tests: {
-                          [examType.id]: {
-                            testValues: newtestValues,
-                            testTypeName: examType.name,
-                            testTypeId: examType.id,
-                            validated: false,
-                          },
-                          ...prev.tests,
-                        },
-                      }));
-                      setTimeout(() => {
-                        document
-                          .querySelector(
-                            `input[name=${examType.tests[0].name}]`
-                          )
-                          .focus();
-                      }, 120);
-                    }}
-                  >
-                    {examType.name}
-                  </button>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          <div className="col-span-2">
-            <div className="flex justify-end space-x-4 pt-4">
-              <button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : null}
-                className={`px-16 py-3 rounded-md font-semibold ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                } ${
-                  submitString == "Actualizar"
-                    ? "bg-color4 text-color1"
-                    : "bg-color1 text-color4"
-                }`}
-              >
-                {loading ? "Procesando..." : submitString}
-              </button>
+            <div className="col-span-2">
+              <div className="flex justify-end space-x-4 pt-4">
+                <button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : null}
+                  className={`px-16 py-3 rounded-md font-semibold ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  } ${
+                    submitString == "Actualizar"
+                      ? "bg-color4 text-color1"
+                      : "bg-color1 text-color4"
+                  }`}
+                >
+                  {loading ? "Procesando..." : submitString}
+                </button>
+              </div>
             </div>
+          </form>
+        </Modal>
+        {!isModalOpen && (
+          <div
+            className="ag-theme-alpine ag-grid-no-border"
+            style={{ height: 500 }}
+          >
+            {
+              <MaterialReactTable
+                columns={columns}
+                data={data}
+                rowCount={rowCount}
+                manualPagination
+                manualSorting
+                manualFiltering
+                manualGlobalFilter
+                initialState={{
+                  density: "compact",
+                }}
+                state={{
+                  pagination,
+                  sorting,
+                  columnFilters,
+                  globalFilter,
+                  isLoading,
+                }}
+                onPaginationChange={setPagination}
+                onSortingChange={setSorting}
+                onColumnFiltersChange={setColumnFilters}
+                onGlobalFilterChange={(value) => debouncedGlobalFilter(value)}
+                enableGlobalFilter={true}
+                enableColumnFilters={true}
+                enableSorting={true}
+                enableFilters={true}
+                muiTablePaginationProps={{
+                  rowsPerPageOptions: [25, 50, 100],
+                  showFirstButton: true,
+                  showLastButton: true,
+                }}
+                muiSearchTextFieldProps={{
+                  placeholder: "Buscar",
+                  sx: { minWidth: "300px" },
+                  variant: "outlined",
+                }}
+              />
+            }
           </div>
-        </form>
-      </Modal>
-      {!isModalOpen && (
-        <div
-          className="ag-theme-alpine ag-grid-no-border"
-          style={{ height: 500 }}
+        )}
+
+        <Modal
+          title="Enviar mensaje"
+          isOpen={isMessageModalOpen}
+          onClose={() => setIsMessageModalOpen(false)}
         >
-          {
-            <MaterialReactTable
-              columns={columns}
-              data={data}
-              rowCount={rowCount}
-              manualPagination
-              manualSorting
-              manualFiltering
-              manualGlobalFilter
-              initialState={{
-                density: "compact",
-              }}
-              state={{
-                pagination,
-                sorting,
-                columnFilters,
-                globalFilter,
-                isLoading,
-              }}
-              onPaginationChange={setPagination}
-              onSortingChange={setSorting}
-              onColumnFiltersChange={setColumnFilters}
-              onGlobalFilterChange={(value) => debouncedGlobalFilter(value)}
-              enableGlobalFilter={true}
-              enableColumnFilters={true}
-              enableSorting={true}
-              enableFilters={true}
-              muiTablePaginationProps={{
-                rowsPerPageOptions: [25, 50, 100],
-                showFirstButton: true,
-                showLastButton: true,
-              }}
-              muiSearchTextFieldProps={{
-                placeholder: "Buscar",
-                sx: { minWidth: "300px" },
-                variant: "outlined",
-              }}
-            />
-          }
-        </div>
-      )}
+          <div className="flex gap-4">
+            <button
+              title="Enviar por correo"
+              onClick={() => handleMessage()}
+              className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
+            >
+              <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
+              <span className="text-sm">Enviar por correo</span>
+            </button>
 
-      <Modal
-        title="Enviar mensaje"
-        isOpen={isMessageModalOpen}
-        onClose={() => setIsMessageModalOpen(false)}
-      >
-        <div className="flex gap-4">
-          <button
-            title="Enviar por correo"
-            onClick={() => handleMessage()}
-            className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
-          >
-            <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
-            <span className="text-sm">Enviar por correo</span>
-          </button>
+            <a
+              title="Enviar por WhatsApp"
+              onClick={() =>{ 
+                setIsMessageModalOpen(false)
+                  setIsMessageSentModalOpen(true)}}
+              href={`https://wa.me/${
+                messageData?.patient?.phone_number
+              }?text=Hola ${
+                messageData?.patient?.first_name
+              }, en el siguiente link podrás ver los resultados de tu exámen: ${
+                window.location.origin
+              }/results/${resultsToken || "cargando..."}`}
+              target="_blank"
+              className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
+            >
+              <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
+              <span className="text-sm">Enviar por WhatsApp</span>
+            </a>
+          </div>
+        </Modal>
 
-          <a
-            title="Enviar por WhatsApp"
-            onClick={() =>{ 
-              setIsMessageModalOpen(false)
-                setIsMessageSentModalOpen(true)}}
-            href={`https://wa.me/${
-              messageData?.patient?.phone_number
-            }?text=Hola ${
-              messageData?.patient?.first_name
-            }, en el siguiente link podrás ver los resultados de tu exámen: ${
-              window.location.origin
-            }/results/${resultsToken || "cargando..."}`}
-            target="_blank"
-            className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
-          >
-            <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
-            <span className="text-sm">Enviar por WhatsApp</span>
-          </a>
-        </div>
-      </Modal>
-
-      <Modal
-        title="¿El mensaje de WhatsApp fue enviado?"
-        isOpen={isMessageSentModalOpen}
-        onClose={() => setIsMessageSentModalOpen(false)}
-      >
-        <p>A diferencia de enviar el mensaje por correo, con WhatsApp no sabemos si fue enviado o no, por lo tanto, necesitamos su confirmación.</p>
-        <div className="flex gap-4 justify-between mt-4">
-          <button
-            onClick={() => setIsMessageSentModalOpen(false)}
-            className="bg-gray-300 hover:shadow-xl hover:brightness-110 rounded-xl p-3 px-5"
-          >
-            No
-          </button>
-          <button
-            onClick={() => handleWhatsAppMessageSent()}
-            className="bg-color2 hover:shadow-xl hover:brightness-110 text-white rounded-xl p-3 px-5"
-          >
-            Sí, se envió
-          </button>
-        </div>
-      </Modal>
-    </div>
+        <Modal
+          title="¿El mensaje de WhatsApp fue enviado?"
+          isOpen={isMessageSentModalOpen}
+          onClose={() => setIsMessageSentModalOpen(false)}
+        >
+          <p>A diferencia de enviar el mensaje por correo, con WhatsApp no sabemos si fue enviado o no, por lo tanto, necesitamos su confirmación.</p>
+          <div className="flex gap-4 justify-between mt-4">
+            <button
+              onClick={() => setIsMessageSentModalOpen(false)}
+              className="bg-gray-300 hover:shadow-xl hover:brightness-110 rounded-xl p-3 px-5"
+            >
+              No
+            </button>
+            <button
+              onClick={() => handleWhatsAppMessageSent()}
+              className="bg-color2 hover:shadow-xl hover:brightness-110 text-white rounded-xl p-3 px-5"
+            >
+              Sí, se envió
+            </button>
+          </div>
+        </Modal>
+      </div>
+    </>
   );
 }
