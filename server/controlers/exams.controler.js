@@ -435,21 +435,20 @@ export const validateExam = catchAsync(async (req, res, next) => {
 });
 
 export const getChartData = catchAsync(async (req, res, next) => {
-  console.log("getChartData");
   console.log(req.params);
   try {
     const { period } = req.params;
 
     const total = await Exams.getDetailedCountByPeriod(period);
     const perType = await Exams.getTotalPerExaminationTypeByPeriod(period);
-    const totalPatients = await Analysis.getTotalPatientsByPeriod(period);
+    const analyses = await Analysis.getChartDataByPeriod(period);
 
     res.status(200).json({
       status: "success",
       data: {
         total,
         perType,
-        totalPatients,
+        analyses,
       },
     });
   } catch (error) {

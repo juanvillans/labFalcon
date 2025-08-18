@@ -42,20 +42,19 @@ export default function SideNav(props) {
       onMouseLeave={() => props.handleSidebarToggle()}
     >
       <Link
-        className={`mb-4 font-exo2 flex h-20 items-end justify-end rounded-md bg-white bg-opacity-5  md:h-28 ${props.isSidebarOpen ? 'p-4' : 'p-1'}`}
+        className={`duration-150 mb-4 font-exo2 flex h-20 items-end justify-end rounded-md bg-white bg-opacity-5   md:h-28 ${props.isSidebarOpen ? 'p-4' : 'p-1'}`}
         href="/"
       >
-        <div className="w-32  text-white md:w-40 flex flex-row justify-between items-end">
+        <div className="w-32 relative duration-150 text-white md:w-40 flex flex-row justify-between items-end">
           <img
             src={labFalconLogo}
-            className="logo w-12"
+            className="logo w-12 duration-150"
             alt="logo del sistema"
           />
-          {props.isSidebarOpen ? (
-            <p className={` relative top-1.5 font-semibold self-end`}>
+          
+            <p className={ props.isSidebarOpen ? "block duration-300  absolute -bottom-1 right-1 font-semibold self-end opacity-100" : "opacity-0 absolute"}>
               LabFalcón
             </p>
-          ) : null}
         </div>
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
@@ -67,15 +66,20 @@ export default function SideNav(props) {
                 end
                 key={eachLink.href}
                 className={({ isActive }) =>
-                  `flex h-[48px]  grow items-center relative justify-center gap-2  text-sm font-medium hover:bg-sky-100 md:flex-none md:justify-start pl-2 ${
+                  `flex h-[48px] hover:text-color3 grow items-center relative justify-between gap-2  text-sm font-medium hover:bg-sky-100 md:flex-none md:justify-between pl-2 ${
                     isActive
                       ? "bg-gray-50 activeLink text-color1 rounded-l-2xl"
                       : "text-gray-50"
                   }`
                 }
               >
-                <Icon icon={eachLink.icon} width={24} height={24} />
-                {props.isSidebarOpen ? eachLink.name : null}
+                <div className="grid grid-cols-12  items-center">
+                    <Icon className={` col-span-3 z-10`} icon={eachLink.icon} width={24} height={24} />
+                    <span className={props.isSidebarOpen ? "opacity-100" : "opacity-0" + " duration-200 z-0"}>
+                      {eachLink.name}
+                    </span>
+
+                </div>
               </NavLink>
             );
           }

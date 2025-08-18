@@ -126,7 +126,7 @@ class Analysis {
     }
   }
 
-  static async getTotalPatientsByPeriod(period) {
+  static async getChartDataByPeriod(period) {
     let query = db("analysis");
     const today = new Date();
 
@@ -155,8 +155,19 @@ class Analysis {
         throw new Error("Invalid period specified");
     }
 
-    const result = await query.countDistinct("ci as total").first();
-    return parseInt(result.total);
+    const result = await query.select(
+      db.raw("COUNT(CASE WHEN message_status = 'ENVIADO' THEN 1 END) as message_sent"),
+      db.raw("COUNT(CASE WHEN message_status = 'NO_ENVIADO' THEN 1 END) as message_not_sent"),
+      db.raw("COUNT(CASE WHEN message_status = 'LEIDO' THEN 1 END) as message_read"),
+      db.raw("COUNT(DISTINCT ci) as total_patients")
+    ).first();
+
+    return {
+      total_patients: parseInt(result.total_patients),
+      message_sent: parseInt(result.message_sent),
+      message_not_sent: parseInt(result.message_not_sent),
+      message_read: parseInt(result.message_read),
+    } 
   }
 }
 

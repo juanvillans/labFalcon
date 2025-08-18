@@ -33,17 +33,25 @@ body,
   font-family: "Inter", sans-serif !important;
   font-optical-sizing: auto;
 }
+body {
+  scrollbar-color: #dcdddd transparent;
+  scrollbar-width: thin;
+  border-radius: 20px;
+}
+
 /* Remove shadow from MaterialReactTable paper */
 .MuiPaper-root {
   --paper-shadow: none !important;
-  box-shadow: 8px 8px 50px #bebebe, -8px -8px 50px #ffffff !important;
-  background: #f0f0f3 !important;
+  box-shadow: 8px 8px 30px #e0e0e0, -8px -8px 50px #ffffff !important;
   border-radius: 20px !important;
+}
+td.MuiTableCell-root {
+  border-color: rgb(247, 247, 247) !important;
 }
 .neuphormism {
   border-radius: 40px;
-  background: #f0f0f0;
-  box-shadow: 12px 12px 50px #d3d3d3, -12px -12px 50px #ffffff;
+  background: #f7f7f7;
+  box-shadow: 12px 12px 25px #d3d3d3ec, -12px -12px 15px #ffffff;
 }
 
 h1,

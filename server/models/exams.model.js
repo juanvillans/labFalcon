@@ -85,7 +85,8 @@ class Exams {
       .select(
         db.raw("COUNT(*) as total"),
         db.raw("COUNT(CASE WHEN validated = true THEN 1 END) as validated"),
-        db.raw("COUNT(CASE WHEN validated = false THEN 1 END) as not_validated")
+        db.raw("COUNT(CASE WHEN validated = false THEN 1 END) as not_validated"),
+       
       )
       .first();
 
@@ -104,7 +105,7 @@ class Exams {
         "exams.examination_type_id",
         "examination_types.id"
       )
-      .select("examination_types.name", db.raw("COUNT(*) as total"));
+     
 
     const today = new Date();
 
@@ -132,10 +133,17 @@ class Exams {
       default:
         throw new Error("Invalid period specified");
     }
-    query.groupBy("examination_types.name");
+    query.select(
+      db.raw("examination_types.name as id"), // Utiliza 'name' como 'id'
+      db.raw("examination_types.name as label"), // Renombra 'name' a 'label'
+      db.raw("COUNT(*) as value") // Renombra 'total' a 'value'
+  )
+   .groupBy("examination_types.name");
 
     return query;
   }
+
+
   static async findById(id) {
     const exam = await db("exams").where("id", id).first();
 

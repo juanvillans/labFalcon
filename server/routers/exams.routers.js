@@ -12,6 +12,7 @@ examsRouter.post("/generate-results-token", protect, generateToken);
 examsRouter.post("/send-results", protect, sendExamResults);
 examsRouter.put("/update-message-status/:id", protect, updateMessageStatusEndpoint);
 examsRouter.put("/validate-exam", protect, requireValidateExam, validateExam);
+examsRouter.post("/", protect, createExam);
 
 // Las rutas con parámetros van AL FINAL
 examsRouter.get("/:id", protect, findExamById);
