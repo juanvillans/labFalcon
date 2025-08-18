@@ -3,6 +3,17 @@
       CREATE TYPE message_status_enum AS ENUM ('NO_ENVIADO', 'ENVIADO', 'LEIDO')
     `);
 
+    // Create trigger function for updated_at
+    await knex.raw(`
+      CREATE OR REPLACE FUNCTION update_updated_at_column()
+      RETURNS TRIGGER AS $$
+      BEGIN
+          NEW.updated_at = CURRENT_TIMESTAMP;
+          RETURN NEW;
+      END;
+      $$ language 'plpgsql';
+    `);
+
     // Check if table exists before creating
     const usersTableExists = await knex.schema.hasTable('users');
     if (!usersTableExists) {
@@ -15,8 +26,8 @@
         table.boolean('allow_handle_users').defaultTo(false);
         table.string('password');
         table.string('status').notNullable();  
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.timestamp('updated_at').defaultTo(knex.fn.now());
+        table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+        table.timestamp('updated_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       });
     }
 
@@ -45,8 +56,8 @@
         table.string('sex');
         table.boolean('allValidated').defaultTo(false);
         table.enum('message_status', ['NO_ENVIADO', 'ENVIADO', 'LEIDO']).defaultTo('NO_ENVIADO');
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.timestamp('updated_at').defaultTo(knex.fn.now());
+        table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+        table.timestamp('updated_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       });
     }
     const analysis_examsTableExists = await knex.schema.hasTable('analysis_exams');
@@ -65,15 +76,44 @@
         table.integer('examination_type_id').notNullable();
         table.jsonb('tests_values').notNullable();
         table.boolean('validated').defaultTo(false);
-
+        table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+        table.timestamp('updated_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       });
     }
+
+    // Apply trigger to analysis table
+    await knex.raw(`
+      CREATE TRIGGER update_analysis_updated_at 
+      BEFORE UPDATE ON analysis 
+      FOR EACH ROW 
+      EXECUTE FUNCTION update_updated_at_column();
+    `);
+
+    // Apply trigger to other tables
+    await knex.raw(`
+      CREATE TRIGGER update_users_updated_at 
+      BEFORE UPDATE ON users 
+      FOR EACH ROW 
+      EXECUTE FUNCTION update_updated_at_column();
+    `);
   }
 
 
   export async function down(knex) {
+    // Eliminar triggers primero
+    await knex.raw('DROP TRIGGER IF EXISTS update_analysis_updated_at ON analysis');
+    await knex.raw('DROP TRIGGER IF EXISTS update_users_updated_at ON users');
+    
+    // Eliminar función
+    await knex.raw('DROP FUNCTION IF EXISTS update_updated_at_column()');
+    
+    // Eliminar tablas en orden correcto (por dependencias)
+    await knex.schema.dropTableIfExists('analysis_exams');
+    await knex.schema.dropTableIfExists('exams');
+    await knex.schema.dropTableIfExists('analysis');
     await knex.schema.dropTableIfExists('examination_types');
     await knex.schema.dropTableIfExists('users');
-    await knex.schema.dropTableIfExists('analysis');
+    
+    // Eliminar enum al final
     await knex.raw('DROP TYPE IF EXISTS message_status_enum');
   }

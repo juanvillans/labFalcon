@@ -39,8 +39,7 @@ class Analysis {
           address: examData.patient.address,
           sex: examData.patient.sex,
           allValidated: examData.allValidated || false,
-          created_at: trx.fn.now(),
-          updated_at: trx.fn.now(),
+          // Remove created_at and updated_at - let database handle defaults
         })
         .returning("*");
 
@@ -125,6 +124,39 @@ class Analysis {
     } catch (error) {
       throw new Error("Failed to delete exam");
     }
+  }
+
+  static async getTotalPatientsByPeriod(period) {
+    let query = db("analysis");
+    const today = new Date();
+
+    switch (period) {
+      case "today":
+        query.where("created_at", ">=", new Date(today.setHours(0, 0, 0, 0)));
+        break;
+      case "this_week":
+        const startOfWeek = new Date(
+          today.setDate(today.getDate() - today.getDay())
+        );
+        startOfWeek.setHours(0, 0, 0, 0);
+        query.where("created_at", ">=", startOfWeek);
+        break;
+      case "this_month":
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        query.where("created_at", ">=", startOfMonth);
+        break;
+      case "this_year":
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        startOfYear.setHours(0, 0, 0, 0);
+        query.where("created_at", ">=", startOfYear);
+        break;
+      default:
+        throw new Error("Invalid period specified");
+    }
+
+    const result = await query.countDistinct("ci as total").first();
+    return parseInt(result.total);
   }
 }
 

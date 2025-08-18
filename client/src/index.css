@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,100..900&family=Inter:ital,opsz,wght@1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,100..900&family=Inter:ital,opsz,wght@1,14..32,100..900&display=swap");
 
 @keyframes slideIn {
   from {
@@ -25,26 +25,32 @@
     opacity: 0;
   }
 }
-body, 
-.MuiDataGrid-root, 
-.MuiDataGrid-columnHeader, 
-.MuiDataGrid-cell, 
+body,
+.MuiDataGrid-root,
+.MuiDataGrid-columnHeader,
+.MuiDataGrid-cell,
 .MuiDataGrid-toolbarContainer {
   font-family: "Inter", sans-serif !important;
   font-optical-sizing: auto;
 }
 /* Remove shadow from MaterialReactTable paper */
 .MuiPaper-root {
- --paper-shadow: none !important;
-  box-shadow: 
-    10px 10px 50px #bebebe,
-    -10px -10px 50px #ffffff !important;
+  --paper-shadow: none !important;
+  box-shadow: 8px 8px 50px #bebebe, -8px -8px 50px #ffffff !important;
   background: #f0f0f3 !important;
   border-radius: 20px !important;
 }
+.neuphormism {
+  border-radius: 40px;
+  background: #f0f0f0;
+  box-shadow: 12px 12px 50px #d3d3d3, -12px -12px 50px #ffffff;
+}
 
-
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-family: "Exo 2", sans-serif !important;
   font-optical-sizing: auto;
 }
@@ -85,7 +91,10 @@ h1, h2, h3, h4, h5 {
   border-color: white !important;
   box-shadow: 1px 1px 8px rgba(61, 61, 61, 0.13);
 }
-.MuiDataGrid-row, .MuiDataGrid-cell, .MuiDataGrid-virtualScrollerContent .css-aymtem-MuiDataGrid-virtualScrollerContent{
+.MuiDataGrid-row,
+.MuiDataGrid-cell,
+.MuiDataGrid-virtualScrollerContent
+  .css-aymtem-MuiDataGrid-virtualScrollerContent {
   border-color: white !important;
 }
 
@@ -111,7 +120,7 @@ h1, h2, h3, h4, h5 {
   font-weight: 600 !important;
   color: #495057 !important;
 }
-/* From Uiverse.io by virus231 */ 
+/* From Uiverse.io by virus231 */
 .button {
   background: linear-gradient(140.14deg, #59d6df 15.05%, #0554af 114.99%)
       padding-box,
@@ -204,7 +213,12 @@ h1, h2, h3, h4, h5 {
 /* Optimized animations with will-change and transform3d */
 .gradient-bg .g1 {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color1), 0.6) 0, rgba(var(--color1), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color1), 0.6) 0,
+      rgba(var(--color1), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: var(--circle-size);
   height: var(--circle-size);
@@ -217,7 +231,12 @@ h1, h2, h3, h4, h5 {
 }
 .gradient-bg .g2 {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color2), 0.6) 0, rgba(var(--color2), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color2), 0.6) 0,
+      rgba(var(--color2), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: var(--circle-size);
   height: var(--circle-size);
@@ -230,7 +249,12 @@ h1, h2, h3, h4, h5 {
 }
 .gradient-bg .g3 {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color3), 0.8) 0,
+      rgba(var(--color3), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: var(--circle-size);
   height: var(--circle-size);
@@ -242,7 +266,12 @@ h1, h2, h3, h4, h5 {
 }
 .gradient-bg .g4 {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color4), 0.8) 0,
+      rgba(var(--color4), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: var(--circle-size);
   height: var(--circle-size);
@@ -254,7 +283,12 @@ h1, h2, h3, h4, h5 {
 }
 .gradient-bg .g5 {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color5), 0.8) 0,
+      rgba(var(--color5), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: calc(var(--circle-size) * 2);
   height: calc(var(--circle-size) * 2);
@@ -267,7 +301,12 @@ h1, h2, h3, h4, h5 {
 /* Optimize interactive element */
 .gradient-bg .interactive {
   position: absolute;
-  background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.5) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
+  background: radial-gradient(
+      circle at center,
+      rgba(var(--color-interactive), 0.5) 0,
+      rgba(var(--color-interactive), 0) 50%
+    )
+    no-repeat;
   mix-blend-mode: var(--blending);
   width: 80%; /* Reduced size */
   height: 80%;

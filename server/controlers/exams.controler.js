@@ -434,4 +434,27 @@ export const validateExam = catchAsync(async (req, res, next) => {
   }
 });
 
+export const getChartData = catchAsync(async (req, res, next) => {
+  console.log("getChartData");
+  console.log(req.params);
+  try {
+    const { period } = req.params;
+
+    const total = await Exams.getDetailedCountByPeriod(period);
+    const perType = await Exams.getTotalPerExaminationTypeByPeriod(period);
+    const totalPatients = await Analysis.getTotalPatientsByPeriod(period);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        total,
+        perType,
+        totalPatients,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 

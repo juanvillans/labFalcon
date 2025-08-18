@@ -4,8 +4,10 @@ class Exams {
   constructor(data) {
     this.id = data.id || null;
     this.tests_values = data.tests_values;
-    this.examination_type_id = data.test
+    this.examination_type_id = data.examination_type_id;
     this.validated = data.validated;
+    this.created_at = data.created_at;
+    this.updated_at = data.updated_at;
   }
   static async createWithTransaction(trx, examData) {
     try {
@@ -14,10 +16,11 @@ class Exams {
           examination_type_id: examData.testTypeId,
           validated: examData.validated,
           tests_values: JSON.stringify(examData.tests_values),
+          // Remove created_at and updated_at - let database handle defaults
         })
         .returning("*");
 
-      return new Exams({ ...exam});
+      return new Exams({ ...exam });
     } catch (error) {
       if (error.code === "23505") {
         throw new Error("Exam with this CI already exists");
@@ -35,19 +38,109 @@ class Exams {
         "exams.examination_type_id",
         "examination_types.id"
       )
-      .select("exams.*", "examination_types.name as examination_type_name",  db.raw("to_char(exams.date_birth, 'YYYY-MM-DD') as date_birth")
-    );
+      .select(
+        "exams.*",
+        "examination_types.name as examination_type_name",
+        db.raw("to_char(exams.date_birth, 'YYYY-MM-DD') as date_birth")
+      );
 
     return exams.map((exam) => new Exams(exam));
   }
 
+  static async getDetailedCountByPeriod(period) {
+    let query = db("exams");
+    console.log({ period });
+    const today = new Date();
+
+    switch (period) {
+      case "today":
+        query.where("created_at", ">=", new Date(today.setHours(0, 0, 0, 0)));
+        break;
+      case "this_week":
+        const lastSunday = new Date(
+          today.setDate(today.getDate() - today.getDay())
+        );
+        lastSunday.setHours(0, 0, 0, 0); // Start of the day
+        query.where("created_at", ">=", lastSunday);
+        break;
+      case "this_month":
+        const firstDayOfMonth = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          1
+        );
+        firstDayOfMonth.setHours(0, 0, 0, 0);
+        query.where("created_at", ">=", firstDayOfMonth);
+        break;
+      case "this_year":
+        const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+        firstDayOfYear.setHours(0, 0, 0, 0);
+        query.where("created_at", ">=", firstDayOfYear);
+        break;
+      default:
+        throw new Error("Invalid period specified");
+    }
+
+    const result = await query
+      .select(
+        db.raw("COUNT(*) as total"),
+        db.raw("COUNT(CASE WHEN validated = true THEN 1 END) as validated"),
+        db.raw("COUNT(CASE WHEN validated = false THEN 1 END) as not_validated")
+      )
+      .first();
+
+    return {
+      total: parseInt(result.total),
+      validated: parseInt(result.validated),
+      not_validated: parseInt(result.not_validated),
+    };
+  }
+
+  static async getTotalPerExaminationTypeByPeriod(period) {
+    console.log({ period });
+    let query = db("exams")
+      .join(
+        "examination_types",
+        "exams.examination_type_id",
+        "examination_types.id"
+      )
+      .select("examination_types.name", db.raw("COUNT(*) as total"));
+
+    const today = new Date();
+
+    switch (period) {
+      case "today":
+        query.where("exams.created_at", ">=", new Date(today.setHours(0, 0, 0, 0)));
+        break;
+      case "this_week":
+        const startOfWeek = new Date(
+          today.setDate(today.getDate() - today.getDay())
+        );
+        startOfWeek.setHours(0, 0, 0, 0);
+        query.where("exams.created_at", ">=", startOfWeek);
+        break;
+      case "this_month":
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        query.where("exams.created_at", ">=", startOfMonth);
+        break;
+      case "this_year":
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        startOfYear.setHours(0, 0, 0, 0);
+        query.where("exams.created_at", ">=", startOfYear);
+        break;
+      default:
+        throw new Error("Invalid period specified");
+    }
+    query.groupBy("examination_types.name");
+
+    return query;
+  }
   static async findById(id) {
     const exam = await db("exams").where("id", id).first();
 
     return exam ? new Exams(exam) : null;
   }
-
- 
 
   static async delete(id) {
     try {
@@ -61,9 +154,7 @@ class Exams {
   static async deleteMultipleWithTransaction(trx, examIds) {
     try {
       if (examIds.length > 0) {
-        await trx("exams")
-          .whereIn("id", examIds)
-          .del();
+        await trx("exams").whereIn("id", examIds).del();
       }
       return true;
     } catch (error) {
@@ -74,9 +165,7 @@ class Exams {
   static async deleteMultiple(examIds) {
     try {
       if (examIds.length > 0) {
-        await db("exams")
-          .whereIn("id", examIds)
-          .del();
+        await db("exams").whereIn("id", examIds).del();
       }
       return true;
     } catch (error) {
