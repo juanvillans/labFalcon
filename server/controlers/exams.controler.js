@@ -119,6 +119,7 @@ export const getExams = catchAsync(async (req, res, next) => {
                 analysisQuery = analysisQuery.whereILike(fieldName, `%${value}%`);
               }
             } else {
+              console.log({ field, value });
               // Handle direct fields
               if (field === 'allValidated') {
                 analysisQuery = analysisQuery.where(field, value === 'true');
@@ -131,7 +132,10 @@ export const getExams = catchAsync(async (req, res, next) => {
                     [ageValue]
                   );
                 }
-              } else {
+              } else if (field === 'message_status') {
+                analysisQuery = analysisQuery.where(field, value);
+              }
+               else {
                 analysisQuery = analysisQuery.whereILike(field, `%${value}%`);
               }
             }

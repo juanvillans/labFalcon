@@ -58,7 +58,7 @@ export default function HomePage() {
     <>
       <title>Dashboard - LabFalcón</title>
       <div>
-        <h1 className="text-2xl font-bold mb-4 ">Dashboard</h1>
+        <h1 className="text-lg md:text-2xl font-bold mb-4 ">Dashboard</h1>
         <FormField
           name={"sex"}
           type={"select"}
@@ -77,8 +77,8 @@ export default function HomePage() {
         />
 
         {chartData && (
-          <div className="grid grid-cols-4 min-h-36 gap-6 mt-4">
-            <div className="rounded-md p-7 neuphormism hover:shadow-none flex flex-col justify-between ">
+          <div className="md:grid space-y-4 grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4">
+            <div className="rounded-md p-4 md:p-7 neuphormism hover:shadow-none flex flex-col justify-between ">
               <p>Total Exámenes realizados</p>
               <b className=" text-gray-500 mt-auto text-right w-full ml-auto   flex justify-end items-end">
                 <Icon
@@ -95,7 +95,7 @@ export default function HomePage() {
               </b>
             </div>
 
-            <div className="rounded-md p-7 neuphormism hover:shadow-none flex flex-col justify-between ">
+            <div className="rounded-md p-4 md:p-7 neuphormism hover:shadow-none flex flex-col justify-between ">
               <p>Total Pacientes atendidos</p>
               <b className=" text-gray-500 mt-auto text-right w-full ml-auto   flex justify-end items-end">
                 <Icon
@@ -114,7 +114,7 @@ export default function HomePage() {
               </b>
             </div>
 
-            <div className="rounded-md p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Estado de examenes</p>
               <ResponsivePie /* or Pie for fixed dimensions */
                 data={[
@@ -141,12 +141,12 @@ export default function HomePage() {
                 arcLabelsSkipAngle={10}
                 arcLabelsTextColor={{
                   from: "color",
-                  modifiers: [["darker", 2]],
+                  modifiers: [["darker", 4]],
                 }}
               />
             </div>
 
-            <div className="rounded-md p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Tipo de exámenes realizados</p>
               <ResponsivePie /* or Pie for fixed dimensions */
                 data={chartData?.perType}
@@ -162,29 +162,28 @@ export default function HomePage() {
                 arcLabelsSkipAngle={10}
                 arcLabelsTextColor={{
                   from: "color",
-                  modifiers: [["darker", 2]],
+                  modifiers: [["darker", 4]],
                 }}
               />
             </div>
 
-
-            <div className="rounded-md p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
-              <p>Resultados validados enviados</p>
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Mensaje de resultados validados</p>
               <ResponsivePie /* or Pie for fixed dimensions */
                 data={[
                   {
-                    id: "enviados",
-                    label: "Enviados",
+                    id: "Enviado",
+                    label: "Enviado",
                     value: chartData?.analyses.message_sent,
                   },
                   {
-                    id: "no enviados",
-                    label: "No Enviados",
+                    id: "No enviado",
+                    label: "No Enviado",
                     value: chartData?.analyses.message_not_sent,
                   },
                   {
-                    id: "leidos",
-                    label: "Leidos",
+                    id: "Leído",
+                    label: "Leído",
                     value: chartData?.analyses.message_read,
                   },
                 ]}
@@ -200,10 +199,13 @@ export default function HomePage() {
                 arcLabelsSkipAngle={10}
                 arcLabelsTextColor={{
                   from: "color",
-                  modifiers: [["darker", 2]],
+                  modifiers: [["darker", 4]],
                 }}
               />
             </div>
+
+
+        
           </div>
         )}
       </div>

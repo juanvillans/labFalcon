@@ -87,7 +87,7 @@ export function FeedbackProvider({ children }) {
   const messagesContainer = (
     <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
       {messages.map(({ id, message, type }) => (
-        <div key={id} className="animate-slideIn">
+        <div key={id} className="animate-slideIn z-50">
           <FeedbackMessage 
             message={message} 
             type={type} 

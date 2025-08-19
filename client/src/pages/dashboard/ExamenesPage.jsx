@@ -14,6 +14,8 @@ import { useFeedback } from "../../context/FeedbackContext";
 import PrintPage from "../../components/PrintableExamResult";
 import { MaterialReactTable } from "material-react-table";
 
+
+
 import debounce from "lodash.debounce";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -48,8 +50,10 @@ export default function ExamenesPage() {
   const [messageData, setMessageData] = useState({});
   const [resultsToken, setResultsToken] = useState(null);
   const [examinationTypes, setExaminationTypes] = useState([]);
+  const [loadingMessage, setLoadingMessage] = useState(false);
   const { user } = useAuth();
-  console.log({user})
+
+  console.log({ user });
   // Form configuration for ReusableForm
   const patientFormFields = useMemo(() => [
     {
@@ -269,7 +273,7 @@ export default function ExamenesPage() {
         filterFn: "equals",
         enableColumnFilter: true,
         enableSorting: true,
-        Cell: ({ cell }) => (cell.getValue() ? "Sí" : "No"),
+        Cell: ({ cell }) => (cell.getValue() ? <Icon className="relative -left-1.5 text-color2 w-7 h-7" icon="bitcoin-icons:verify-filled" />  : <Icon icon="octicon:unverifed-24" className="text-gray-600 w-4 h-4" />),
         filterVariant: "select",
         filterSelectOptions: [
           { value: "true", label: "Validado" },
@@ -279,29 +283,54 @@ export default function ExamenesPage() {
       {
         accessorKey: "message_status",
         header: "Estado de envio",
-        id: "enviado",
         size: 100,
         Cell: ({ cell }) => {
           const value = cell.getValue();
           if (value === "ENVIADO") {
             return (
               <div className="flex items-center gap-2">
-                <Icon className="text-gray-500" icon="iconamoon:check-fill" width={20} height={20} />
+                <Icon
+                  className="text-gray-500"
+                  icon="iconamoon:check-fill"
+                  width={20}
+                  height={20}
+                />
                 <p>Enviado</p>
               </div>
             );
           } else if (value === "LEIDO") {
             return (
               <div className="flex items-center gap-2">
-                <Icon className="text-color3" icon={"line-md:check-all"} width={20} height={20} />
+                <Icon
+                  className="text-color3"
+                  icon={"line-md:check-all"}
+                  width={20}
+                  height={20}
+                />
                 <p>Leído</p>
               </div>
             );
           } else {
-            return null;
+            return (
+              <div className="flex items-center gap-2 opacity-50">
+                <Icon
+                  className="text-red-500"
+                  icon={"line-md:close"}
+                  width={20}
+                  height={20}
+                />
+                <p>No Enviado</p>
+              </div>
+            );
           }
         },
-        enableColumnFilter: false,
+        enableColumnFilter: true,
+        filterVariant: "select",
+        filterSelectOptions: [
+          { value: "ENVIADO", label: "Enviado" },
+          { value: "LEIDO", label: "Leído" },
+          { value: "NO_ENVIADO", label: "No Enviado" },
+        ],
         enableSorting: false,
       },
       {
@@ -315,6 +344,7 @@ export default function ExamenesPage() {
           return (
             <div className="flex gap-2 justify-center items-center">
               <button
+                className="mx-1 p-1 hover:p-2 duration-75 text-gray-500 hover:bg-blue-100 hover:text-color3 rounded-full"
                 onClick={() => {
                   setIsModalOpen(true);
                   setFormData({
@@ -327,7 +357,12 @@ export default function ExamenesPage() {
                 }}
                 title="Editar"
               >
-                <Icon icon="hugeicons:edit-02" width={20} height={20} />
+                <Icon
+                  icon="material-symbols:edit"
+                  className=""
+                  width={20}
+                  height={20}
+                />
               </button>
 
               <PrintPage data={data} isHidden={true} />
@@ -335,7 +370,7 @@ export default function ExamenesPage() {
               {data.allValidated && (
                 <button
                   title="Enviar mensaje"
-                  className="mx-1  hover:bg-blue-100 rounded-full"
+                  className="mx-1 p-1 hover:p-2 duration-75 text-gray-600  hover:bg-green-100 hover:text-green-600 rounded-full"
                   onClick={async () => {
                     setMessageData(data);
                     setIsMessageModalOpen(true);
@@ -346,7 +381,9 @@ export default function ExamenesPage() {
                 >
                   <Icon
                     icon="carbon:send-alt"
-                    className="w-6 h-6 text-gray-500"
+                    className=""
+                    width={20}
+                    height={20}
                   />
                 </button>
               )}
@@ -354,12 +391,9 @@ export default function ExamenesPage() {
               <button
                 onClick={() => handleDelete(data.id)}
                 title="Eliminar"
-                className="ml-auto"
+                className="ml-auto hover:p-2 duration-75 text-gray-500 hover:bg-red-100 rounded-full p-1 hover:text-red-600"
               >
-                <Icon
-                  icon="heroicons:trash"
-                  className="w-5 h-5 text-gray-500"
-                />
+                <Icon icon="heroicons:trash" className="w-5 h-5" />
               </button>
             </div>
           );
@@ -370,6 +404,7 @@ export default function ExamenesPage() {
   );
 
   const handleMessage = async () => {
+    setLoadingMessage(true);
     try {
       await examResultsAPI.sendExamResults(messageData);
       showSuccess("Mensaje enviado con éxito");
@@ -381,6 +416,7 @@ export default function ExamenesPage() {
         error.response?.data?.message || error.message || "An error occurred";
       showError(errorMessage);
     }
+    setLoadingMessage(false);
   };
   const handleWhatsAppMessageSent = async () => {
     try {
@@ -601,8 +637,8 @@ export default function ExamenesPage() {
     <>
       <title>Exámenes Médicos - LabFalcón</title>
       <div style={{ height: 580, width: "100%" }}>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Exámenes médicos</h1>
+        <div className="md:flex justify-between items-center mb-4">
+          <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">Exámenes médicos</h1>
           <FuturisticButton
             onClick={() => {
               setIsModalOpen(true);
@@ -628,7 +664,9 @@ export default function ExamenesPage() {
             onSubmit={onSubmit}
           >
             <div className="space-y-3 z-10">
-              <h2 className="text-xl font-bold mb-2">Información del Paciente</h2>
+              <h2 className="text-xl font-bold mb-2">
+                Información del Paciente
+              </h2>
               <div className="grid grid-cols-2 gap-4">
                 {formData?.patient?.ci.length >= 6 && (
                   <div className="w-full col-span-2 h-6 overflow-hidden text-center">
@@ -751,18 +789,18 @@ export default function ExamenesPage() {
                       </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(formData.tests[key]?.testValues || {})?.map(
-                        ([name, field]) => (
-                          <MemoizedTestField
-                            key={name}
-                            field={field}
-                            value={formData.tests[key]?.testValues?.[name]?.value}
-                            onChange={handleTestInputChange}
-                            testKey={key}
-                            fieldName={name}
-                          />
-                        )
-                      )}
+                      {Object.entries(
+                        formData.tests[key]?.testValues || {}
+                      )?.map(([name, field]) => (
+                        <MemoizedTestField
+                          key={name}
+                          field={field}
+                          value={formData.tests[key]?.testValues?.[name]?.value}
+                          onChange={handleTestInputChange}
+                          testKey={key}
+                          fieldName={name}
+                        />
+                      ))}
                       <div className="ml-auto col-span-2 flex items-center gap-3">
                         <input
                           type="checkbox"
@@ -907,18 +945,23 @@ export default function ExamenesPage() {
           <div className="flex gap-4">
             <button
               title="Enviar por correo"
-              onClick={() => handleMessage()}
+              onClick={() => loadingMessage || handleMessage()}
               className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
-            >
-              <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
-              <span className="text-sm">Enviar por correo</span>
+              >
+              {loadingMessage ? (
+                <CircularProgress size={20} />
+              ) : (
+                <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
+              )}
+              <span className="text-sm">{loadingMessage ? "Enviando..." : "Enviar por correo"} </span>
             </button>
 
             <a
               title="Enviar por WhatsApp"
-              onClick={() =>{ 
-                setIsMessageModalOpen(false)
-                  setIsMessageSentModalOpen(true)}}
+              onClick={() => {
+                setIsMessageModalOpen(false);
+                setIsMessageSentModalOpen(true);
+              }}
               href={`https://wa.me/${
                 messageData?.patient?.phone_number
               }?text=Hola ${
@@ -940,7 +983,11 @@ export default function ExamenesPage() {
           isOpen={isMessageSentModalOpen}
           onClose={() => setIsMessageSentModalOpen(false)}
         >
-          <p>A diferencia de enviar el mensaje por correo, con WhatsApp no sabemos si fue enviado o no, por lo tanto, necesitamos su confirmación.</p>
+          <p>
+            A diferencia de enviar el mensaje por correo, con WhatsApp no
+            sabemos si fue enviado o no, por lo tanto, necesitamos su
+            confirmación.
+          </p>
           <div className="flex gap-4 justify-between mt-4">
             <button
               onClick={() => setIsMessageSentModalOpen(false)}

@@ -154,9 +154,12 @@ export default function UsuariosPage() {
               setFormData({ ...row.original });
               setSubmitString("Actualizar");
             }}
+            className="mx-1 p-1 hover:p-2 duration-75 text-gray-500 hover:bg-blue-100 hover:text-color3 rounded-full"
+
             title="Editar"
           >
-            <Icon icon="hugeicons:edit-02" width={20} height={20} />
+
+            <Icon icon="material-symbols:edit" width={20} height={20} />
           </button>
         </div>
       ),
@@ -183,8 +186,8 @@ export default function UsuariosPage() {
     <>
       <title>Gestión de Usuarios - LabFalcón</title>
       <div style={{ height: 580, width: "100%" }}>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
+        <div className="md:flex justify-between items-center mb-4">
+          <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">Gestión de Usuarios</h1>
           <FuturisticButton
             onClick={() => {
               if (submitString === "Actualizar") {
