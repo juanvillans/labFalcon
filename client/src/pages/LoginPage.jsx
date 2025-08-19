@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
  
     let emailInput = document.querySelector("#email");
     emailInput.focus()
+
+  
   }, 300);
+
 });
 
 export default function LoginPage() {

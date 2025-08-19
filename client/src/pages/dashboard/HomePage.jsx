@@ -141,7 +141,7 @@ export default function HomePage() {
                 arcLabelsSkipAngle={10}
                 arcLabelsTextColor={{
                   from: "color",
-                  modifiers: [["darker", 2]],
+                  modifiers: [["darker", 4]],
                 }}
               />
             </div>
@@ -162,7 +162,44 @@ export default function HomePage() {
                 arcLabelsSkipAngle={10}
                 arcLabelsTextColor={{
                   from: "color",
-                  modifiers: [["darker", 2]],
+                  modifiers: [["darker", 4]],
+                }}
+              />
+            </div>
+
+            <div className="rounded-md p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Mensaje de resultados validados</p>
+              <ResponsivePie /* or Pie for fixed dimensions */
+                data={[
+                  {
+                    id: "Enviado",
+                    label: "Enviado",
+                    value: chartData?.analyses.message_sent,
+                  },
+                  {
+                    id: "No enviado",
+                    label: "No Enviado",
+                    value: chartData?.analyses.message_not_sent,
+                  },
+                  {
+                    id: "Leído",
+                    label: "Leído",
+                    value: chartData?.analyses.message_read,
+                  },
+                ]}
+                innerRadius={0.5}
+                margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
+                padAngle={0.6}
+                cornerRadius={2}
+                activeOuterRadiusOffset={8}
+                arcLinkLabelsSkipAngle={10}
+                arcLinkLabelsTextColor="#333333"
+                arcLinkLabelsThickness={2}
+                arcLinkLabelsColor={{ from: "color" }}
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor={{
+                  from: "color",
+                  modifiers: [["darker", 4]],
                 }}
               />
             </div>
