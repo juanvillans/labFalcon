@@ -166,6 +166,44 @@ export default function HomePage() {
                 }}
               />
             </div>
+
+
+            <div className="rounded-md p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Resultados validados enviados</p>
+              <ResponsivePie /* or Pie for fixed dimensions */
+                data={[
+                  {
+                    id: "enviados",
+                    label: "Enviados",
+                    value: chartData?.analyses.message_sent,
+                  },
+                  {
+                    id: "no enviados",
+                    label: "No Enviados",
+                    value: chartData?.analyses.message_not_sent,
+                  },
+                  {
+                    id: "leidos",
+                    label: "Leidos",
+                    value: chartData?.analyses.message_read,
+                  },
+                ]}
+                innerRadius={0.5}
+                margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
+                padAngle={0.6}
+                cornerRadius={2}
+                activeOuterRadiusOffset={8}
+                arcLinkLabelsSkipAngle={10}
+                arcLinkLabelsTextColor="#333333"
+                arcLinkLabelsThickness={2}
+                arcLinkLabelsColor={{ from: "color" }}
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor={{
+                  from: "color",
+                  modifiers: [["darker", 2]],
+                }}
+              />
+            </div>
           </div>
         )}
       </div>
