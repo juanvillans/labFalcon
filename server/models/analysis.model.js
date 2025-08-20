@@ -12,18 +12,17 @@ class Analysis {
     this.phone_number = patientData.phone_number;
     this.address = patientData.address;
     this.sex = patientData.sex;
-    this.allValidated = data.allValidated;
+    this.all_validated = data.all_validated;
     this.updated_at = data.updated_at;
     this.created_at = data.created_at;
-    
+
     // Add virtual fields (not stored in DB)
-    this.created_date = new Date(data.created_at).toISOString().split('T')[0]; // "2025-07-02"
-    this.created_time = new Date(data.created_at).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+    this.created_date = new Date(data.created_at).toISOString().split("T")[0]; // "2025-07-02"
+    this.created_time = new Date(data.created_at).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     }); // "3:36 PM"
-  
   }
 
   static async createWithTransaction(trx, examData) {
@@ -38,7 +37,7 @@ class Analysis {
           phone_number: examData.patient.phone_number,
           address: examData.patient.address,
           sex: examData.patient.sex,
-          allValidated: examData.allValidated || false,
+          all_validated: examData.all_validated || false,
           // Remove created_at and updated_at - let database handle defaults
         })
         .returning("*");
@@ -54,8 +53,6 @@ class Analysis {
     }
   }
 
-
-
   static async findById(id) {
     const exam = await db("analysis").where("id", id).first();
 
@@ -64,7 +61,7 @@ class Analysis {
 
   static async update(id, updateData) {
     const updates = {};
-  
+
     // Flatten patient info if present
     if (updateData.patient) {
       const {
@@ -77,7 +74,7 @@ class Analysis {
         address,
         sex,
       } = updateData.patient;
-  
+
       updates.ci = ci;
       updates.first_name = first_name;
       updates.last_name = last_name;
@@ -87,35 +84,34 @@ class Analysis {
       updates.address = address;
       updates.sex = sex;
     }
-  
+
     // Handle direct updates
     if (updateData.testsValues !== undefined)
       updates.test_values = JSON.stringify(updateData.testsValues);
-  
-    if (updateData.allValidated !== undefined)
-      updates.validated = updateData.validated;
-  
+
+    if (updateData.all_validated !== undefined)
+      updates.all_validated = updateData.all_validated;
+
     if (updateData.testTypeId !== undefined)
       updates.examination_type_id = updateData.testTypeId;
-  
+
     if (Object.keys(updates).length === 0) {
       throw new Error("No valid fields to update");
     }
-  
+
     updates.updated_at = db.fn.now();
-  
+
     try {
       const [updatedExam] = await db("analysis")
         .where("id", id)
         .update(updates)
         .returning("*");
-  
+
       return new Analysis(updatedExam);
     } catch (error) {
       throw error;
     }
   }
-  
 
   static async delete(id) {
     try {
@@ -155,19 +151,23 @@ class Analysis {
         throw new Error("Invalid period specified");
     }
 
-    const result = await query.select(
-      db.raw("COUNT(CASE WHEN message_status = 'ENVIADO' THEN 1 END) as message_sent"),
-      db.raw("COUNT(CASE WHEN message_status = 'NO_ENVIADO' THEN 1 END) as message_not_sent"),
-      db.raw("COUNT(CASE WHEN message_status = 'LEIDO' THEN 1 END) as message_read"),
-      db.raw("COUNT(DISTINCT ci) as total_patients")
-    ).first();
+    // Single query approach - more efficient
+    const result = await query
+      .select(
+        db.raw("COUNT(DISTINCT ci) as total_patients"),
+        db.raw(
+          "COUNT(CASE WHEN message_status = 'ENVIADO' AND all_validated = true THEN 1 END) as message_sent"
+        ),
+        db.raw(
+          "COUNT(CASE WHEN message_status = 'NO_ENVIADO' AND all_validated = true THEN 1 END) as message_not_sent"
+        ),
+        db.raw(
+          "COUNT(CASE WHEN message_status = 'LEIDO' AND all_validated = true THEN 1 END) as message_read"
+        )
+      )
+      .first();
 
-    return {
-      total_patients: parseInt(result.total_patients),
-      message_sent: parseInt(result.message_sent),
-      message_not_sent: parseInt(result.message_not_sent),
-      message_read: parseInt(result.message_read),
-    } 
+    return result;
   }
 }
 

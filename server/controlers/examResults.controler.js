@@ -212,7 +212,7 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
         address: analysis.address,
         sex: analysis.sex,
       },
-      allValidated: analysis.allValidated,
+      all_validated: analysis.all_validated,
       created_date: analysis.created_date,
       created_time: analysis.created_time,
       age: calculateAge(analysis.date_birth),

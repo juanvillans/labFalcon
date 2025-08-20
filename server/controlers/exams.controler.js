@@ -35,7 +35,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       // Create the analysis within transaction
       const analysis = await Analysis.createWithTransaction(trx, {
         patient,
-        allValidated,
+        all_validated: allValidated,
       });
 
       const analysisId = analysis.id;
@@ -121,7 +121,7 @@ export const getExams = catchAsync(async (req, res, next) => {
             } else {
               console.log({ field, value });
               // Handle direct fields
-              if (field === 'allValidated') {
+              if (field === 'all_validated') {
                 analysisQuery = analysisQuery.where(field, value === 'true');
               } else if (field === 'age') {
                 // Handle age filtering (you might want to implement range filtering here)
@@ -162,7 +162,7 @@ export const getExams = catchAsync(async (req, res, next) => {
       'age': db.raw('EXTRACT(YEAR FROM AGE(CURRENT_DATE, date_birth))'),
       'created_date': 'created_at',
       'created_time': 'created_at',
-      'allValidated': 'allValidated'
+      'all_validated': 'all_validated'
     };
 
     if (fieldMapping[sortField]) {
@@ -237,7 +237,7 @@ export const getExams = catchAsync(async (req, res, next) => {
         sex: analysis.sex,
         patient_id: null
       },
-      allValidated: analysis.allValidated,
+      all_validated: analysis.all_validated,
       message_status: analysis.message_status,
       created_date: analysis.created_date,
       created_time: analysis.created_time,
@@ -339,7 +339,7 @@ export const updateExam = catchAsync(async (req, res, next) => {
         phone_number: patient.phone_number,
         address: patient.address,
         sex: patient.sex,
-        allValidated: allValidated,
+        all_validated: allValidated,
         updated_at: trx.fn.now()
       };
 

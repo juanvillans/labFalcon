@@ -129,7 +129,7 @@ export default function ExamenesPage() {
       sex: "",
       patient_id: null,
     },
-    allValidated: false,
+    all_validated: false,
     tests: {},
   };
 
@@ -267,7 +267,7 @@ export default function ExamenesPage() {
         enableSorting: true,
       },
       {
-        accessorKey: "allValidated",
+        accessorKey: "all_validated",
         header: "Validado",
         size: 100,
         filterFn: "equals",
@@ -350,7 +350,7 @@ export default function ExamenesPage() {
                   setFormData({
                     patient: data.patient,
                     id: data.id,
-                    allValidated: data.validated,
+                    all_validated: data.validated,
                     tests: data.tests,
                   });
                   setSubmitString("Actualizar");
@@ -367,7 +367,7 @@ export default function ExamenesPage() {
 
               <PrintPage data={data} isHidden={true} />
 
-              {data.allValidated && (
+              {data.all_validated && (
                 <button
                   title="Enviar mensaje"
                   className="mx-1 p-1 hover:p-2 duration-75 text-gray-600  hover:bg-green-100 hover:text-green-600 rounded-full"
@@ -513,6 +513,22 @@ export default function ExamenesPage() {
     fetchData();
   }, [fetchData]);
 
+  // Create debounced function once
+  const debouncedSaveFormData = useMemo(
+    () =>
+      debounce((data) => {
+        console.log("saving to localStorage");
+        localStorage.setItem('formData', JSON.stringify(data));
+        localStorage.setItem('submitString', JSON.stringify(submitString));
+      }, 300),
+    []
+  );
+
+  // Use it in useEffect
+  useEffect(() => {
+    debouncedSaveFormData(formData);
+  }, [formData, debouncedSaveFormData]);
+
   // Debounced global filter handler
   const debouncedGlobalFilter = useMemo(
     () =>
@@ -586,14 +602,14 @@ export default function ExamenesPage() {
       };
 
       // Check if all exam types are validated
-      const allValidated = Object.values(newTests).every(
+      const all_validated = Object.values(newTests).every(
         (test) => test.validated === true
       );
 
       return {
         ...prev,
         tests: newTests,
-        allValidated: allValidated,
+        all_validated: all_validated,
       };
     });
   }, []);
@@ -843,7 +859,7 @@ export default function ExamenesPage() {
                         );
                         setFormData((prev) => ({
                           ...prev,
-                          allValidated: false,
+                          all_validated: false,
                           tests: {
                             [examType.id]: {
                               testValues: newtestValues,
