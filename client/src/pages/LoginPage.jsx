@@ -9,13 +9,9 @@ import secretariaLogo from "../assets/secretaria_logo.png";
 
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
- 
     let emailInput = document.querySelector("#email");
-    emailInput.focus()
-
-  
+    emailInput.focus();
   }, 300);
-
 });
 
 export default function LoginPage() {
@@ -26,7 +22,6 @@ export default function LoginPage() {
   const { user, login, loading: authLoading } = useAuth();
   const { showError, showSuccess } = useFeedback();
 
-    
   // Redirect to dashboard if user is already logged in
   useEffect(() => {
     if (!authLoading && user) {
@@ -56,7 +51,7 @@ export default function LoginPage() {
   // Show loading while checking authentication status
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="md:min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Verificando sesión...</p>
@@ -68,33 +63,53 @@ export default function LoginPage() {
   return (
     <>
       <title>Iniciar Sesión - LabFalcón</title>
-      <div className="min-h-screen overflow-hidden relative flex items-center justify-end bg-gray-600 bg-cover bg-center">
+      <div className="md:min-h-screen overflow-hidden relative flex items-center justify-end bg-gray-600 bg-cover bg-center">
         <img
           src={lab}
           alt="lab"
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
+
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-l from-color1 to-transparent opacity-50"></div>
-        <div className="bg-black bg-opacity-20 z-50 absolute top-0 left-0 w-full h-full p-10">
-          <img
-            src={secretariaLogo}
-            alt="secretariaLogo"
-            className="w-24 mr-auto"
-          />
-          <h1 className="text-white mt-7 w-2/3 max-w-[800px] text-5xl md:text-6xl lg:text-8xl font-semibold">Sistema de Laboratorio de la Secretaria de Salud de Falcón</h1>
+        <div className="bg-black bg-opacity-20 z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
+          <div className="flex justify-start gap-3">
+            <img
+              src={secretariaLogo}
+              alt="secretariaLogo"
+              className="w-14 h-14  aspect-square md:w-24 md:h-24 md:mr-auto"
+            />
+
+            <div className="flex items-center">
+
+              <div className="bg-color1 w-14 h-14 flex items-center justify-center aspect-square rounded-full p-3">
+                <img
+                  src={labFalconLogo}
+                  className="logo w-10 mx-auto md:hidden block"
+                  alt="logo del sistema"
+                />
+
+              </div>
+              <h1 className=" text-sm ml-2 text-white text-md font-bold text-center md:hidden block">
+                LabFalcon Login
+              </h1>
+            </div>
+          </div>
+          <h1 className="text-white mt-3 md:mt-7 w-2/3  min-w-[270px] max-w-[800px] text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-semibold">
+            Sistema de Laboratorio de la Secretaria de Salud de Falcón
+          </h1>
         </div>
-        <div className="absolute md:min-w-[400px] z-50 top-6 pt-20 right-10 loginFormContainer  bg-color1 h-[94%] text-gray-50 md:p-16 rounded-lg  shadow-2xl ">
+        <div className="absolute md:min-w-[400px] z-50 top-64 md:top-6 px-5 pt-1 md:pt-10  sm:pt-20 right-10 loginFormContainer  bg-color1 md:h-[94%] text-gray-50 md:p-16 rounded-lg  shadow-2xl ">
           <img
             src={labFalconLogo}
-            className="logo w-16 mx-auto"
+            className="logo w-16 mx-auto hidden md:block"
             alt="logo del sistema"
           />
-          <h1 className="text-2xl font-bold mb-6 text-center">
+          <h1 className="text-lg md:text-2xl font-bold mb-6 text-center hidden md:block">
             LabFalcon Login
           </h1>
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-4 mt-10">
+            <div className="mb-4 mt-4 md:mt-10">
               <label
                 className="block text-gray-200 text-sm  mb-2"
                 htmlFor="email"
@@ -106,7 +121,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-gray-800 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -123,7 +138,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-gray-800 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -131,7 +146,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-color4 text-color1 font-bold py-2 px-4 rounded hover:border hover:border-color3 hover:bg-color1 hover:text-color3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full mb-4 md:mb-0 bg-color4 text-color1 font-bold py-2 px-4 rounded hover:border hover:border-color3 hover:bg-color1 hover:text-color3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading ? "Ingresando..." : "Ingresar"}
             </button>

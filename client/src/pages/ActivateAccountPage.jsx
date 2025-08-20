@@ -101,7 +101,7 @@ export default function ActivateAccountPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
               <Icon icon="heroicons:exclamation-triangle" className="w-8 h-8 text-red-500" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Enlace Inválido</h1>
+            <h1 className="text-lg md:text-2xl font-bold text-gray-800">Enlace Inválido</h1>
             <p className="text-gray-600 mt-2">
               El enlace de activación es inválido o ha expirado. Por favor, contacta al administrador para solicitar un nuevo enlace.
             </p>
@@ -127,7 +127,7 @@ export default function ActivateAccountPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
               <Icon icon="heroicons:user" className="w-8 h-8 text-blue-500" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Activar Cuenta</h1>
+            <h1 className="text-lg md:text-2xl font-bold text-gray-800">Activar Cuenta</h1>
             <p className="text-gray-600 mt-2">
               !Hola {userData.name}!, establece tu contraseña para activar tu cuenta.
             </p>

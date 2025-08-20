@@ -53,7 +53,6 @@ export default function ExamenesPage() {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const { user } = useAuth();
 
-  console.log({ user });
   // Form configuration for ReusableForm
   const patientFormFields = useMemo(() => [
     {
@@ -136,14 +135,12 @@ export default function ExamenesPage() {
   const [formData, setFormData] = useState(structuredClone(defaultFormData));
   const [submitString, setSubmitString] = useState("Registrar");
 
-  console.log({ formData });
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      console.log({ formData });
 
       // Prepare both requests
       const internalRequest =
@@ -486,7 +483,6 @@ export default function ExamenesPage() {
           }, {})
         ),
       });
-      console.log({ res });
       setData(res.data.exams);
       setRowCount(res.data.totalCount);
     } catch (e) {
@@ -498,7 +494,6 @@ export default function ExamenesPage() {
   const getExaminationTypes = useCallback(async () => {
     try {
       const res = await examinationTypesAPI.getExaminationTypes();
-      console.log(res.data);
       setExaminationTypes(res.data.examinationTypes);
     } catch (e) {
       console.error("Failed to fetch data", e);
@@ -653,8 +648,8 @@ export default function ExamenesPage() {
     <>
       <title>Exámenes Médicos - LabFalcón</title>
       <div style={{ height: 580, width: "100%" }}>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Exámenes médicos</h1>
+        <div className="md:flex justify-between items-center mb-4">
+          <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">Exámenes médicos</h1>
           <FuturisticButton
             onClick={() => {
               setIsModalOpen(true);
@@ -676,7 +671,7 @@ export default function ExamenesPage() {
           size="xl"
         >
           <form
-            className={`grid grid-cols-2 gap-7 w-full relative`}
+            className={`md:grid grid-cols-2 space-y-5 md:space-y-0 gap-7 w-full relative`}
             onSubmit={onSubmit}
           >
             <div className="space-y-3 z-10">
@@ -804,7 +799,7 @@ export default function ExamenesPage() {
                         </svg>
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col md:grid  md:grid-cols-2 gap-4">
                       {Object.entries(
                         formData.tests[key]?.testValues || {}
                       )?.map(([name, field]) => (
@@ -817,7 +812,7 @@ export default function ExamenesPage() {
                           fieldName={name}
                         />
                       ))}
-                      <div className="ml-auto col-span-2 flex items-center gap-3">
+                      <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
                         <input
                           type="checkbox"
                           name={`validated-${key}`}
@@ -826,17 +821,39 @@ export default function ExamenesPage() {
                             if (user?.allow_validate_exam === false) return;
                             handleValidatedChange(key, e);
                           }}
+                          className="invisible"
                           // onChange={(e) => handleValidatedChange(key, e)}
                           checked={formData.tests[key]?.validated || false}
                           id={`validated-${key}`}
                         />
-                        <label htmlFor={`validated-${key}`}>Validado</label>
+                        
+                        <label className="cursor-pointer hover:bg-green-100 rounded-xl p-2" htmlFor={`validated-${key}`}>
+                        {formData.tests[key]?.validated ? (
+                          <span className="flex gap-2 items-center">
+                            <small className="text-gray-400">
+                                Validado
+
+                            </small>
+                            <Icon className="text-color2 w-9 h-9 " icon="bitcoin-icons:verify-filled" />
+                          </span>
+
+                        ) : (
+                          <span className="flex gap-2 items-center">
+                            <small className="text-gray-400">
+                              No Validado
+
+                            </small>
+                            <Icon icon="octicon:unverifed-24" className="text-gray-600 w-6 h-6" />
+                          </span>
+                        ) }
+                          
+                          </label>
                       </div>
                     </div>
                   </div>
                 ))
               )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col md:grid  md:grid-cols-2 gap-3 md:gap-6">
                 {examinationTypes.map((examType) => {
                   if (formData.tests[examType.id]) {
                     return null;
@@ -845,7 +862,7 @@ export default function ExamenesPage() {
                     <button
                       type="button"
                       key={examType.id}
-                      className="hover bg-gray-200 py-5 hover:bg-gray-300 rounded "
+                      className="hover bg-gray-200 py-2 md:py-5 hover:bg-gray-300 rounded "
                       onClick={() => {
                         const newtestValues = examType.tests.reduce(
                           (acc, test) => {

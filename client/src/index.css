@@ -78,7 +78,6 @@ h5 {
 .animate-slideOut {
   animation: slideOut 0.3s ease-in forwards;
 }
-
 .activeLink:after {
   content: "";
   position: absolute;
@@ -87,11 +86,15 @@ h5 {
   width: 28px;
   height: 83px;
   /* background-color: #397373; */
-  background-image: url("./assets/linkCurve.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: right center;
   border-radius: 0 2px 2px 0;
+}
+@media (min-width: 600px) {
+  .activeLink:after {
+    background-image: url("./assets/linkCurve.png");
+  }
 }
 .MuiDataGrid-root {
   border-radius: 20px !important;
@@ -146,6 +149,12 @@ h5 {
   color: white;
   font-size: 18px;
   font-weight: 500;
+}
+@media (max-width: 500px) {
+  .button {
+    font-size: 13px;
+    padding: 5px 20px;
+  }
 }
 
 .button:hover {

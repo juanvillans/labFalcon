@@ -62,7 +62,7 @@ export default function ExamResultsPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Error</h1>
+          <h1 className="text-lg md:text-2xl font-bold text-gray-800 mb-4">Error</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <p className="text-sm text-gray-500">
             El enlace puede haber expirado o ser inválido.
