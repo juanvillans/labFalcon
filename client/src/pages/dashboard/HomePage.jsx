@@ -53,7 +53,7 @@ export default function HomePage() {
       color: "hsl(47, 70%, 50%)",
     },
   ];
-  console.log({ chartData });
+  
   return (
     <>
       <title>Dashboard - LabFalcón</title>
