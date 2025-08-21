@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   examinationTypesAPI,
   examsAPI,
@@ -13,8 +13,6 @@ import { CircularProgress } from "@mui/material";
 import { useFeedback } from "../../context/FeedbackContext";
 import PrintPage from "../../components/PrintableExamResult";
 import { MaterialReactTable } from "material-react-table";
-
-
 
 import debounce from "lodash.debounce";
 import axios from "axios";
@@ -134,14 +132,13 @@ export default function ExamenesPage() {
 
   const [formData, setFormData] = useState(structuredClone(defaultFormData));
   const [submitString, setSubmitString] = useState("Registrar");
-
+  const [isFormInitialized, setIsFormInitialized] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-
       // Prepare both requests
       const internalRequest =
         submitString === "Actualizar"
@@ -175,8 +172,10 @@ export default function ExamenesPage() {
       showSuccess("Operación completada con éxito");
       setFormData(structuredClone(defaultFormData));
       setIsModalOpen(false);
+      setIsFormInitialized(false); // ← Desactivar guardado
       fetchData();
-
+      localStorage.removeItem("formData"); // ← Limpiar
+      localStorage.removeItem("submitString");
       // Optional: Log external API result
       if (!externalResponse.success) {
         console.warn("External system update failed (non-critical)");
@@ -270,7 +269,18 @@ export default function ExamenesPage() {
         filterFn: "equals",
         enableColumnFilter: true,
         enableSorting: true,
-        Cell: ({ cell }) => (cell.getValue() ? <Icon className="relative -left-1.5 text-color2 w-7 h-7" icon="bitcoin-icons:verify-filled" />  : <Icon icon="octicon:unverifed-24" className="text-gray-600 w-4 h-4" />),
+        Cell: ({ cell }) =>
+          cell.getValue() ? (
+            <Icon
+              className="relative -left-1.5 text-color2 w-7 h-7"
+              icon="bitcoin-icons:verify-filled"
+            />
+          ) : (
+            <Icon
+              icon="octicon:unverifed-24"
+              className="text-gray-600 w-4 h-4"
+            />
+          ),
         filterVariant: "select",
         filterSelectOptions: [
           { value: "true", label: "Validado" },
@@ -344,6 +354,7 @@ export default function ExamenesPage() {
                 className="mx-1 p-1 hover:p-2 duration-75 text-gray-500 hover:bg-blue-100 hover:text-color3 rounded-full"
                 onClick={() => {
                   setIsModalOpen(true);
+                  setIsFormInitialized(true); // ← Activar guardado automático
                   setFormData({
                     patient: data.patient,
                     id: data.id,
@@ -511,18 +522,20 @@ export default function ExamenesPage() {
   // Create debounced function once
   const debouncedSaveFormData = useMemo(
     () =>
-      debounce((data) => {
+      debounce((data, submitStr) => {
         console.log("saving to localStorage");
-        localStorage.setItem('formData', JSON.stringify(data));
-        localStorage.setItem('submitString', JSON.stringify(submitString));
+        localStorage.setItem("formData", JSON.stringify(data));
+        localStorage.setItem("submitString", JSON.stringify(submitStr));
       }, 300),
     []
   );
 
-  // Use it in useEffect
   useEffect(() => {
-    debouncedSaveFormData(formData);
-  }, [formData, debouncedSaveFormData]);
+    // Solo guardar si el formulario ya fue inicializado por el usuario
+    if (isFormInitialized) {
+      debouncedSaveFormData(formData, submitString);
+    }
+  }, [formData, debouncedSaveFormData, isFormInitialized]);
 
   // Debounced global filter handler
   const debouncedGlobalFilter = useMemo(
@@ -534,14 +547,6 @@ export default function ExamenesPage() {
     []
   );
 
-  // Debounced version of setFormData for better performance
-  const debouncedSetFormData = useMemo(
-    () =>
-      debounce((updateFn) => {
-        setFormData(updateFn);
-      }, 50),
-    []
-  );
 
   const handleTestInputChange = useCallback((examination_type_id, event) => {
     const { name, value } = event.target;
@@ -572,6 +577,7 @@ export default function ExamenesPage() {
         },
       };
     });
+
   }, []);
 
   const handlePatientInputChange = useCallback((e) => {
@@ -649,23 +655,47 @@ export default function ExamenesPage() {
       <title>Exámenes Médicos - LabFalcón</title>
       <div style={{ height: 580, width: "100%" }}>
         <div className="md:flex justify-between items-center mb-4">
-          <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">Exámenes médicos</h1>
-          <FuturisticButton
-            onClick={() => {
-              setIsModalOpen(true);
-              if (submitString === "Actualizar") {
-                setSubmitString("Registrar");
-                setFormData(structuredClone(defaultFormData));
-              }
-            }}
-          >
-            Registrar exámen
-          </FuturisticButton>
+          <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">
+            Exámenes médicos
+          </h1>
+
+          <div>
+            {localStorage.getItem("formData") && (
+              <button
+                onClick={() => {
+                  console.log(JSON.parse(localStorage.getItem("formData")));
+                  
+                  setFormData(JSON.parse(localStorage.getItem("formData")));
+                  setSubmitString(JSON.parse(localStorage.getItem("submitString")));
+                  setIsModalOpen(true);
+                }}
+              >
+                <small>
+                  Restaurar Formulario anterior
+                </small>
+              </button>
+            )}
+           
+            <FuturisticButton
+              onClick={() => {
+                setIsModalOpen(true);
+                setIsFormInitialized(true); // ← Activar guardado automático
+                if (submitString === "Actualizar") {
+                  setSubmitString("Registrar");
+                  setFormData(structuredClone(defaultFormData));
+                }
+              }}
+            >
+              Registrar exámen
+            </FuturisticButton>
+          </div>
         </div>
         <Modal
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false);
+            setIsFormInitialized(false); // ← Desactivar guardado
+            // Opcional: también limpiar localStorage aquí si quieres
           }}
           title="Registrar exámen"
           size="xl"
@@ -826,28 +856,31 @@ export default function ExamenesPage() {
                           checked={formData.tests[key]?.validated || false}
                           id={`validated-${key}`}
                         />
-                        
-                        <label className="cursor-pointer hover:bg-green-100 rounded-xl p-2" htmlFor={`validated-${key}`}>
-                        {formData.tests[key]?.validated ? (
-                          <span className="flex gap-2 items-center">
-                            <small className="text-gray-400">
-                                Validado
 
-                            </small>
-                            <Icon className="text-color2 w-9 h-9 " icon="bitcoin-icons:verify-filled" />
-                          </span>
-
-                        ) : (
-                          <span className="flex gap-2 items-center">
-                            <small className="text-gray-400">
-                              No Validado
-
-                            </small>
-                            <Icon icon="octicon:unverifed-24" className="text-gray-600 w-6 h-6" />
-                          </span>
-                        ) }
-                          
-                          </label>
+                        <label
+                          className="cursor-pointer hover:bg-green-100 rounded-xl p-2"
+                          htmlFor={`validated-${key}`}
+                        >
+                          {formData.tests[key]?.validated ? (
+                            <span className="flex gap-2 items-center">
+                              <small className="text-gray-400">Validado</small>
+                              <Icon
+                                className="text-color2 w-9 h-9 "
+                                icon="bitcoin-icons:verify-filled"
+                              />
+                            </span>
+                          ) : (
+                            <span className="flex gap-2 items-center">
+                              <small className="text-gray-400">
+                                No Validado
+                              </small>
+                              <Icon
+                                icon="octicon:unverifed-24"
+                                className="text-gray-600 w-6 h-6"
+                              />
+                            </span>
+                          )}
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -980,13 +1013,15 @@ export default function ExamenesPage() {
               title="Enviar por correo"
               onClick={() => loadingMessage || handleMessage()}
               className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
-              >
+            >
               {loadingMessage ? (
                 <CircularProgress size={20} />
               ) : (
                 <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
               )}
-              <span className="text-sm">{loadingMessage ? "Enviando..." : "Enviar por correo"} </span>
+              <span className="text-sm">
+                {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
+              </span>
             </button>
 
             <a
