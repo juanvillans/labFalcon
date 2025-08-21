@@ -127,13 +127,13 @@ export default function UsuariosPage() {
       accessorKey: "allow_validate_exam",
       header: "Puede Validar",
       size: 130,
-      Cell: ({ cell }) => cell.getValue() ? "Sí" : "No",
+      Cell: ({ cell }) => cell.getValue() ? <Icon className="text-color2" icon="iconamoon:check-fill" width={20} height={20} /> :  <Icon className="text-red-300" icon="line-md:close" width={18} height={17} />,
     },
     {
       accessorKey: "allow_handle_users",
       header: "Gestión de Usuarios",
       size: 180,
-      Cell: ({ cell }) => cell.getValue() ? "Sí" : "No",
+      Cell: ({ cell }) => cell.getValue() ? <Icon className="text-color2" icon="iconamoon:check-fill" width={20} height={20} /> :  <Icon className="text-red-300" icon="line-md:close" width={18} height={17} />,
     },
     {
       accessorKey: "status",

@@ -37,7 +37,7 @@ class Analysis {
           phone_number: examData.patient.phone_number,
           address: examData.patient.address,
           sex: examData.patient.sex,
-          all_validated: examData.all_validated || false,
+          all_validated: examData.all_validated,
           // Remove created_at and updated_at - let database handle defaults
         })
         .returning("*");

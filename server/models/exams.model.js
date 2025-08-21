@@ -19,7 +19,7 @@ class Exams {
           // Remove created_at and updated_at - let database handle defaults
         })
         .returning("*");
-
+        
       return new Exams({ ...exam });
     } catch (error) {
       if (error.code === "23505") {

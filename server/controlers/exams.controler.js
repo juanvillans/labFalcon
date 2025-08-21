@@ -7,7 +7,7 @@ import { db } from "../database/postgre.js";
 
 export const createExam = catchAsync(async (req, res, next) => {
   try {
-    const { patient, tests, allValidated } = req.body;
+    const { patient, tests, all_validated } = req.body;
 
     // Validate required fields
     if (!patient.ci) {
@@ -29,13 +29,16 @@ export const createExam = catchAsync(async (req, res, next) => {
     if (!patient.email) {
       throw commonErrors.missingFields(["Correo Electrónico"]);
     }
+    if (!patient.sex) {
+      throw commonErrors.missingFields(["Género"]);
+    }
 
     // Use database transaction
     const result = await db.transaction(async (trx) => {
       // Create the analysis within transaction
       const analysis = await Analysis.createWithTransaction(trx, {
         patient,
-        all_validated: allValidated,
+        all_validated: all_validated,
       });
 
       const analysisId = analysis.id;
@@ -298,7 +301,7 @@ export const findExamById = catchAsync(async (req, res, next) => {
 export const updateExam = catchAsync(async (req, res, next) => {
   try {
     const analysisId = req.params.id; // This is the analysis ID, not exam ID
-    const { patient, tests, allValidated } = req.body;
+    const { patient, tests, all_validated } = req.body;
 
     // Validate required fields
     if (!patient.ci) {
@@ -339,7 +342,7 @@ export const updateExam = catchAsync(async (req, res, next) => {
         phone_number: patient.phone_number,
         address: patient.address,
         sex: patient.sex,
-        all_validated: allValidated,
+        all_validated: all_validated,
         updated_at: trx.fn.now()
       };
 
@@ -428,7 +431,7 @@ export const validateExam = catchAsync(async (req, res, next) => {
     if (!id) {
       throw commonErrors.missingFields(["id"]);
     }
-    await Exams.updateById(id, { allValidated: true });
+    await Exams.updateById(id, { all_validated: true });
     res.status(200).json({
       status: "success",
       message: "Examen validado con éxito",

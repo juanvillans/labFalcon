@@ -67,8 +67,9 @@ const FormField = React.memo(function FormField({
             value={value || ""}
             onChange={onChange}
             disabled={disabled}
+            required={required}
             {...props}
-            
+
           >
             {props.options.map((option) => (
               <MenuItem key={option.value} value={option.value}>

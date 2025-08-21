@@ -104,7 +104,7 @@ export default function ExamenesPage() {
     },
     {
       name: "sex",
-      label: "Género",
+      label: "Género *",
       type: "select",
       options: [
         { value: "Masculino", label: "Masculino" },
@@ -613,14 +613,19 @@ export default function ExamenesPage() {
         all_validated: all_validated,
       };
     });
+    
   }, []);
+
+  console.log({ formData });
 
   const [prosecingSearchPatient, setProsecingSearchPatient] = useState(false);
   const searchPatient = debounce(async (ci) => {
+    console.log("Searching patient...", ci);
     setProsecingSearchPatient(true); // Cambiar a verdadero antes de la búsqueda
 
     try {
       const res = await externalApi.get(`/patients?ci=${ci}`);
+      console.log(res)
       if (res.data.data.data.length === 0) {
         console.log("No se encontró el paciente");
         setFormData((prev) => ({
@@ -659,9 +664,11 @@ export default function ExamenesPage() {
             Exámenes médicos
           </h1>
 
-          <div>
+          <div className="flex gap-3">
             {localStorage.getItem("formData") && (
               <button
+              title="Restaurar formulario sin guardar"
+                className="hover:shadow-lg hover:bg-gray-100 flex gap-1 items-center text-gray-600 bg-gray-200 rounded-xl font-bold px-3"
                 onClick={() => {
                   console.log(JSON.parse(localStorage.getItem("formData")));
                   
@@ -670,9 +677,10 @@ export default function ExamenesPage() {
                   setIsModalOpen(true);
                 }}
               >
-                <small>
-                  Restaurar Formulario anterior
+                <small className="text-gray-500">
+                  Recuperar 
                 </small>
+                <Icon icon="line-md:backup-restore" className="w-6 h-6 text-gray-500  " />
               </button>
             )}
            
@@ -739,30 +747,11 @@ export default function ExamenesPage() {
                         <FormField
                           {...field}
                           value={formData.patient?.[field.name]}
-                          onPaste={(e) => {
-                            // Manejar pegado específicamente
-                            const pastedValue = e.clipboardData.getData("text");
-                            formData.patient.patient_id = null;
-
-                            // Actualizar el valor del campo
-                            const syntheticEvent = {
-                              target: {
-                                name: field.name,
-                                value: pastedValue,
-                              },
-                            };
-
-                            handlePatientInputChange(syntheticEvent);
-
-                            if (pastedValue.length >= 6) {
-                              setProsecingSearchPatient(true);
-                              searchPatient(pastedValue);
-                            }
-                          }}
+                     
                           onInput={(e) => {
                             formData.patient.patient_id = null;
                             handlePatientInputChange(e);
-                            if (formData.patient.ci.length >= 6) {
+                            if (e.target.value.length >= 6) {
                               setProsecingSearchPatient(true);
                               searchPatient(e.target.value);
                             }
