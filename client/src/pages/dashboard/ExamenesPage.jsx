@@ -18,6 +18,7 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
+let isThereLocalStorageFormData = localStorage.getItem("formData") ? true : false;
 // Memoized component for test fields to prevent unnecessary re-renders
 const MemoizedTestField = React.memo(
   ({ field, value, onChange, testKey, fieldName }) => {
@@ -104,13 +105,12 @@ export default function ExamenesPage() {
     },
     {
       name: "sex",
-      label: "Género *",
+      label: "Sexo *",
       type: "select",
       options: [
         { value: "Masculino", label: "Masculino" },
         { value: "Femenino", label: "Femenino" },
       ],
-      required: true,
       className: "col-span-1",
     },
   ]);
@@ -354,7 +354,6 @@ export default function ExamenesPage() {
                 className="mx-1 p-1 hover:p-2 duration-75 text-gray-500 hover:bg-blue-100 hover:text-color3 rounded-full"
                 onClick={() => {
                   setIsModalOpen(true);
-                  setIsFormInitialized(true); // ← Activar guardado automático
                   setFormData({
                     patient: data.patient,
                     id: data.id,
@@ -578,6 +577,8 @@ export default function ExamenesPage() {
       };
     });
 
+    setIsFormInitialized(true); // ← Activar guardado automático
+
   }, []);
 
   const handlePatientInputChange = useCallback((e) => {
@@ -589,6 +590,9 @@ export default function ExamenesPage() {
         [name]: value,
       },
     }));
+
+    setIsFormInitialized(true); // ← Activar guardado automático
+
   }, []);
 
   const handleValidatedChange = useCallback((examTypeId, e) => {
@@ -606,6 +610,7 @@ export default function ExamenesPage() {
       const all_validated = Object.values(newTests).every(
         (test) => test.validated === true
       );
+    setIsFormInitialized(true); // ← Activar guardado automático
 
       return {
         ...prev,
@@ -613,6 +618,8 @@ export default function ExamenesPage() {
         all_validated: all_validated,
       };
     });
+
+
     
   }, []);
 
@@ -665,12 +672,11 @@ export default function ExamenesPage() {
           </h1>
 
           <div className="flex gap-3">
-            {localStorage.getItem("formData") && (
+            {isThereLocalStorageFormData && (
               <button
               title="Restaurar formulario sin guardar"
                 className="hover:shadow-lg hover:bg-gray-100 flex gap-1 items-center text-gray-600 bg-gray-200 rounded-xl font-bold px-3"
                 onClick={() => {
-                  console.log(JSON.parse(localStorage.getItem("formData")));
                   
                   setFormData(JSON.parse(localStorage.getItem("formData")));
                   setSubmitString(JSON.parse(localStorage.getItem("submitString")));
@@ -687,7 +693,6 @@ export default function ExamenesPage() {
             <FuturisticButton
               onClick={() => {
                 setIsModalOpen(true);
-                setIsFormInitialized(true); // ← Activar guardado automático
                 if (submitString === "Actualizar") {
                   setSubmitString("Registrar");
                   setFormData(structuredClone(defaultFormData));
@@ -702,7 +707,6 @@ export default function ExamenesPage() {
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false);
-            setIsFormInitialized(false); // ← Desactivar guardado
             // Opcional: también limpiar localStorage aquí si quieres
           }}
           title="Registrar exámen"
@@ -722,7 +726,7 @@ export default function ExamenesPage() {
                     {prosecingSearchPatient ? (
                       <Icon
                         icon="eos-icons:three-dots-loading"
-                        className="text-3xl"
+                        className="text-3xl inline-block mx-auto"
                       />
                     ) : formData?.patient.patient_id !== null ? (
                       <span className="flex items-center gap-2 text-center mx-auto justify-center">

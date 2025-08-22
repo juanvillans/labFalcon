@@ -30,7 +30,7 @@ function FeedbackMessage({ message, type, onClose }) {
   };
 
   return (
-    <div className={`${getBgColor()} z-50 text-white p-4 rounded-md shadow-lg flex justify-between items-center min-w-[300px]`}>
+    <div className={`${getBgColor()} z-40 text-white p-4 rounded-md shadow-lg flex justify-between items-center min-w-[300px]`}>
       <span>{message}</span>
       <button 
         onClick={onClose} 
