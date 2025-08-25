@@ -1,8 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { examsAPI } from "../../services/api";
-import { ResponsivePie } from "@nivo/pie";
+import { Pie, ResponsivePie } from "@nivo/pie";
 import { Icon } from "@iconify/react";
 import FormField from "../../components/forms/FormField";
+
+const PieChart = ({ data }) => (
+  <ResponsivePie
+    data={data}
+    innerRadius={0.5}
+    margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
+    padAngle={0.6}
+    cornerRadius={2}
+    activeOuterRadiusOffset={8}
+    arcLinkLabelsSkipAngle={10}
+    arcLinkLabelsTextColor="#333333"
+    arcLinkLabelsThickness={2}
+    arcLinkLabelsColor={{ from: "color" }}
+    arcLabelsSkipAngle={10}
+    arcLabelsTextColor={{
+      from: "color",
+      modifiers: [["darker", 4]],
+    }}
+  />
+);
 
 export default function HomePage() {
   const [chartData, setChartData] = useState(null);
@@ -21,38 +41,6 @@ export default function HomePage() {
     fetchChartData();
   }, [selectedPeriod]);
 
-  const data = [
-    {
-      id: "ruby",
-      label: "ruby",
-      value: 242,
-      color: "hsl(138, 70%, 50%)",
-    },
-    {
-      id: "css",
-      label: "css",
-      value: 389,
-      color: "hsl(14, 70%, 50%)",
-    },
-    {
-      id: "python",
-      label: "python",
-      value: 431,
-      color: "hsl(165, 70%, 50%)",
-    },
-    {
-      id: "elixir",
-      label: "elixir",
-      value: 18,
-      color: "hsl(48, 70%, 50%)",
-    },
-    {
-      id: "java",
-      label: "java",
-      value: 508,
-      color: "hsl(47, 70%, 50%)",
-    },
-  ];
   
   return (
     <>
@@ -116,8 +104,7 @@ export default function HomePage() {
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Estado de examenes</p>
-              <ResponsivePie /* or Pie for fixed dimensions */
-                data={[
+              <PieChart data={[
                   {
                     id: "validados",
                     label: "Validados",
@@ -129,48 +116,19 @@ export default function HomePage() {
                     value: chartData?.total.not_validated,
                   },
                 ]}
-                innerRadius={0.5}
-                margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
-                padAngle={0.6}
-                cornerRadius={2}
-                activeOuterRadiusOffset={8}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="#333333"
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: "color" }}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 4]],
-                }}
               />
+              
             </div>
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Tipo de exámenes realizados</p>
-              <ResponsivePie /* or Pie for fixed dimensions */
-                data={chartData?.perType}
-                innerRadius={0.5}
-                margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
-                padAngle={0.6}
-                cornerRadius={2}
-                activeOuterRadiusOffset={8}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="#333333"
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: "color" }}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 4]],
-                }}
-              />
+              <PieChart data={chartData?.perType} />
+             
             </div>
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Mensaje de resultados validados</p>
-              <ResponsivePie /* or Pie for fixed dimensions */
-                data={[
+              <PieChart data={[
                   {
                     id: "Enviado",
                     label: "Enviado",
@@ -186,21 +144,8 @@ export default function HomePage() {
                     label: "Leído",
                     value: chartData?.analyses.message_read,
                   },
-                ]}
-                innerRadius={0.5}
-                margin={{ top: 30, right: 80, bottom: 50, left: 80 }}
-                padAngle={0.6}
-                cornerRadius={2}
-                activeOuterRadiusOffset={8}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="#333333"
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: "color" }}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 4]],
-                }}
+
+                  ]}
               />
             </div>
 

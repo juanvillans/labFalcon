@@ -5,28 +5,43 @@ import SecretrariaLogo from "../assets/secretaria_logo.png";
 import Latidos from "../assets/latidos.png";
 import FuturisticButton from "./FuturisticButton";
 
-const PrintableContent = React.memo(React.forwardRef((props, ref) => {
-  console.log("PrintableContent rendered with props:", props);
-  return (
-    <div ref={ref} className="w-full mx-auto bg-white border" style={{padding: "20mm", width: "210mm", height: "297mm"}}>
-      <header style={{marginBlock: "50px !important", marginBottom: "50px !important"}} className="my-2 relative flex justify-center items-center py-4">
-        <img src={SecretrariaLogo} alt="" className="absolute left-4 w-16" />
+const PrintableContent = React.memo(
+  React.forwardRef((props, ref) => {
+    console.log("PrintableContent rendered with props:", props);
+    return (
+      <div
+        ref={ref}
+        className="w-full mx-auto bg-white border"
+        style={{ padding: "20mm", width: "210mm", height: "297mm" }}
+      >
+        <header
+          style={{
+            marginBlock: "50px !important",
+            marginBottom: "50px !important",
+          }}
+          className="my-2 relative flex justify-center items-center py-4"
+        >
+          <img src={SecretrariaLogo} alt="" className="absolute left-4 w-16" />
 
-        <div className="text-center">
-          <p>Secretaria de Salud de Falcón.</p>
-          <p>Laboratorio.</p>
-        </div>
+          <div className="text-center">
+            <p>Secretaria de Salud de Falcón.</p>
+            <p>Laboratorio.</p>
+          </div>
 
-        <img src={Latidos} alt="" className="absolute right-4 w-24" />
-      </header>
-      <p>Nombres y apellidos: {props.data.patient.first_name + " " + props.data.patient.last_name}</p>
-      <p>C.I: {props.data.patient.ci}</p>
-      <p>Fecha de Nacimiento: {props.data.patient.date_birth}</p>
-      <p>Sexo: {props.data.patient.sex}</p>
-      {
-        Object.entries(props.data.tests).map(([key, value]) => (
+          <img src={Latidos} alt="" className="absolute right-4 w-24" />
+        </header>
+        <p>
+          Nombres y apellidos:{" "}
+          {props.data.patient.first_name + " " + props.data.patient.last_name}
+        </p>
+        <p>C.I: {props.data.patient.ci}</p>
+        <p>Fecha de Nacimiento: {props.data.patient.date_birth}</p>
+        <p>Sexo: {props.data.patient.sex}</p>
+        {Object.entries(props.data.tests).map(([key, value]) => (
           <div key={key}>
-            <h1 className="font-semibold uppercase text-lg text-center">{value.testTypeName}</h1>
+            <h1 className="font-semibold uppercase text-lg text-center">
+              {value.testTypeName}
+            </h1>
 
             <table className="mt-2 mb-4">
               <thead
@@ -41,14 +56,22 @@ const PrintableContent = React.memo(React.forwardRef((props, ref) => {
                   <th className="px-3">Resultado</th>
                   <th className="px-3">Rango de Referencia</th>
                 </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(value.testValues).map((key) => (
+              </thead>
+              <tbody>
+                {Object.keys(value.testValues).map((key) => {
+                  if (value.testValues[key].value.trim() === "") {
+                    return <></>;
+                  } else {
+                    return (
                     <tr key={key} className="py-5">
-                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                      <td
+                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                      >
                         {value.testValues[key].label}
                       </td>
-                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                      <td
+                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                      >
                         {value.testValues[key].value}{" "}
                         {value.testValues[key].unit ? (
                           <span className="text-sm">
@@ -57,7 +80,9 @@ const PrintableContent = React.memo(React.forwardRef((props, ref) => {
                           </span>
                         ) : null}
                       </td>
-                      <td style={{ paddingInline: "12px", paddingBlock: "5px" }}>
+                      <td
+                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                      >
                         {value.testValues[key].reference_range?.min || ""} -{" "}
                         {value.testValues[key].reference_range?.max || ""}
                         {value.testValues[key].unit ? (
@@ -68,16 +93,17 @@ const PrintableContent = React.memo(React.forwardRef((props, ref) => {
                         ) : null}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-           
-          ))
-      }
-     </div>
-  );
-}));
+                    );
+                  }
+                })}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    );
+  })
+);
 
 const PrintPage = React.memo(function PrintPage(props) {
   console.log("PrintPage rendered with props:", props);
@@ -100,32 +126,31 @@ const PrintPage = React.memo(function PrintPage(props) {
 
   return (
     <div>
-      
-      {props.isHidden ? <button onClick={handlePrint} title="Imprimir">
+      {props.isHidden ? (
+        <button onClick={handlePrint} title="Imprimir">
           <Icon
             icon="material-symbols:print-rounded"
             className="w-6 h-6 text-gray-500  ml-2"
           />
-        </button> : (
-        <div className="flex justify-center mb-4"> 
-
-        <FuturisticButton onClick={handlePrint} title="Imprimir" className="flex gap-2 text-xl mx-auto py-1 px-2 ">
-          <Icon
-            icon="material-symbols:download-rounded"
-            className="w-6 h-6 text-gray-700  mr-3 inline "
-          />
-          <span>
-          Descargar / Imprimir
-
-          </span>
-        </FuturisticButton>
+        </button>
+      ) : (
+        <div className="flex justify-center mb-4">
+          <FuturisticButton
+            onClick={handlePrint}
+            title="Imprimir"
+            className="flex gap-2 text-xl mx-auto py-1 px-2 "
+          >
+            <Icon
+              icon="material-symbols:download-rounded"
+              className="w-6 h-6 text-gray-700  mr-3 inline "
+            />
+            <span>Descargar / Imprimir</span>
+          </FuturisticButton>
         </div>
       )}
-     
 
       <div className={props.isHidden ? "hidden" : ""}>
         <PrintableContent
-
           data={props.data}
           ref={componentRef}
           className=""

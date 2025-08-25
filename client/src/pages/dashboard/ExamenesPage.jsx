@@ -473,7 +473,9 @@ export default function ExamenesPage() {
 
   // Server-side state
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    { id: "id", desc: true },
+  ]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -1024,7 +1026,7 @@ export default function ExamenesPage() {
                 setIsMessageSentModalOpen(true);
               }}
               href={`https://wa.me/${
-                messageData?.patient?.phone_number
+                messageData?.patient?.phone_number.replace(/[ -]/g, '')
               }?text=Hola ${
                 messageData?.patient?.first_name
               }, en el siguiente link podrás ver los resultados de tu exámen: ${
