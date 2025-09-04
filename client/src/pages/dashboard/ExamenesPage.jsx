@@ -1029,7 +1029,7 @@ export default function ExamenesPage() {
                 messageData?.patient?.phone_number.replace(/[ -]/g, '')
               }?text=Hola ${
                 messageData?.patient?.first_name
-              }, en el siguiente link podrás ver los resultados de tu exámen: ${
+              }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
                 window.location.origin
               }/results/${resultsToken || "cargando..."}`}
               target="_blank"
