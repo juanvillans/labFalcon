@@ -10,7 +10,7 @@ examsRouter.get("/", protect, getExams);
 examsRouter.get("/chart-data/:period", protect, getChartData);
 examsRouter.post("/generate-results-token", protect, generateToken);
 examsRouter.post("/send-results", protect, sendExamResults);
-examsRouter.put("/update-message-status/:id", protect, updateMessageStatusEndpoint);
+examsRouter.put("/update-message-status/:id", updateMessageStatusEndpoint);
 examsRouter.put("/validate-exam", protect, requireValidateExam, validateExam);
 examsRouter.post("/", protect, createExam);
 
