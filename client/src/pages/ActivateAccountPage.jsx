@@ -31,7 +31,6 @@ export default function ActivateAccountPage() {
 
       try {
         const response = await authAPI.verifyInvitationToken(token);
-        console.log(response.data)
         setUserData(response.data.user);
         setVerifying(false);
         setLoading(false);

@@ -371,8 +371,11 @@ export default function ExamenesPage() {
                   height={20}
                 />
               </button>
+              
+              <span className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full">
+                <PrintPage data={data} isHidden={true} />
 
-              <PrintPage data={data} isHidden={true} />
+              </span>
 
               {data.all_validated && (
                 <button
@@ -625,7 +628,6 @@ export default function ExamenesPage() {
     
   }, []);
 
-  console.log({ formData });
 
   const [prosecingSearchPatient, setProsecingSearchPatient] = useState(false);
   const searchPatient = debounce(async (ci) => {
@@ -634,7 +636,6 @@ export default function ExamenesPage() {
 
     try {
       const res = await externalApi.get(`/patients?ci=${ci}`);
-      console.log(res)
       if (res.data.data.data.length === 0) {
         console.log("No se encontró el paciente");
         setFormData((prev) => ({

@@ -45,7 +45,6 @@ export const generateToken = catchAsync(async (req, res, next) => {
 
 // Function to update message status (internal use)
 export const updateMessageStatus = async (analysisId, status) => {
-  console.log({analysisId, status});
   try {
     await db("analysis")
       .where("id", analysisId)
@@ -146,7 +145,6 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
 
     const { analysisId } = decoded;
 
-    console.log({analysisId});
     // Get analysis data
     const analysis = await db("analysis")
       .select(

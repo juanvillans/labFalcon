@@ -34,11 +34,4 @@ export const {
   CLIENT_URL, // Agregar esta nueva variable
 } = process.env;
  
-// Validate critical environment variables
-if (!JWT_SECRET && NODE_ENV !== 'migration') {
-  throw new Error("JWT_SECRET environment variable is required but not set");
-}
 
-if (!DB_URI && NODE_ENV !== 'migration') {
-  throw new Error("DB_URI environment variable is required but not set");
-}

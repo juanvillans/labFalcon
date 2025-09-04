@@ -6,6 +6,7 @@ import { authAPI } from "../services/api";
 import labFalconLogo from "../assets/logoRed.png";
 import lab from "../assets/lab.jpg";
 import secretariaLogo from "../assets/secretaria_logo.png";
+import { Icon } from "@iconify/react";
 
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Add state for showPassword
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, login, loading: authLoading } = useAuth();
@@ -121,12 +123,12 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-gray-100 text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
-            <div className="mb-6">
+            <div className="relative mb-6 ">
               <label
                 className="block text-gray-200 text-sm  mb-2"
                 htmlFor="password"
@@ -135,12 +137,18 @@ export default function LoginPage() {
               </label>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-gray-100  text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                 required
               />
+              { showPassword ? (
+                <Icon onClick={() => setShowPassword(!showPassword)} icon="majesticons:eye-line" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+              ) : (
+                <Icon onClick={() => setShowPassword(!showPassword)} icon="mdi:eye-off-outline" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+              )}
+
             </div>
 
             <button
