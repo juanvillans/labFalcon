@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
-    
     setLoading(false);
   }, []);
 

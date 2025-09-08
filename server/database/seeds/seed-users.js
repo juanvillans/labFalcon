@@ -13,30 +13,13 @@ const usersSeed = [
     {
       first_name: "Admin Juan",
       last_name: "Villasmil",
-      email: "juanvillasmil@gmail.com",
+      email: "juanvillans16@gmail.com",
       password: "123456",
       allow_validate_exam: true,
       allow_handle_users: true,
       status: "activo",
     },
-    {
-      first_name: "User Test",
-      last_name: "Test",
-      email: "usertest@gmail.com",
-      password: "123456",
-      allow_validate_exam: false,
-      allow_handle_users: true,
-      status: "activo",
-    },
-    {
-      first_name: "User Test 2",
-      last_name: "Test 2",
-      email: "usertest2@gmail.com",
-      password: "123456",
-      allow_validate_exam: false,
-      allow_handle_users: false,
-      status: "activo",
-    },
+ 
   ];
 
   export async function seed(knex) {

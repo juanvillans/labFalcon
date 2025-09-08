@@ -11,7 +11,7 @@ import { Icon } from "@iconify/react";
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     let emailInput = document.querySelector("#email");
-    emailInput.focus();
+    emailInput?.focus();
   }, 300);
 });
 
@@ -30,6 +30,19 @@ export default function LoginPage() {
       navigate("/dashboard", { replace: true });
     }
   }, [user, authLoading, navigate]);
+  
+  const handleForgotPsw = async (e) => {
+    if (!email) {
+      showError("Por favor ingrese su correo electrónico");
+      return;
+    }
+    try {
+      await authAPI.forgotPassword(email);
+      showSuccess("Se ha enviado un enlace para restablecer la contraseña");
+    } catch (err) {
+      showError(err.message);
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,7 +141,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="relative mb-6 ">
+            <div className="relative mb-1 ">
               <label
                 className="block text-gray-200 text-sm  mb-2"
                 htmlFor="password"
@@ -149,6 +162,15 @@ export default function LoginPage() {
                 <Icon onClick={() => setShowPassword(!showPassword)} icon="mdi:eye-off-outline" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
               )}
 
+            </div>
+            <div className="flex justify-end mb-6">
+              <button
+                type="button"
+                onClick={handleForgotPsw}
+                className="text-sm text-gray-300 hover:underline"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
             </div>
 
             <button

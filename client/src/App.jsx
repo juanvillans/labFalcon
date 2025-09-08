@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { FeedbackProvider } from './context/FeedbackContext';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute'
+import PermissionGate from './components/auth/PermissionGate';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/dashboard/HomePage';
@@ -12,7 +13,6 @@ import ExamResultsPage from './pages/ExamResultsPage';
 
 function App() {
   // Get user from localStorage (instead of useAuth)
-  const user = JSON.parse(localStorage.getItem('user'));
 
   return (
     <AuthProvider>
@@ -36,9 +36,14 @@ function App() {
               <Route index element={<HomePage />} />
               <Route path="examenes" element={<ExamenesPage />} />
               {/* Only show "usuarios" if user has permission */}
-              {user?.allow_handle_users && (
-                <Route path="usuarios" element={<UsuariosPage />} />
-              )}
+              <Route 
+                path="usuarios" 
+                element={
+                  <PermissionGate requiredPermission="allow_handle_users">
+                    <UsuariosPage />
+                  </PermissionGate>
+                } 
+              />
               {/* Fallback route */}
             </Route>
           </Routes>
