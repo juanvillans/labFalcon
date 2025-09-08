@@ -11,7 +11,7 @@ import examsRouter from "./routers/exams.routers.js";
 import resultsRouter from "./routers/results.routers.js";
 
 const app = express();
-
+console.log(APP_URL);
 // Enable CORS (Cross-Origin Resource Sharing)
 app.use(
   cors({

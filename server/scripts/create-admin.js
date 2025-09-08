@@ -60,10 +60,6 @@ async function createAdminUser() {
       adminUser.status
     ]);
     
-    console.log("Admin user created successfully:", result.rows[0]);
-    console.log("Email:", adminUser.email);
-    console.log("Password:", adminUser.password);
-    console.log("Please change this password after first login!");
     
   } catch (error) {
     console.error("Error creating admin user:", error);

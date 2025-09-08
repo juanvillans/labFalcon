@@ -38,7 +38,6 @@ function isValidEmail(email) {
 
 export const sendInvitationEmail = function (recipient, invitationToken, url) {
     const activationLink = `${url}/activar-cuenta?token=${invitationToken}`;
-    console.log(activationLink);
     const mailOptions = {
         to: recipient.email,
         subject: "Bienvenido a labFalcón - Activa tu cuenta",

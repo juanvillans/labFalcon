@@ -122,7 +122,6 @@ export const getExams = catchAsync(async (req, res, next) => {
                 analysisQuery = analysisQuery.whereILike(fieldName, `%${value}%`);
               }
             } else {
-              console.log({ field, value });
               // Handle direct fields
               if (field === 'all_validated') {
                 analysisQuery = analysisQuery.where(field, value === 'true');
@@ -282,7 +281,6 @@ export const getExams = catchAsync(async (req, res, next) => {
 
 export const findExamById = catchAsync(async (req, res, next) => {
   try {
-    console.log(req.params.id);
     const exam = await Exams.findById(req.params.id);
     if (!exam) {
       throw commonErrors.notFound("Exam");

@@ -7,7 +7,6 @@ import FuturisticButton from "./FuturisticButton";
 
 const PrintableContent = React.memo(
   React.forwardRef((props, ref) => {
-    console.log("PrintableContent rendered with props:", props);
     return (
       <div
         ref={ref}
@@ -106,7 +105,6 @@ const PrintableContent = React.memo(
 );
 
 const PrintPage = React.memo(function PrintPage(props) {
-  console.log("PrintPage rendered with props:", props);
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     contentRef: componentRef,

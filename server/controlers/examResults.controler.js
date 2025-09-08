@@ -45,7 +45,6 @@ export const generateToken = catchAsync(async (req, res, next) => {
 
 // Function to update message status (internal use)
 export const updateMessageStatus = async (analysisId, status) => {
-  console.log({analysisId, status});
   try {
     await db("analysis")
       .where("id", analysisId)
@@ -101,7 +100,7 @@ export const sendExamResults = catchAsync(async (req, res, next) => {
     const token = generateResultsToken(id, analysis.email);
     const resultsUrl = `${APP_URL}/results/${token}`;
     
-    // Send email
+    // Send emailf
     await sendResultsEmail({
       to: analysis.email,
       patientName: `${analysis.first_name} ${analysis.last_name}`,
@@ -128,6 +127,7 @@ export const sendExamResults = catchAsync(async (req, res, next) => {
 // Get exam results by token (PUBLIC ROUTE)
 export const getExamResultsByToken = catchAsync(async (req, res, next) => {
   console.log("getExamResultsByToken");
+  
   try {
     const { token } = req.params;
 
@@ -146,7 +146,6 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
 
     const { analysisId } = decoded;
 
-    console.log({analysisId});
     // Get analysis data
     const analysis = await db("analysis")
       .select(

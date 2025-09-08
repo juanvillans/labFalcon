@@ -6,6 +6,7 @@ import { authAPI } from "../services/api";
 import labFalconLogo from "../assets/logoRed.png";
 import lab from "../assets/lab.jpg";
 import secretariaLogo from "../assets/secretaria_logo.png";
+import { Icon } from "@iconify/react";
 
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Add state for showPassword
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, login, loading: authLoading } = useAuth();
@@ -70,7 +72,7 @@ export default function LoginPage() {
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
 
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-l from-color1 to-transparent opacity-50"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-50"></div>
         <div className="bg-black bg-opacity-20 z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
           <div className="flex justify-start gap-3">
             <img
@@ -121,12 +123,12 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-gray-100 text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
-            <div className="mb-6">
+            <div className="relative mb-6 ">
               <label
                 className="block text-gray-200 text-sm  mb-2"
                 htmlFor="password"
@@ -135,12 +137,18 @@ export default function LoginPage() {
               </label>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-gray-100  text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                 required
               />
+              { showPassword ? (
+                <Icon onClick={() => setShowPassword(!showPassword)} icon="majesticons:eye-line" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+              ) : (
+                <Icon onClick={() => setShowPassword(!showPassword)} icon="mdi:eye-off-outline" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+              )}
+
             </div>
 
             <button
@@ -152,34 +160,7 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
-        <div className="gradient-bg absolute w-screen top-0 left-0 bg-opacity-45 opacity-80 z-10">
-          <svg xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <filter id="goo">
-                <feGaussianBlur
-                  in="SourceGraphic"
-                  stdDeviation="10"
-                  result="blur"
-                />
-                <feColorMatrix
-                  in="blur"
-                  mode="matrix"
-                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                  result="goo"
-                />
-                <feBlend in="SourceGraphic" in2="goo" />
-              </filter>
-            </defs>
-          </svg>
-          <div className="gradients-container">
-            <div className="g1"></div>
-            <div className="g2"></div>
-            <div className="g3"></div>
-            <div className="g4"></div>
-            <div className="g5"></div>
-            <div className="interactive"></div>
-          </div>
-        </div>
+        
       </div>
       <footer className="text-color1 text-sm text-center bg-color4 py-3">
         <p className="">
