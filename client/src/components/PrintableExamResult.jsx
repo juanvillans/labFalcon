@@ -4,6 +4,7 @@ import { Icon } from "@iconify/react";
 import SecretrariaLogo from "../assets/secretaria_logo.png";
 import Latidos from "../assets/latidos.png";
 import FuturisticButton from "./FuturisticButton";
+import firmaDigital from "../assets/firmaDigital.png";
 
 const PrintableContent = React.memo(
   React.forwardRef((props, ref) => {
@@ -99,6 +100,12 @@ const PrintableContent = React.memo(
             </table>
           </div>
         ))}
+            <div className="flex justify-between">
+                <div>
+                  Qr
+                </div>
+            <img className="w-28" src={firmaDigital} alt="" />
+            </div>
       </div>
     );
   })
