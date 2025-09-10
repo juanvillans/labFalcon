@@ -73,7 +73,7 @@ const FormField = React.memo(function FormField({
           >
             {props.options.map((option) => (
               <MenuItem key={option.value} value={option.value}>
-                {option.label}
+                {option.label || option.value}
               </MenuItem>
             ))}
           </Select>
@@ -110,8 +110,20 @@ const FormField = React.memo(function FormField({
               : undefined,
           endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
         }}
+        inputProps={{
+          list: type === "list" ? name : undefined,
+          ...props.inputProps
+        }}
         {...props}
       />
+
+      {type === "list" && (
+        <datalist id={name}>
+          {props.labels?.map((label) => (
+            <option key={label} value={label} />
+          ))}
+        </datalist>
+      )}
     </div>
   );
 });

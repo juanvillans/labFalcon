@@ -108,7 +108,10 @@ h5 {
   .css-aymtem-MuiDataGrid-virtualScrollerContent {
   border-color: white !important;
 }
-
+.css-13sd685-MuiFormLabel-root-MuiInputLabel-root {
+  background: rgb(235, 235, 235) ;
+  padding-inline: 4px !important;
+}
 /* AG Grid - Remove border and add light shadow */
 .ag-grid-no-border .ag-root-wrapper {
   border: none !important;

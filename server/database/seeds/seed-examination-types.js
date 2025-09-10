@@ -1,10 +1,10 @@
-
 import dotenv from "dotenv";
 
 // Load environment variables based on NODE_ENV
-const envFile = process.env.NODE_ENV === "production" 
-  ? ".env.production" 
-  : ".env.development.local";
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? ".env.production"
+    : ".env.development.local";
 
 dotenv.config({ path: envFile });
 
@@ -12,6 +12,8 @@ dotenv.config({ path: envFile });
 const examinationTypesSeed = [
   {
     name: "Hematologia",
+    groupedBySections: false,
+    
     tests: [
       {
         label: "Cuenta blanca",
@@ -85,8 +87,11 @@ const examinationTypesSeed = [
       },
     ],
   },
+
   {
     name: "Química sanguinea",
+    groupedBySections: false,
+    
     tests: [
       {
         label: "Glucosa",
@@ -120,6 +125,7 @@ const examinationTypesSeed = [
       },
     ],
   },
+  
   {
     name: "Prueba de coagulación",
     tests: [
@@ -145,60 +151,365 @@ const examinationTypesSeed = [
       },
     ],
   },
+
   {
     name: "Serología",
+    groupedBySections: false,
+    
     tests: [
       {
         label: "HIV",
         name: "hiv",
-        type: "boolean",
-        labels: {true: "Reactivo", false: "No reactivo"},
+        type: "select",
+        options: [{value: "Reactivo"}, {value: "No reactivo" }],
       },
+      {
+        label: "Pyloriset",
+        name: "pyloriset",
+        type: "select",
+        options: [{value: "Positivo"}, {value: "Negativo"}],
+      },
+
       {
         label: "VDRL",
         name: "vdrl",
-        type: "boolean",
-        labels: {true: "Reactivo", false: "No reactivo"},
+        type: "list",
+        labels: [
+          "No reactivo",
+          "Reactivo",
+          "Reactivo 2dil",
+          "Reactivo 4dil",
+          "Reactivo 8dil",
+          "Reactivo 16dil",
+          "Reactivo 32dil",
+          "Reactivo 64dil",
+          "Reactivo 128dil",
+          "Reactivo 256dil",
+          "Reactivo 512dil",
+          "Reactivo 1024dil",
+        ],
       },
-    ]
+      {
+        label: "Dengue",
+        name: "dengue",
+        type: "select",
+        options: [{value: "Positivo"}, {value: "Negativo"}],
+      },
+      {
+        label: "VHA",
+        name: "vha",
+        type: "select",
+        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+      },
+      {
+        label: "TEST-PACK HCG",
+        name: "test_pack_hcg",
+        type: "select",
+        options: [{value: "Positivo"}, {value: "Negativo"}],
+      },
+      {
+        label: "VHB AGS",
+        name: "vhb_ags",
+        type: "select",
+        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+      },
+
+      {
+        label: "HCV",
+        name: "hcv",
+        type: "select",
+        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+      },
+      {
+        label: "VHB anticore",
+        name: "vhb_anticore",
+        type: "select",
+        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+      },
+      {
+        label: "Sangre oculta en heces",
+        name: "sangre_oculta_en_heces",
+        type: "select",
+        options: [{value: "Positivo"}, {value: "Negativo"}],
+      },
+    ],
   },
+
   {
     name: "Análisis de heces",
+    groupedBySections: false,
+    
     tests: [
-      {
-        label: "Color",
-        name: "color",
-        type: "string",
-        labels: {
-          "Negro": "Negro",
-          "Marrón": "Marrón",
-          "Amarillo": "Amarillo",
-          "Blanco": "Blanco",
-        },
-      },
       {
         label: "Aspecto",
         name: "aspecto",
-        type: "string",
-        labels: {
-          "Fresco": "Fresco",
-          "Seco": "Seco",
-          "Viscoso": "Viscoso",
-        },
+        type: "list",
+        labels: ["Heterogeneo", "Homogeneo"],
       },
-    ],  
-  }
+      {
+        label: "Color",
+        name: "color",
+        type: "list",
+        labels: ["Marrón", "Amarillo", "Pardo", "Negro", "Rojo", "Verde"],
+      },
+      {
+        label: "Consistencia",
+        name: "consistencia",
+        type: "list",
+        labels: ["Blanda", "Dura", "Pastoza", "Diarreica"],
+      },
+
+      {
+        label: "Olor",
+        name: "olor",
+        type: "list",
+        labels: ["Fecal", "Fétido"],
+      },
+      {
+        label: "Moco",
+        name: "moco",
+        type: "boolean",
+        labels: { true: "Presente", false: "No observado" },
+      },
+      {
+        label: "Sangre",
+        name: "sangre",
+        type: "boolean",
+        labels: { true: "Presente", false: "No observado" },
+      },
+      {
+        labe: "Reacción",
+        name: "reaccion_5",
+        type: "list",
+        labels: ["Acida", "Alcalina"],
+      },
+      {
+        label: "Restos alimenticios",
+        name: "restos_alimenticios",
+        type: "boolean",
+        labels: { true: "Presente", false: "No observado" },
+      },
+    ],
+  },
+  {
+    name: "Hepatitis A, B, C",
+    tests: [
+      {
+        label: "HAV",
+        name: "hav",
+        type: "select",
+        options: [{value: "Reactivo"},{value: "No reactivo" }],
+      },
+      {
+        label: "AgsHB",
+        name: "agshb",
+        type: "select",
+        options: [{value: "Reactivo"},{value: "No reactivo" }],
+      },
+      {
+        label: "CORE",
+        name: "core",
+        type: "select",
+        options: [{value: "Reactivo"},{value: "No reactivo" }],
+      },
+      {
+        label: "HCV",
+        name: "hcv",
+        type: "select",
+        options: [{value: "Reactivo"},{value: "No reactivo" }],
+      },
+    ],
+  },
+
+  {
+    name: "Análisis de orina",
+    groupedBySections: true,
+    tests: [
+        {
+          label: "Aspecto",
+          name: "aspecto",
+          type: "list",
+          labels: ["límpida", "Turbio", "Ligeramente Turbio", "Cristalizada"],
+        },
+        {
+          label: "Color",
+          name: "color",
+          type: "list",
+          labels: ["Amarillo", "Ambar", "Negro", "Rojo", "Verde"],
+        },
+        {
+          label: "Olor",
+          name: "olor",
+          type: "list",
+          labels: ["Amoniacal", "Fétido"],
+        },
+        {
+          label: "Reacción",
+          name: "reaccion",
+          type: "list",
+          labels: ["Acida", "Alcalina", "Neutral"],
+        },
+        {
+          label: "pH",
+          name: "ph",
+          type: "list",
+          unit: "pH",
+          labels: ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5"],
+          reference_range: {
+            min: 5,
+            max: 8.5,
+          },
+        },
+
+
+        ///
+
+
+        {
+          label: "Albúmina",
+          name: "albumina",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Hemoglobina",
+          name: "hemoglobina",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Urobilina",
+          name: "urobilina",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Glucosa",
+          name: "glucosa",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Acetona",
+          name: "acetona",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+        label: "Pigmentos bilares",
+          name: "pigmentos_bilares",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Nitritos",
+          name: "nitritos",
+          type: "list",
+          labels: [
+            "Negativo",
+            "Positivo 1+",
+            "Positivo 2++",
+            "Positivo 3+++",
+            "Positivo 4++++",
+          ],
+        },
+        {
+          label: "Otros",
+          name: "otros",
+          type: "string",
+        },
+
+
+
+        ///
+
+        {
+          section: true,
+          label: "Bacterias",
+          name: "bacterias",
+          type: "string",
+        },
+        {
+          label: "Células epiteliales",
+          name: "celulas_epiteliales",
+          type: "string",
+        },
+        {
+          label: "Leucocitos",
+          name: "leucitos",
+          type: "string",
+        },
+        {
+          label: "Hematies",
+          name: "hematies",
+          type: "string",
+        },
+        {
+          label: "Cilindros",
+          name: "cilindros",
+          type: "string",
+        },
+        {
+          label: "Cristales",
+          name: "cristales",
+          type: "string",
+        },
+
+        {
+          label: "Otros",
+          name: "otros",
+          type: "string",
+        },
+    ]
+    
+  },
 ];
 
 export async function seed(knex) {
-  const count = await knex('examination_types').count('id');
+  const count = await knex("examination_types").count("id");
   if (parseInt(count[0].count) > 0) {
     console.log("Examination types already exist. Seeding skipped.");
     return;
   }
 
   for (const examType of examinationTypesSeed) {
-    await knex('examination_types').insert({
+    await knex("examination_types").insert({
       name: examType.name,
       tests: JSON.stringify(examType.tests),
     });

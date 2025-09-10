@@ -28,11 +28,13 @@ const MemoizedTestField = React.memo(
       },
       [onChange, testKey]
     );
+    console.log(field, testKey)
 
     return (
       <FormField
-        key={fieldName}
+        key={fieldName+"_"+testKey}
         {...field}
+        examination_type_id={testKey}
         value={value || ""}
         onChange={handleChange}
       />
@@ -50,6 +52,7 @@ export default function ExamenesPage() {
   const [resultsToken, setResultsToken] = useState(null);
   const [examinationTypes, setExaminationTypes] = useState([]);
   const [loadingMessage, setLoadingMessage] = useState(false);
+  const [printButtonId, setPrintButtonId] = useState(null);
   const { user } = useAuth();
 
   // Form configuration for ReusableForm
@@ -192,6 +195,8 @@ export default function ExamenesPage() {
       setLoading(false);
     }
   };
+
+  console.log({formData})
 
   const columns = useMemo(
     () => [
@@ -372,8 +377,10 @@ export default function ExamenesPage() {
                 />
               </button>
               
-              <span className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full">
-                <PrintPage data={data} isHidden={true} />
+              <span onClick={() => setPrintButtonId(data.id)} className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full">
+                
+                <PrintPage data={data} active={printButtonId === data.id}  isHidden={true} />
+                
 
               </span>
 
@@ -782,14 +789,18 @@ export default function ExamenesPage() {
             <div className="space-y-3 z-10 ">
               <h2 className="text-xl font-bold">Resultados del Exámen</h2>
 
+                
               {Object.entries(formData.tests || {}).length === 0 ? (
                 <p>Seleccione al menos un tipo de exámen</p>
               ) : (
-                Object.keys(formData?.tests || {})?.map((key) => (
+
+                <>
+                {Object.keys(formData?.tests || {})?.map((key,i) => (
                   <div
                     key={key}
                     className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
                   >
+                   
                     <div className="flex justify-between items-center ">
                       <h3 className="text-lg font-bold text-color1 mb-4">
                         {formData.tests[key]?.testTypeName}
@@ -825,18 +836,42 @@ export default function ExamenesPage() {
                         </svg>
                       </button>
                     </div>
+
                     <div className="flex flex-col md:grid  md:grid-cols-2 gap-4">
                       {Object.entries(
                         formData.tests[key]?.testValues || {}
-                      )?.map(([name, field]) => (
-                        <MemoizedTestField
-                          key={name}
-                          field={field}
-                          value={formData.tests[key]?.testValues?.[name]?.value}
-                          onChange={handleTestInputChange}
-                          testKey={key}
-                          fieldName={name}
-                        />
+                      )?.map(([name, field, type, labels], i) => (
+                        <React.Fragment key={name}>
+                          {i === 0 && key == 7 && (
+                            <div className="flex justify-between items-center col-span-2">
+                              <h3 className="text-md font-bold text-gray-600 ml-2">
+                                Examen Físico
+                              </h3>
+                            </div>
+                          )}
+                          {i === 5 && key == 7 && (
+                            <div className="flex justify-between items-center mt-4 col-span-2">
+                              <h3 className="text-md font-bold text-gray-600 ml-2">
+                                Examen Microscópico
+                              </h3>
+                            </div>
+                          )}
+                          {i === 13 && key == 7 && (
+                            <div className="flex justify-between items-center mt-4 col-span-2">
+                              <h3 className="text-md font-bold text-gray-600 ml-2">
+                                Examen Químico
+                              </h3>
+                            </div>
+                          )}
+                          <MemoizedTestField
+                            field={field}
+                            value={formData.tests[key]?.testValues?.[name]?.value}
+                            onChange={handleTestInputChange}
+                            testKey={key}
+                            fieldName={name}
+                          />
+
+                        </React.Fragment>
                       ))}
                       <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
                         <input
@@ -880,7 +915,8 @@ export default function ExamenesPage() {
                       </div>
                     </div>
                   </div>
-                ))
+                ))}
+                </>
               )}
               <div className="flex flex-col md:grid  md:grid-cols-2 gap-3 md:gap-6">
                 {examinationTypes.map((examType) => {

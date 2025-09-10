@@ -30,22 +30,7 @@ export default function ExamResultsPage() {
     }
   }, [token]);
 
-  const downloadPDF = async () => {
-    try {
-      const response = await examResultsAPI.downloadPDF(token);
-      // Create blob and download
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `resultados-${examData.patient.ci}.pdf`;
-      link.click();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Error downloading PDF:", err);
-    }
-  };
-
+ 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">

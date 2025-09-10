@@ -1,13 +1,37 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Icon } from "@iconify/react";
 import SecretrariaLogo from "../assets/secretaria_logo.png";
 import Latidos from "../assets/latidos.png";
 import FuturisticButton from "./FuturisticButton";
 import firmaDigital from "../assets/firmaDigital.png";
+import QRCode from "react-qr-code";
+import { examResultsAPI } from "../services/api";
+
+const generateResultsToken = async (analysisId) => {
+  try {
+    const response = await examResultsAPI.generateToken({ analysisId });
+    return response.data.token;
+  } catch (error) {
+    console.error("Error generating token:", error);
+    return null;
+  }
+};
 
 const PrintableContent = React.memo(
   React.forwardRef((props, ref) => {
+    if (!props.data) {
+      return 
+    }
+    const [token, setToken] = useState(null);
+    useEffect(async () => {
+      let tokenRequest = await generateResultsToken(props.data.id);
+      setToken(tokenRequest);
+    }, []);
+    if (!token) {
+      return <div>Cargando...</div>;
+    }
+
     return (
       <div
         ref={ref}
@@ -63,36 +87,36 @@ const PrintableContent = React.memo(
                     return <></>;
                   } else {
                     return (
-                    <tr key={key} className="py-5">
-                      <td
-                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
-                      >
-                        {value.testValues[key].label}
-                      </td>
-                      <td
-                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
-                      >
-                        {value.testValues[key].value}{" "}
-                        {value.testValues[key].unit ? (
-                          <span className="text-sm">
-                            {" "}
-                            {value.testValues[key].unit}
-                          </span>
-                        ) : null}
-                      </td>
-                      <td
-                        style={{ paddingInline: "12px", paddingBlock: "5px" }}
-                      >
-                        {value.testValues[key].reference_range?.min || ""} -{" "}
-                        {value.testValues[key].reference_range?.max || ""}
-                        {value.testValues[key].unit ? (
-                          <span className="text-sm">
-                            {" "}
-                            {value.testValues[key].unit}
-                          </span>
-                        ) : null}
-                      </td>
-                    </tr>
+                      <tr key={key} className="py-5">
+                        <td
+                          style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                        >
+                          {value.testValues[key].label}
+                        </td>
+                        <td
+                          style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                        >
+                          {value.testValues[key].value}{" "}
+                          {value.testValues[key].unit ? (
+                            <span className="text-sm">
+                              {" "}
+                              {value.testValues[key].unit}
+                            </span>
+                          ) : null}
+                        </td>
+                        <td
+                          style={{ paddingInline: "12px", paddingBlock: "5px" }}
+                        >
+                          {value.testValues[key].reference_range?.min || ""} -{" "}
+                          {value.testValues[key].reference_range?.max || ""}
+                          {value.testValues[key].unit ? (
+                            <span className="text-sm">
+                              {" "}
+                              {value.testValues[key].unit}
+                            </span>
+                          ) : null}
+                        </td>
+                      </tr>
                     );
                   }
                 })}
@@ -100,12 +124,15 @@ const PrintableContent = React.memo(
             </table>
           </div>
         ))}
-            <div className="flex justify-between">
-                <div>
-                  Qr
-                </div>
-            <img className="w-28" src={firmaDigital} alt="" />
-            </div>
+        <div className="flex justify-between mt-5">
+          <div style={{ width: "min-content" }}>
+            <QRCode
+              size={126}
+              value={`${window.location.origin}/results/${token}`}
+            />
+          </div>
+          <img className="w-28 min-w-[132px]" src={firmaDigital} alt="" />
+        </div>
       </div>
     );
   })
@@ -128,42 +155,51 @@ const PrintPage = React.memo(function PrintPage(props) {
       }
     `,
   });
-
-  return (
-    <div>
-      {props.isHidden ? (
-        <button onClick={handlePrint} title="Imprimir">
-          <Icon
-            icon="material-symbols:print-rounded"
-            className="w-6 h-6 text-gray-500  ml-2"
-          />
-        </button>
-      ) : (
-        <div className="flex justify-center mb-4">
-          <FuturisticButton
-            onClick={handlePrint}
-            title="Imprimir"
-            className="flex gap-2 text-xl mx-auto py-1 px-2 "
-          >
+  if (!props.active) {
+    return (
+    <button onClick={handlePrint} title="Imprimir">
+      <Icon
+        icon="material-symbols:print-rounded"
+        className="w-6 h-6 text-gray-500  ml-2"
+      />
+    </button>)
+  } else {
+    return (
+      <div>
+        {props.isHidden ? (
+          <button onClick={handlePrint} title="Imprimir">
             <Icon
-              icon="material-symbols:download-rounded"
-              className="w-6 h-6 text-gray-700  mr-3 inline "
+              icon="material-symbols:print-rounded"
+              className="w-6 h-6 text-gray-500  ml-2"
             />
-            <span>Descargar / Imprimir</span>
-          </FuturisticButton>
-        </div>
-      )}
+          </button>
+        ) : (
+          <div className="flex justify-center mb-4">
+            <FuturisticButton
+              onClick={handlePrint}
+              title="Imprimir"
+              className="flex gap-2 text-xl mx-auto py-1 px-2 "
+            >
+              <Icon
+                icon="material-symbols:download-rounded"
+                className="w-6 h-6 text-gray-700  mr-3 inline "
+              />
+              <span>Descargar / Imprimir</span>
+            </FuturisticButton>
+          </div>
+        )}
 
-      <div className={props.isHidden ? "hidden" : ""}>
-        <PrintableContent
-          data={props.data}
-          ref={componentRef}
-          className=""
-          size="A4"
-        />
+        <div className={props.isHidden ? "hidden" : ""}>
+          <PrintableContent
+            data={props.data}
+            ref={componentRef}
+            className=""
+            size="A4"
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 });
 
 export default PrintPage;
