@@ -7,7 +7,7 @@ import { db } from "../database/postgre.js";
 
 export const createExam = catchAsync(async (req, res, next) => {
   try {
-    const { patient, tests, all_validated } = req.body;
+    const { patient, tests, all_validated, method } = req.body;
 
     // Validate required fields
     if (!patient.ci) {
@@ -45,12 +45,15 @@ export const createExam = catchAsync(async (req, res, next) => {
       const analysis_exams_ids = [];
 
       // Create all exams within transaction
+
       for (const testKey in tests) {
         const test = tests[testKey];
         const exam = await Exams.createWithTransaction(trx, {
           tests_values: test.testValues,
           testTypeId: test.testTypeId,
           validated: test.validated,
+          method: test.method,
+          observation: test.observation
         });
         analysis_exams_ids.push(
           {analysis_id: analysisId, 
@@ -165,6 +168,7 @@ export const getExams = catchAsync(async (req, res, next) => {
       'created_date': 'created_at',
       'created_time': 'created_at',
       'all_validated': 'all_validated'
+
     };
 
     if (fieldMapping[sortField]) {
@@ -249,7 +253,9 @@ export const getExams = catchAsync(async (req, res, next) => {
           testValues: safeJsonParse(exam.tests_values),
           testTypeName: exam.examination_type_name,
           testTypeId: exam.examination_type_id,
-          validated: exam.validated
+          validated: exam.validated,
+          method: exam.method,
+          observation: exam.observation
         };
         return acc;
       }, {})
@@ -365,6 +371,8 @@ export const updateExam = catchAsync(async (req, res, next) => {
           tests_values: test.testValues,
           testTypeId: test.testTypeId,
           validated: test.validated,
+          method: test.method,
+          observation: test.observation
         });
         analysis_exams_ids.push(
           {analysis_id: analysisId, 

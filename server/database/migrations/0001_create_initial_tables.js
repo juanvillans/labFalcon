@@ -74,6 +74,8 @@
       await knex.schema.createTable('exams', (table) => {
         table.increments('id').primary().unique();
         table.integer('examination_type_id').notNullable();
+        table.string('method');
+        table.string('observation');
         table.jsonb('tests_values').notNullable();
         table.boolean('validated').defaultTo(false);
         table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));

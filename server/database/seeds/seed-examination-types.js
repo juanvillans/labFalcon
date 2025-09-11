@@ -278,8 +278,8 @@ const examinationTypesSeed = [
         labels: { true: "Presente", false: "No observado" },
       },
       {
-        labe: "Reacción",
-        name: "reaccion_5",
+        label: "Reacción",
+        name: "reaccion",
         type: "list",
         labels: ["Acida", "Alcalina"],
       },
@@ -289,6 +289,7 @@ const examinationTypesSeed = [
         type: "boolean",
         labels: { true: "Presente", false: "No observado" },
       },
+      
     ],
   },
   {

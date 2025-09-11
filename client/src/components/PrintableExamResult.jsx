@@ -8,28 +8,12 @@ import firmaDigital from "../assets/firmaDigital.png";
 import QRCode from "react-qr-code";
 import { examResultsAPI } from "../services/api";
 
-const generateResultsToken = async (analysisId) => {
-  try {
-    const response = await examResultsAPI.generateToken({ analysisId });
-    return response.data.token;
-  } catch (error) {
-    console.error("Error generating token:", error);
-    return null;
-  }
-};
 
 const PrintableContent = React.memo(
   React.forwardRef((props, ref) => {
-    if (!props.data) {
+    console.log({props})
+    if (!props.data || !props.token) {
       return 
-    }
-    const [token, setToken] = useState(null);
-    useEffect(async () => {
-      let tokenRequest = await generateResultsToken(props.data.id);
-      setToken(tokenRequest);
-    }, []);
-    if (!token) {
-      return <div>Cargando...</div>;
     }
 
     return (
@@ -124,21 +108,25 @@ const PrintableContent = React.memo(
             </table>
           </div>
         ))}
-        <div className="flex justify-between mt-5">
-          <div style={{ width: "min-content" }}>
-            <QRCode
-              size={126}
-              value={`${window.location.origin}/results/${token}`}
-            />
+        {props.data.all_validated && (
+       
+          <div className="flex justify-between mt-5">
+            <div style={{ width: "min-content" }}>
+              <QRCode
+                size={126}
+                value={`${window.location.origin}/results/${props.token}`}
+              />
+            </div>
+            <img className="w-28 min-w-[132px]" src={firmaDigital} alt="" />
           </div>
-          <img className="w-28 min-w-[132px]" src={firmaDigital} alt="" />
-        </div>
+        )}
       </div>
     );
   })
 );
 
 const PrintPage = React.memo(function PrintPage(props) {
+  console.log(props.token)
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
@@ -155,15 +143,7 @@ const PrintPage = React.memo(function PrintPage(props) {
       }
     `,
   });
-  if (!props.active) {
-    return (
-    <button onClick={handlePrint} title="Imprimir">
-      <Icon
-        icon="material-symbols:print-rounded"
-        className="w-6 h-6 text-gray-500  ml-2"
-      />
-    </button>)
-  } else {
+
     return (
       <div>
         {props.isHidden ? (
@@ -193,13 +173,14 @@ const PrintPage = React.memo(function PrintPage(props) {
           <PrintableContent
             data={props.data}
             ref={componentRef}
+            token={props.token}
             className=""
             size="A4"
           />
         </div>
       </div>
     );
-  }
+  
 });
 
 export default PrintPage;

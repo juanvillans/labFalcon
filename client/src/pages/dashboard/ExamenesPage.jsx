@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import {
   examinationTypesAPI,
   examsAPI,
@@ -18,7 +24,9 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
-let isThereLocalStorageFormData = localStorage.getItem("formData") ? true : false;
+let isThereLocalStorageFormData = localStorage.getItem("formData")
+  ? true
+  : false;
 // Memoized component for test fields to prevent unnecessary re-renders
 const MemoizedTestField = React.memo(
   ({ field, value, onChange, testKey, fieldName }) => {
@@ -28,11 +36,10 @@ const MemoizedTestField = React.memo(
       },
       [onChange, testKey]
     );
-    console.log(field, testKey)
 
     return (
       <FormField
-        key={fieldName+"_"+testKey}
+        key={fieldName + "_" + testKey}
         {...field}
         examination_type_id={testKey}
         value={value || ""}
@@ -196,7 +203,6 @@ export default function ExamenesPage() {
     }
   };
 
-  console.log({formData})
 
   const columns = useMemo(
     () => [
@@ -353,6 +359,7 @@ export default function ExamenesPage() {
         enableSorting: false,
         Cell: ({ row }) => {
           const data = row.original;
+          console.log(data)
           return (
             <div className="flex gap-2 justify-center items-center">
               <button
@@ -376,12 +383,30 @@ export default function ExamenesPage() {
                   height={20}
                 />
               </button>
-              
-              <span onClick={() => setPrintButtonId(data.id)} className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full">
-                
-                <PrintPage data={data} active={printButtonId === data.id}  isHidden={true} />
-                
 
+              <span
+                onClick={async () => {
+                  
+                  if (!data.all_validated) {
+                    showError("El examen no está validado");
+                    return;
+                  }
+                  setPrintButtonId(data.id) 
+                  const token = await generateResultsToken(data.id);
+                  setResultsToken(token);
+                  console.log(token)
+                }}
+                className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full"
+              >
+                {data.all_validated && resultsToken && (
+                    <PrintPage
+                      data={data}
+                      token={resultsToken}
+                      active={printButtonId === data.id}
+                      isHidden={true}
+                    />
+
+                )}
               </span>
 
               {data.all_validated && (
@@ -473,7 +498,6 @@ export default function ExamenesPage() {
       showError(errorMessage);
     }
 
-    console.log("Delete exam:", exam.id);
     // Call your delete API or show a confirmation dialog
   };
 
@@ -483,9 +507,7 @@ export default function ExamenesPage() {
 
   // Server-side state
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });
-  const [sorting, setSorting] = useState([
-    { id: "id", desc: true },
-  ]);
+  const [sorting, setSorting] = useState([{ id: "id", desc: true }]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -558,7 +580,6 @@ export default function ExamenesPage() {
     []
   );
 
-
   const handleTestInputChange = useCallback((examination_type_id, event) => {
     const { name, value } = event.target;
 
@@ -590,8 +611,48 @@ export default function ExamenesPage() {
     });
 
     setIsFormInitialized(true); // ← Activar guardado automático
-
   }, []);
+
+  const handleMethodChange = useCallback((examination_type_id, event) => {
+    const { name, value } = event.target;
+
+    setFormData((prev) => {
+      return {
+        ...prev,
+        tests: {
+          ...prev.tests,
+          [examination_type_id]: {
+            ...prev.tests[examination_type_id],
+            method: value,
+          },
+        },
+      };
+    });
+
+    setIsFormInitialized(true); // ← Activar guardado automático
+  }, []);
+
+  const handleObservationChange = useCallback((examination_type_id, event) => {
+    const { name, value } = event.target;
+
+    setFormData((prev) => {
+      return {
+        ...prev,
+        tests: {
+          ...prev.tests,
+          [examination_type_id]: {
+            ...prev.tests[examination_type_id],
+            observation: value,
+          },
+        },
+      };
+    });
+
+    setIsFormInitialized(true); // ← Activar guardado automático
+  }, []);
+
+  console.log({formData});
+  
 
   const handlePatientInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -604,7 +665,6 @@ export default function ExamenesPage() {
     }));
 
     setIsFormInitialized(true); // ← Activar guardado automático
-
   }, []);
 
   const handleValidatedChange = useCallback((examTypeId, e) => {
@@ -622,7 +682,7 @@ export default function ExamenesPage() {
       const all_validated = Object.values(newTests).every(
         (test) => test.validated === true
       );
-    setIsFormInitialized(true); // ← Activar guardado automático
+      setIsFormInitialized(true); // ← Activar guardado automático
 
       return {
         ...prev,
@@ -630,15 +690,10 @@ export default function ExamenesPage() {
         all_validated: all_validated,
       };
     });
-
-
-    
   }, []);
-
 
   const [prosecingSearchPatient, setProsecingSearchPatient] = useState(false);
   const searchPatient = debounce(async (ci) => {
-    console.log("Searching patient...", ci);
     setProsecingSearchPatient(true); // Cambiar a verdadero antes de la búsqueda
 
     try {
@@ -684,22 +739,24 @@ export default function ExamenesPage() {
           <div className="flex gap-3">
             {isThereLocalStorageFormData && (
               <button
-              title="Restaurar formulario sin guardar"
+                title="Restaurar formulario sin guardar"
                 className="hover:shadow-lg hover:bg-gray-100 flex gap-1 items-center text-gray-600 bg-gray-200 rounded-xl font-bold px-3"
                 onClick={() => {
-                  
                   setFormData(JSON.parse(localStorage.getItem("formData")));
-                  setSubmitString(JSON.parse(localStorage.getItem("submitString")));
+                  setSubmitString(
+                    JSON.parse(localStorage.getItem("submitString"))
+                  );
                   setIsModalOpen(true);
                 }}
               >
-                <small className="text-gray-500">
-                  Recuperar 
-                </small>
-                <Icon icon="line-md:backup-restore" className="w-6 h-6 text-gray-500  " />
+                <small className="text-gray-500">Recuperar</small>
+                <Icon
+                  icon="line-md:backup-restore"
+                  className="w-6 h-6 text-gray-500  "
+                />
               </button>
             )}
-           
+
             <FuturisticButton
               onClick={() => {
                 setIsModalOpen(true);
@@ -726,7 +783,7 @@ export default function ExamenesPage() {
             className={`md:grid grid-cols-2 space-y-5 md:space-y-0 gap-7 w-full relative`}
             onSubmit={onSubmit}
           >
-            <div className="space-y-3 z-10">
+            <div className="space-y-3 z-10 sticky top-0 h-max">
               <h2 className="text-xl font-bold mb-2">
                 Información del Paciente
               </h2>
@@ -761,7 +818,6 @@ export default function ExamenesPage() {
                         <FormField
                           {...field}
                           value={formData.patient?.[field.name]}
-                     
                           onInput={(e) => {
                             formData.patient.patient_id = null;
                             handlePatientInputChange(e);
@@ -789,133 +845,157 @@ export default function ExamenesPage() {
             <div className="space-y-3 z-10 ">
               <h2 className="text-xl font-bold">Resultados del Exámen</h2>
 
-                
               {Object.entries(formData.tests || {}).length === 0 ? (
                 <p>Seleccione al menos un tipo de exámen</p>
               ) : (
-
                 <>
-                {Object.keys(formData?.tests || {})?.map((key,i) => (
-                  <div
-                    key={key}
-                    className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
-                  >
-                   
-                    <div className="flex justify-between items-center ">
-                      <h3 className="text-lg font-bold text-color1 mb-4">
-                        {formData.tests[key]?.testTypeName}
-                      </h3>
-                      <button
-                        type="button"
-                        className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                        aria-label="Close"
-                        onClick={() => {
-                          setFormData((prev) => {
-                            const { [key]: value, ...rest } = prev.tests;
-
-                            return {
-                              ...prev,
-                              tests: rest,
-                            };
-                          });
-                        }}
-                      >
-                        <span className="sr-only">Close</span>
-                        <svg
-                          className="h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="flex flex-col md:grid  md:grid-cols-2 gap-4">
-                      {Object.entries(
-                        formData.tests[key]?.testValues || {}
-                      )?.map(([name, field, type, labels], i) => (
-                        <React.Fragment key={name}>
-                          {i === 0 && key == 7 && (
-                            <div className="flex justify-between items-center col-span-2">
-                              <h3 className="text-md font-bold text-gray-600 ml-2">
-                                Examen Físico
-                              </h3>
-                            </div>
-                          )}
-                          {i === 5 && key == 7 && (
-                            <div className="flex justify-between items-center mt-4 col-span-2">
-                              <h3 className="text-md font-bold text-gray-600 ml-2">
-                                Examen Microscópico
-                              </h3>
-                            </div>
-                          )}
-                          {i === 13 && key == 7 && (
-                            <div className="flex justify-between items-center mt-4 col-span-2">
-                              <h3 className="text-md font-bold text-gray-600 ml-2">
-                                Examen Químico
-                              </h3>
-                            </div>
-                          )}
-                          <MemoizedTestField
-                            field={field}
-                            value={formData.tests[key]?.testValues?.[name]?.value}
-                            onChange={handleTestInputChange}
-                            testKey={key}
-                            fieldName={name}
-                          />
-
-                        </React.Fragment>
-                      ))}
-                      <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name={`validated-${key}`}
-                          readOnly={user?.allow_validate_exam === false}
-                          onChange={(e) => {
-                            if (user?.allow_validate_exam === false) return;
-                            handleValidatedChange(key, e);
+                  {Object.keys(formData?.tests || {})?.map((key, i) => (
+                    <div
+                      key={key}
+                      className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
+                    >
+                      <div className="flex justify-between items-center ">
+                        <h3 className="text-lg font-bold text-color1 mb-4">
+                          {formData.tests[key]?.testTypeName}
+                        </h3>
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                          aria-label="Close"
+                          onClick={() => {
+                            setFormData((prev) => {
+                              const { [key]: value, ...rest } = prev.tests;
+                              return {
+                                ...prev,
+                                tests: rest,
+                              };
+                            });
                           }}
-                          className="invisible"
-                          // onChange={(e) => handleValidatedChange(key, e)}
-                          checked={formData.tests[key]?.validated || false}
-                          id={`validated-${key}`}
-                        />
-
-                        <label
-                          className="cursor-pointer hover:bg-green-100 rounded-xl p-2"
-                          htmlFor={`validated-${key}`}
                         >
-                          {formData.tests[key]?.validated ? (
-                            <span className="flex gap-2 items-center">
-                              <small className="text-gray-400">Validado</small>
-                              <Icon
-                                className="text-color2 w-9 h-9 "
-                                icon="bitcoin-icons:verify-filled"
-                              />
-                            </span>
-                          ) : (
-                            <span className="flex gap-2 items-center">
-                              <small className="text-gray-400">
-                                No Validado
-                              </small>
-                              <Icon
-                                icon="octicon:unverifed-24"
-                                className="text-gray-600 w-6 h-6"
-                              />
-                            </span>
-                          )}
-                        </label>
+                          <span className="sr-only">Close</span>
+                          <svg
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <MemoizedTestField
+                        field={{
+                          name: "method",
+                          label: "Método",
+                          type: "list",
+                        }}
+                        value={formData.tests[key]?.method}
+                        onChange={() => handleMethodChange(key, event)}
+                        testKey={"method"}
+                        fieldName={"method"}
+                      />
+
+                      <div className="flex flex-col md:grid mt-3.5 md:grid-cols-2 gap-4 ">
+                        {Object.entries(
+                          formData.tests[key]?.testValues || {}
+                        )?.map(([name, field, type, labels], i) => (
+                          <React.Fragment key={name}>
+                            {i === 0 && key == 7 && (
+                              <div className="flex justify-between items-center col-span-2">
+                                <h3 className="text-md font-bold text-gray-600 ml-2">
+                                  Examen Físico
+                                </h3>
+                              </div>
+                            )}
+                            {i === 5 && key == 7 && (
+                              <div className="flex justify-between items-center mt-4 col-span-2">
+                                <h3 className="text-md font-bold text-gray-600 ml-2">
+                                  Examen Microscópico
+                                </h3>
+                              </div>
+                            )}
+                            {i === 13 && key == 7 && (
+                              <div className="flex justify-between items-center mt-4 col-span-2">
+                                <h3 className="text-md font-bold text-gray-600 ml-2">
+                                  Examen Químico
+                                </h3>
+                              </div>
+                            )}
+                            <MemoizedTestField
+                              field={field}
+                              value={
+                                formData.tests[key]?.testValues?.[name]?.value
+                              }
+                              onChange={handleTestInputChange}
+                              testKey={key}
+                              fieldName={name}
+                            />
+                          </React.Fragment>
+                        ))}
+
+                        <div className="mb-2 col-span-2">
+                          <MemoizedTestField
+                            field={{
+                              name: "observation",
+                              label: "Observación",
+                            }}
+                            value={formData.tests[key]?.observation}
+                            onChange={() => handleObservationChange(key, event)}
+                            testKey={"observation"}
+                            fieldName={"observation"}
+                          />
+                        </div>
+                        <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            name={`validated-${key}`}
+                            readOnly={user?.allow_validate_exam === false}
+                            onChange={(e) => {
+                              if (user?.allow_validate_exam === false) return;
+                              handleValidatedChange(key, e);
+                            }}
+                            className="invisible"
+                            // onChange={(e) => handleValidatedChange(key, e)}
+                            checked={formData.tests[key]?.validated || false}
+                            id={`validated-${key}`}
+                          />
+
+                          <label
+                            className="cursor-pointer hover:bg-green-100 rounded-xl p-2"
+                            htmlFor={`validated-${key}`}
+                          >
+                            {formData.tests[key]?.validated ? (
+                              <span className="flex gap-2 items-center">
+                                <small className="text-gray-400">
+                                  Validado
+                                </small>
+                                <Icon
+                                  className="text-color2 w-9 h-9 "
+                                  icon="bitcoin-icons:verify-filled"
+                                />
+                              </span>
+                            ) : (
+                              <span className="flex gap-2 items-center">
+                                <small className="text-gray-400">
+                                  No Validado
+                                </small>
+                                <Icon
+                                  icon="octicon:unverifed-24"
+                                  className="text-gray-600 w-6 h-6"
+                                />
+                              </span>
+                            )}
+                          </label>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 </>
               )}
               <div className="flex flex-col md:grid  md:grid-cols-2 gap-3 md:gap-6">
@@ -948,6 +1028,7 @@ export default function ExamenesPage() {
                               testTypeName: examType.name,
                               testTypeId: examType.id,
                               validated: false,
+                              method: "",
                             },
                             ...prev.tests,
                           },
@@ -1038,7 +1119,12 @@ export default function ExamenesPage() {
         <Modal
           title="Enviar mensaje"
           isOpen={isMessageModalOpen}
-          onClose={() => setIsMessageModalOpen(false)}
+          onClose={() => {
+            setResultsToken(null);
+            setIsMessageModalOpen(false);
+          } 
+          
+          }
         >
           <div className="flex gap-4">
             <button
@@ -1062,9 +1148,10 @@ export default function ExamenesPage() {
                 setIsMessageModalOpen(false);
                 setIsMessageSentModalOpen(true);
               }}
-              href={`https://wa.me/${
-                messageData?.patient?.phone_number.replace(/[ -]/g, '')
-              }?text=Hola ${
+              href={`https://wa.me/${messageData?.patient?.phone_number.replace(
+                /[ -]/g,
+                ""
+              )}?text=Hola ${
                 messageData?.patient?.first_name
               }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
                 window.location.origin

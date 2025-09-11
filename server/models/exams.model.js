@@ -6,15 +6,20 @@ class Exams {
     this.tests_values = data.tests_values;
     this.examination_type_id = data.examination_type_id;
     this.validated = data.validated;
+    this.method = data.method;
+    this.observation = data.observation;
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
   }
   static async createWithTransaction(trx, examData) {
+    console.log({examData});
     try {
       const [exam] = await trx("exams")
         .insert({
           examination_type_id: examData.testTypeId,
           validated: examData.validated,
+          method: examData.method,
+          observation: examData.observation,
           tests_values: JSON.stringify(examData.tests_values),
           // Remove created_at and updated_at - let database handle defaults
         })
