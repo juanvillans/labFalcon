@@ -448,7 +448,6 @@ export const validateExam = catchAsync(async (req, res, next) => {
 });
 
 export const getChartData = catchAsync(async (req, res, next) => {
-  console.log(req.params);
   try {
     const { period } = req.params;
 

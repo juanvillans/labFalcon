@@ -94,7 +94,6 @@ class User {
     // Default to page 1 if page is 0 or not provided
     const page = params.page <= 0 ? 1 : parseInt(params.page) || 1;
     const pageSize = parseInt(params.pageSize) || 10;
-    console.log({ params });
     // Default sort if not provided
     const sort = params.sort || "created_at:desc";
     const [sortField, sortDirection] = sort.split(":");
@@ -112,7 +111,6 @@ class User {
     if (params.filters) {
       try {
         const filters = JSON.parse(params.filters);
-        console.log({ filters });
 
         const { field, operator, value } = filters;
 

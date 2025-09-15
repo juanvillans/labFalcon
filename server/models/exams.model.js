@@ -12,7 +12,6 @@ class Exams {
     this.updated_at = data.updated_at;
   }
   static async createWithTransaction(trx, examData) {
-    console.log({examData});
     try {
       const [exam] = await trx("exams")
         .insert({
@@ -54,7 +53,6 @@ class Exams {
 
   static async getDetailedCountByPeriod(period) {
     let query = db("exams");
-    console.log({ period });
     const today = new Date();
 
     switch (period) {
@@ -103,7 +101,6 @@ class Exams {
   }
 
   static async getTotalPerExaminationTypeByPeriod(period) {
-    console.log({ period });
     let query = db("exams")
       .join(
         "examination_types",

@@ -125,7 +125,6 @@ export const sendExamResults = catchAsync(async (req, res, next) => {
 
 // Get exam results by token (PUBLIC ROUTE)
 export const getExamResultsByToken = catchAsync(async (req, res, next) => {
-  console.log("getExamResultsByToken");
   
   try {
     const { token } = req.params;
@@ -225,7 +224,6 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
       }, {})
     };
 
-    console.log({result});
     res.status(200).json({
       status: "success",
       data: result

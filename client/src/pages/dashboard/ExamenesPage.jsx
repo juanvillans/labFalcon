@@ -368,7 +368,6 @@ export default function ExamenesPage() {
         enableSorting: false,
         Cell: ({ row }) => {
           const data = row.original;
-          console.log(data);
           return (
             <div className="flex gap-2 justify-center items-center">
               <button
@@ -551,7 +550,6 @@ export default function ExamenesPage() {
   const debouncedSaveFormData = useMemo(
     () =>
       debounce((data, submitStr) => {
-        console.log("saving to localStorage");
         localStorage.setItem("formData", JSON.stringify(data));
         localStorage.setItem("submitString", JSON.stringify(submitStr));
       }, 300),
@@ -691,7 +689,6 @@ export default function ExamenesPage() {
     try {
       const res = await externalApi.get(`/patients?ci=${ci}`);
       if (res.data.data.data.length === 0) {
-        console.log("No se encontró el paciente");
         setFormData((prev) => ({
           ...prev,
           patient: {
@@ -701,7 +698,6 @@ export default function ExamenesPage() {
         }));
         return;
       } else {
-        console.log(res.data.data.data[0], "Se encontró el paciente");
         setFormData((prev) => ({
           ...prev,
           patient: {

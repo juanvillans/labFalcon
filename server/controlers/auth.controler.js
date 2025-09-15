@@ -20,7 +20,6 @@ export const signIn = catchAsync(async (req, res, next) => {
     }
 
     // Check if account is pending activation (stop here if true)
-    console.log(user)
     if (user.status === "pendiente") {
       throw commonErrors.invalidInput("Cuenta pendiente de activación");
     }

@@ -59,7 +59,6 @@ const MyComponent = () => {
 
   const handleSubmit = async (formData) => {
     // formData contains all field values
-    console.log(formData); // { email: '...', firstName: '...', isActive: true/false }
     
     // Make API call
     await api.createUser(formData);

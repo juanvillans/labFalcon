@@ -79,7 +79,6 @@ export default function UsuariosPage() {
   };
 
   const onSubmit = async (submittedFormData) => {
-    console.log(submittedFormData);
     try {
       if (submitString === "Actualizar") {
         await usersAPI.updateUser(formData.id, submittedFormData);

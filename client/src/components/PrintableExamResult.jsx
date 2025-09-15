@@ -9,7 +9,6 @@ import QRCode from "react-qr-code";
 import { examResultsAPI } from "../services/api";
 
 const PrintableContent = forwardRef((props, ref) => {
-  console.log({props});
   return (
     <div
       ref={ref}
@@ -112,8 +111,6 @@ const PrintableContent = forwardRef((props, ref) => {
             </thead>
             <tbody>
               {props.examinationTypes[examination_type_id-1].tests.map(({name}, i) => {
-                console.log({name}, examination_type_id-1, )
-                console.log(exam.testValues[name].value);
                 const testValObj = exam.testValues[name];
                 if (testValObj.value.trim() === "") {
                   return <></>;
@@ -221,7 +218,6 @@ const PrintableContent = forwardRef((props, ref) => {
 });
 
 const PrintPage = (props) => {
-  console.log(props.token);
   const componentRef = useRef(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,

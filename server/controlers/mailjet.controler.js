@@ -23,7 +23,6 @@ export const sendMail = function(mailOptions) {
                 console.log("Email error:", error);
                 reject(error);
             } else {
-                console.log('Email sent: ' + info.response);
                 resolve(info);
             }
         });
