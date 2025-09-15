@@ -246,17 +246,19 @@ const PrintPage = (props) => {
         </button>
       ) : (
         <div className="flex justify-center mb-4">
-          <FuturisticButton
-            onClick={handlePrint}
-            title="Imprimir"
-            className="flex gap-2 text-xl mx-auto py-1 px-2 "
-          >
-            <Icon
-              icon="material-symbols:download-rounded"
-              className="w-6 h-6 text-gray-700  mr-3 inline "
-            />
-            <span>Descargar / Imprimir</span>
-          </FuturisticButton>
+          {props.data.all_validated && (
+            <FuturisticButton
+              onClick={handlePrint}
+              title="Imprimir"
+              className="flex gap-2 text-xl mx-auto py-1 px-2 "
+            >
+              <Icon
+                icon="material-symbols:download-rounded"
+                className="w-6 h-6 text-gray-700  mr-3 inline "
+              />
+              <span>Descargar / Imprimir</span>
+            </FuturisticButton>
+          )}
         </div>
       )}
 

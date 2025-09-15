@@ -44,7 +44,21 @@ export const generateToken = catchAsync(async (req, res, next) => {
 
 // Function to update message status (internal use)
 export const updateMessageStatus = async (analysisId, status) => {
+
   try {
+    // Get current analysis to check message_status
+    const currentAnalysis = await db("analysis").where("id", analysisId).first();
+    
+    if (!currentAnalysis) {
+      throw new Error("Analysis not found");
+    }
+    
+    // Don't update if already LEIDO
+    if (currentAnalysis.message_status === 'LEIDO') {
+      console.log(`Analysis ${analysisId} already marked as LEIDO, skipping update`);
+      return true;
+    }
+    
     await db("analysis")
       .where("id", analysisId)
       .update({ 
@@ -70,7 +84,7 @@ export const updateMessageStatusEndpoint = catchAsync(async (req, res, next) => 
       throw commonErrors.badRequest("Estado inválido");
     }
 
-    // Use the internal function
+    // Use the internal function (it will check LEIDO status)
     await updateMessageStatus(id, status);
 
     res.status(200).json({
@@ -106,9 +120,8 @@ export const sendExamResults = catchAsync(async (req, res, next) => {
       resultsUrl: resultsUrl,
       labName: "Laboratorio Falcón"
     });
-
     // Update status after successful send
-    await updateMessageStatus(id, 'ENVIADO');
+      await updateMessageStatus(id, 'ENVIADO');
 
     res.status(200).json({
       status: "success",

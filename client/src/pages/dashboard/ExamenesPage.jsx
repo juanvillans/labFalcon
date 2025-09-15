@@ -106,14 +106,14 @@ export default function ExamenesPage() {
       name: "email",
       label: "Correo Electrónico",
       type: "email",
-      required: true,
+      required: false,
       className: "col-span-1",
     },
     {
       name: "phone_number",
       label: "Teléfono",
       type: "text",
-      required: true,
+      required: false,
       className: "col-span-1",
     },
     {
@@ -154,6 +154,9 @@ export default function ExamenesPage() {
   const [submitString, setSubmitString] = useState("Registrar");
   const [isFormInitialized, setIsFormInitialized] = useState(false);
 
+
+  console.log({formData});
+  
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -377,7 +380,7 @@ export default function ExamenesPage() {
                   setFormData({
                     patient: data.patient,
                     id: data.id,
-                    all_validated: data.validated,
+                    all_validated: data.all_validated,
                     tests: data.tests,
                   });
                   setSubmitString("Actualizar");
@@ -398,13 +401,15 @@ export default function ExamenesPage() {
                 onClick={async () => {
                   if (!data.all_validated) {
                     showError("El examen no está validado");
-                    return;
+                  } else {
+                    const token = await generateResultsToken(data.id);
+                    setResultsToken(token);
+
                   }
                   setMessageData(data);
                   setIsMessageModalOpen(true);
                   // Generate token for WhatsApp link
-                  const token = await generateResultsToken(data.id);
-                  setResultsToken(token);
+
                 }}
               >
                 <Icon icon="ep:document" className="" width={20} height={20} />
@@ -426,6 +431,10 @@ export default function ExamenesPage() {
   );
 
   const handleMessage = async () => {
+    if (messageData.patient.email.length < 5) {
+      showError("El paciente no tiene correo electrónico");
+      return;
+    }
     setLoadingMessage(true);
     try {
       await examResultsAPI.sendExamResults(messageData);
@@ -443,7 +452,6 @@ export default function ExamenesPage() {
   const handleWhatsAppMessageSent = async () => {
     try {
       await examResultsAPI.updateMessageStatus(messageData.id, "ENVIADO");
-      showSuccess("Mensaje marcado como enviado con éxito");
       setIsMessageSentModalOpen(false);
       setMessageData(null);
       fetchData();
@@ -771,7 +779,7 @@ export default function ExamenesPage() {
             className={`md:grid grid-cols-2 space-y-5 md:space-y-0 gap-7 w-full relative`}
             onSubmit={onSubmit}
           >
-            <div className="space-y-3 z-10 sticky top-0 h-max">
+            <div className="space-y-3 z-10 md:sticky top-0 h-max">
               <h2 className="text-xl font-bold mb-2">
                 Información del Paciente
               </h2>
@@ -1111,55 +1119,64 @@ export default function ExamenesPage() {
             setIsMessageModalOpen(false);
           }}
         >
-          {resultsToken ? (
+          {resultsToken || !messageData.all_validated ? (
             <div className="flex flex-col justify-center">
-              <div className="flex gap-4 w-full justify-center mb-6">
-                <button
-                  title="Enviar por correo"
-                  onClick={() => loadingMessage || handleMessage()}
-                  className="hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
-                >
-                  {loadingMessage ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <Icon
-                      icon="line-md:email-twotone"
-                      className="w-10 h-10"
-                    ></Icon>
-                  )}
-                  <span className="text-sm">
-                    {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
-                  </span>
-                </button>
-
-                <a
-                  title="Enviar por WhatsApp"
-                  onClick={() => {
-                    setIsMessageModalOpen(false);
-                    setIsMessageSentModalOpen(true);
-                
-                  }}
-                  href={`https://wa.me/${(() => {
-                    let phoneNumber = messageData?.patient?.phone_number.replace(/[ -]/g, "");
-                    if (!phoneNumber || phoneNumber.length < 9) return "";
-                    // If number doesn't start with country code, add Venezuelan code
-                    if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("58")) {
-                      phoneNumber = "58" + phoneNumber;
-                    }
-                    // Remove + if present since WhatsApp API doesn't need it
-                    return phoneNumber.replace("+", "") || "";
-                  })()}?text=Hola ${
-                    messageData?.patient?.first_name
-                  }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
-                    window.location.origin
-                  }/results/${resultsToken || "cargando..."}`}
-                  target="_blank"
-                  className="hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
-                >
-                  <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
-                  <span className="text-sm">Enviar por WhatsApp</span>
-                </a>
-              </div>
+              {messageData.all_validated ? (
+                 <div className="flex gap-4 w-full justify-center mb-6">
+                  
+                 <button
+                   title="Enviar por correo"
+                   onClick={() => loadingMessage || handleMessage()}
+                   className={`${messageData.patient.email.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2`}
+                 >
+                   {loadingMessage ? (
+                     <CircularProgress size={20} />
+                   ) : (
+                     <Icon
+                       icon="line-md:email-twotone"
+                       className="w-10 h-10"
+                     ></Icon>
+                   )}
+                   <span className="text-sm">
+                     {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
+                   </span>
+                 </button>
+ 
+                 <a
+                   title="Enviar por WhatsApp"
+                   onClick={() => {
+                     
+                     setIsMessageModalOpen(false);
+                     setIsMessageSentModalOpen(true);
+                 
+                   }}
+                   href={`https://wa.me/${(() => {
+                     let phoneNumber = messageData?.patient?.phone_number.replace(/[ -]/g, "");
+                     if (!phoneNumber || phoneNumber.length < 9) return "";
+                     // If number doesn't start with country code, add Venezuelan code
+                     if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("58")) {
+                       phoneNumber = "58" + phoneNumber;
+                     }
+                     // Remove + if present since WhatsApp API doesn't need it
+                     return phoneNumber.replace("+", "") || "";
+                   })()}?text=Hola ${
+                     messageData?.patient?.first_name
+                   }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
+                     window.location.origin
+                   }/results/${resultsToken || "cargando..."}`}
+                   target="_blank"
+                   className={`${messageData.patient.phone_number.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2`}
+                 >
+                   <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
+                   <span className="text-sm">Enviar por WhatsApp</span>
+                 </a>
+               </div>
+              ) : (
+                <p className=" text-center mb-4">
+                  El examen no está validado, no se puede enviar ni descargar el documento
+                </p>
+              )}
+             
 
               <PrintPage
                 data={messageData}

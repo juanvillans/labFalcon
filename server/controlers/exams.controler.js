@@ -324,14 +324,15 @@ export const updateExam = catchAsync(async (req, res, next) => {
       throw commonErrors.missingFields(["Fecha de Nacimiento"]);
     }
 
-    if (!patient.email) {
-      throw commonErrors.missingFields(["Correo Electrónico"]);
-    }
-
-    // Check if analysis exists
+   
+    // Check if analysis exists and if message_status allows updates
     const existingAnalysis = await db("analysis").where("id", analysisId).first();
     if (!existingAnalysis) {
       throw commonErrors.notFound("Analysis");
+    }
+
+    if (existingAnalysis.message_status === "LEIDO" && existingAnalysis.all_validated) {
+      throw commonErrors.forbidden("No se puede actualizar un examen que ya ha sido leído");
     }
 
     // Use database transaction for data integrity
