@@ -1,4 +1,4 @@
-import labFalconLogo from "../../assets/logoRed.png";
+import labFalconLogo from "../../assets/logoBlue.png";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useFeedback } from "../context/FeedbackContext";
 import { authAPI } from "../services/api";
-import labFalconLogo from "../assets/logoRed.png";
+import labFalconLogo from "../assets/logoBlue.png";
 import lab from "../assets/lab.jpg";
 import secretariaLogo from "../assets/secretaria_logo.png";
 import { Icon } from "@iconify/react";
