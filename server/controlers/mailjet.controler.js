@@ -57,13 +57,13 @@ export const sendPasswordResetEmail = function (recipient, resetToken, url) {
 
     const mailOptions = {
         to: recipient.email,
-        subject: "Password Reset Request",
+        subject: "Solicitud de restablecimiento de contraseña",
         html: `
-            <h3>Password Reset Request</h3>
-            <p>We received a request to reset your password. Please click the link below to set a new password:</p>
-            <p><a href="${resetLink}">Reset Your Password</a></p>
-            <p>This link will expire in 1 hour.</p>
-            <p>If you did not request a password reset, please ignore this email.</p>
+            <h3>Restablecimiento de Contraseña</h3>
+            <p>Has solicitado restablecer tu contraseña. Por favor haz clic en el enlace a continuación para restablecer tu contraseña:</p>
+        <p><a href="${resetLink}">Restablecer contraseña</a></p>
+            <p>El enlace caducará en 1 hora.</p>
+            <p>Si no solicitaste este restablecimiento, por favor ignora este correo electrónico.</p>
         `
     };
 
@@ -73,12 +73,12 @@ export const sendPasswordResetEmail = function (recipient, resetToken, url) {
 export const sendResultsEmail = function ({ to, patientName, resultsUrl, labName }) {
     const mailOptions = {
         to: to,
-        subject: `${labName} - Resultados de Laboratorio Disponibles`,
+        subject: `${labName} - Resultados del Laboratorio de Secretaria de Salud Falcón `,
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="color: #2563eb; margin-bottom: 10px;">${labName}</h1>
-                    <h2 style="color: #374151; margin-top: 0;">Resultados de Laboratorio</h2>
+                    <h2 style="color: #374151; margin-top: 0;">Resultados del Laboratorio de Secretaria de Salud Falcón</h2>
                 </div>
 
                 <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
@@ -104,7 +104,6 @@ export const sendResultsEmail = function ({ to, patientName, resultsUrl, labName
                         <strong>Importante:</strong>
                     </p>
                     <ul style="font-size: 14px; color: #6b7280; line-height: 1.6;">
-                        <li>Este enlace es válido por 7 días por motivos de seguridad</li>
                         <li>Puede descargar sus resultados en formato PDF desde la página</li>
                         <li>Si tiene alguna pregunta sobre sus resultados, consulte con su médico</li>
                     </ul>
