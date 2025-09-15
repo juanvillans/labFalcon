@@ -1137,23 +1137,17 @@ export default function ExamenesPage() {
                   onClick={() => {
                     setIsMessageModalOpen(false);
                     setIsMessageSentModalOpen(true);
-                    let phoneNumber = messageData?.patient?.phone_number.replace(/[ -]/g, "");
-                    // If number doesn't start with country code, add Venezuelan code
-                    if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("58")) {
-                      phoneNumber = "58" + phoneNumber;
-                    }
-                    // Remove + if present since WhatsApp API doesn't need it
-                    console.log(phoneNumber)
-                    return phoneNumber.replace("+", "");
+                
                   }}
                   href={`https://wa.me/${(() => {
                     let phoneNumber = messageData?.patient?.phone_number.replace(/[ -]/g, "");
+                    if (!phoneNumber || phoneNumber.length < 9) return "";
                     // If number doesn't start with country code, add Venezuelan code
                     if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("58")) {
                       phoneNumber = "58" + phoneNumber;
                     }
                     // Remove + if present since WhatsApp API doesn't need it
-                    return phoneNumber.replace("+", "");
+                    return phoneNumber.replace("+", "") || "";
                   })()}?text=Hola ${
                     messageData?.patient?.first_name
                   }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
