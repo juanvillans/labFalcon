@@ -11,7 +11,6 @@ export const generateResultsToken = (analysisId, patientEmail) => {
     analysisId,
     email: patientEmail,
     type: 'exam_results',
-    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days expiration
   };
 
   return jwt.sign(payload, JWT_SECRET);

@@ -111,10 +111,12 @@ const FormField = React.memo(function FormField({
           endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
         }}
         inputProps={{
+
           list: type === "list" ? name : undefined,
           ...props.inputProps
         }}
         {...props}
+        
       />
 
       {type === "list" && (

@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,  useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { examResultsAPI } from "../services/api";
 import PrintPage from "../components/PrintableExamResult";
+import { examinationTypesAPI } from "../services/api";
 
 export default function ExamResultsPage() {
   const { token } = useParams();
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [examinationTypes, setExaminationTypes] = useState(null);
+   const getExaminationTypes = useCallback(async () => {
+      try {
+        const res = await examinationTypesAPI.getExaminationTypes();
+        setExaminationTypes(res.data.examinationTypes);
+      } catch (e) {
+        console.error("Failed to fetch data", e);
+      }
+    }, []);
+  
+    useEffect(() => {
+      getExaminationTypes();
+    }, [getExaminationTypes]);
   useEffect(() => {
     const fetchExamResults = async () => {
       try {
         setLoading(true);
         const response = await examResultsAPI.getByToken(token);
-        console.log(response.data.data);
         setExamData(response.data.data);
         await examResultsAPI.updateMessageStatus(response.data.data.id, "LEIDO");
         
@@ -71,7 +83,12 @@ export default function ExamResultsPage() {
     <>
       <title>Resultados del Examen - LabFalcón</title>
       <div className="min-h-screen bg-gray-100 py-8">
-        <PrintPage isHidden={false} data={examData} />
+        <PrintPage
+          isHidden={false}
+          data={examData}
+          token={token}
+          examinationTypes={examinationTypes}
+        />
       </div>
     </>
   );

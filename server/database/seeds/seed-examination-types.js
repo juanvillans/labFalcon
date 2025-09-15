@@ -326,6 +326,8 @@ const examinationTypesSeed = [
     name: "Análisis de orina",
     groupedBySections: true,
     tests: [
+
+      /////// Examen Físico
         {
           label: "Aspecto",
           name: "aspecto",
@@ -363,7 +365,7 @@ const examinationTypesSeed = [
         },
 
 
-        ///
+        ///  Examen Microscópico
 
 
         {
@@ -458,7 +460,7 @@ const examinationTypesSeed = [
 
 
 
-        ///
+        /// Examen Químico
 
         {
           section: true,

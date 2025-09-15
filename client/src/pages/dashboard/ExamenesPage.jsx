@@ -29,7 +29,7 @@ let isThereLocalStorageFormData = localStorage.getItem("formData")
   : false;
 // Memoized component for test fields to prevent unnecessary re-renders
 const MemoizedTestField = React.memo(
-  ({ field, value, onChange, testKey, fieldName }) => {
+  ({ field, value, onChange, testKey, fieldName, id }) => {
     const handleChange = useCallback(
       (e) => {
         onChange(testKey, e);
@@ -44,7 +44,17 @@ const MemoizedTestField = React.memo(
         examination_type_id={testKey}
         value={value || ""}
         onChange={handleChange}
+        id={id}
       />
+    );
+  },
+  // Custom comparison function for better memoization
+  (prevProps, nextProps) => {
+    return (
+      prevProps.value === nextProps.value &&
+      prevProps.testKey === nextProps.testKey &&
+      prevProps.fieldName === nextProps.fieldName &&
+      JSON.stringify(prevProps.field) === JSON.stringify(nextProps.field)
     );
   }
 );
@@ -203,7 +213,6 @@ export default function ExamenesPage() {
     }
   };
 
-
   const columns = useMemo(
     () => [
       {
@@ -332,7 +341,7 @@ export default function ExamenesPage() {
             return (
               <div className="flex items-center gap-2 opacity-50">
                 <Icon
-                  className="text-red-500"
+                  className="text-gray-300"
                   icon={"line-md:close"}
                   width={20}
                   height={20}
@@ -359,7 +368,7 @@ export default function ExamenesPage() {
         enableSorting: false,
         Cell: ({ row }) => {
           const data = row.original;
-          console.log(data)
+          console.log(data);
           return (
             <div className="flex gap-2 justify-center items-center">
               <button
@@ -384,51 +393,23 @@ export default function ExamenesPage() {
                 />
               </button>
 
-              <span
+              <button
+                title="Documento de resultados"
+                className="mx-1 p-1 hover:p-2 duration-75 text-gray-600  hover:bg-green-100 hover:text-green-600 rounded-full"
                 onClick={async () => {
-                  
                   if (!data.all_validated) {
                     showError("El examen no está validado");
                     return;
                   }
-                  setPrintButtonId(data.id) 
+                  setMessageData(data);
+                  setIsMessageModalOpen(true);
+                  // Generate token for WhatsApp link
                   const token = await generateResultsToken(data.id);
                   setResultsToken(token);
-                  console.log(token)
                 }}
-                className=" hover:p-0.5 hover:pr-2 duration-75 text-gray-600  hover:bg-yellow-100 hover:text-yellow-700 rounded-full"
               >
-                {data.all_validated && resultsToken && (
-                    <PrintPage
-                      data={data}
-                      token={resultsToken}
-                      active={printButtonId === data.id}
-                      isHidden={true}
-                    />
-
-                )}
-              </span>
-
-              {data.all_validated && (
-                <button
-                  title="Enviar mensaje"
-                  className="mx-1 p-1 hover:p-2 duration-75 text-gray-600  hover:bg-green-100 hover:text-green-600 rounded-full"
-                  onClick={async () => {
-                    setMessageData(data);
-                    setIsMessageModalOpen(true);
-                    // Generate token for WhatsApp link
-                    const token = await generateResultsToken(data.id);
-                    setResultsToken(token);
-                  }}
-                >
-                  <Icon
-                    icon="carbon:send-alt"
-                    className=""
-                    width={20}
-                    height={20}
-                  />
-                </button>
-              )}
+                <Icon icon="ep:document" className="" width={20} height={20} />
+              </button>
 
               <button
                 onClick={() => handleDelete(data.id)}
@@ -510,6 +491,20 @@ export default function ExamenesPage() {
   const [sorting, setSorting] = useState([{ id: "id", desc: true }]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  // Move useMemo outside the map - process all test sections at once
+
+  const processedTestSections = useMemo(() => {
+    return Object.keys(formData?.tests || {}).map((key) => {
+      const orderedTests =
+        examinationTypes?.[key - 1]?.tests?.map((testTemplate) => ({
+          ...testTemplate,
+          value:
+            formData.tests[key]?.testValues?.[testTemplate.name]?.value || "",
+        })) || [];
+
+      return { key, orderedTests };
+    });
+  }, [examinationTypes, formData.tests]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -650,9 +645,6 @@ export default function ExamenesPage() {
 
     setIsFormInitialized(true); // ← Activar guardado automático
   }, []);
-
-  console.log({formData});
-  
 
   const handlePatientInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -849,7 +841,7 @@ export default function ExamenesPage() {
                 <p>Seleccione al menos un tipo de exámen</p>
               ) : (
                 <>
-                  {Object.keys(formData?.tests || {})?.map((key, i) => (
+                  {processedTestSections.map(({ key, orderedTests }) => (
                     <div
                       key={key}
                       className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
@@ -895,17 +887,16 @@ export default function ExamenesPage() {
                           label: "Método",
                           type: "list",
                         }}
+                        id={`method-${key}`}
                         value={formData.tests[key]?.method}
                         onChange={() => handleMethodChange(key, event)}
                         testKey={"method"}
                         fieldName={"method"}
                       />
 
-                      <div className="flex flex-col md:grid mt-3.5 md:grid-cols-2 gap-4 ">
-                        {Object.entries(
-                          formData.tests[key]?.testValues || {}
-                        )?.map(([name, field, type, labels], i) => (
-                          <React.Fragment key={name}>
+                      <div className="flex flex-col mb-4 md:grid mt-3.5 md:grid-cols-2 gap-4 ">
+                        {orderedTests.map((obj, i) => (
+                          <React.Fragment key={obj.name + "_" + key + "_" + i}>
                             {i === 0 && key == 7 && (
                               <div className="flex justify-between items-center col-span-2">
                                 <h3 className="text-md font-bold text-gray-600 ml-2">
@@ -928,71 +919,68 @@ export default function ExamenesPage() {
                               </div>
                             )}
                             <MemoizedTestField
-                              field={field}
-                              value={
-                                formData.tests[key]?.testValues?.[name]?.value
-                              }
+                              field={obj}
+                              value={obj.value}
                               onChange={handleTestInputChange}
                               testKey={key}
-                              fieldName={name}
+                              fieldName={obj.name}
+                              id={`test-${key}-${obj.name}`}
                             />
                           </React.Fragment>
                         ))}
+                      </div>
 
-                        <div className="mb-2 col-span-2">
-                          <MemoizedTestField
-                            field={{
-                              name: "observation",
-                              label: "Observación",
-                            }}
-                            value={formData.tests[key]?.observation}
-                            onChange={() => handleObservationChange(key, event)}
-                            testKey={"observation"}
-                            fieldName={"observation"}
-                          />
-                        </div>
-                        <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            name={`validated-${key}`}
-                            readOnly={user?.allow_validate_exam === false}
-                            onChange={(e) => {
-                              if (user?.allow_validate_exam === false) return;
-                              handleValidatedChange(key, e);
-                            }}
-                            className="invisible"
-                            // onChange={(e) => handleValidatedChange(key, e)}
-                            checked={formData.tests[key]?.validated || false}
-                            id={`validated-${key}`}
-                          />
+                      <div className="mb-2 col-span-2">
+                        <MemoizedTestField
+                          field={{
+                            name: "observation",
+                            label: "Observación",
+                          }}
+                          value={formData.tests[key]?.observation}
+                          onChange={() => handleObservationChange(key, event)}
+                          testKey={"observation"}
+                          fieldName={"observation"}
+                        />
+                      </div>
+                      <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          name={`validated-${key}`}
+                          readOnly={user?.allow_validate_exam === false}
+                          onChange={(e) => {
+                            if (user?.allow_validate_exam === false) return;
+                            handleValidatedChange(key, e);
+                          }}
+                          className="invisible"
+                          // onChange={(e) => handleValidatedChange(key, e)}
+                          checked={formData.tests[key]?.validated || false}
+                          id={`validated-${key}`}
+                        />
 
-                          <label
-                            className="cursor-pointer hover:bg-green-100 rounded-xl p-2"
-                            htmlFor={`validated-${key}`}
-                          >
-                            {formData.tests[key]?.validated ? (
-                              <span className="flex gap-2 items-center">
-                                <small className="text-gray-400">
-                                  Validado
-                                </small>
-                                <Icon
-                                  className="text-color2 w-9 h-9 "
-                                  icon="bitcoin-icons:verify-filled"
-                                />
-                              </span>
-                            ) : (
-                              <span className="flex gap-2 items-center">
-                                <small className="text-gray-400">
-                                  No Validado
-                                </small>
-                                <Icon
-                                  icon="octicon:unverifed-24"
-                                  className="text-gray-600 w-6 h-6"
-                                />
-                              </span>
-                            )}
-                          </label>
-                        </div>
+                        <label
+                          className="cursor-pointer ml-auto hover:bg-green-100 rounded-xl p-2"
+                          htmlFor={`validated-${key}`}
+                        >
+                          {formData.tests[key]?.validated ? (
+                            <span className="flex gap-2 items-center">
+                              <small className="text-gray-400">Validado</small>
+                              <Icon
+                                className="text-color2 w-9 h-9 "
+                                icon="bitcoin-icons:verify-filled"
+                              />
+                            </span>
+                          ) : (
+                            <span className="flex gap-2 items-center">
+                              <small className="text-gray-400">
+                                No Validado
+                              </small>
+                              <Icon
+                                icon="octicon:unverifed-24"
+                                className="text-gray-600 w-6 h-6"
+                              />
+                            </span>
+                          )}
+                        </label>
                       </div>
                     </div>
                   ))}
@@ -1034,11 +1022,13 @@ export default function ExamenesPage() {
                           },
                         }));
                         setTimeout(() => {
-                          document
-                            .querySelector(
-                              `input[name=${examType.tests[0].name}]`
-                            )
-                            .focus();
+                          // Try to focus on the method field first, then fallback to first test input
+                          const methodField = document.querySelector(`#method-${examType.id}`);
+                          const firstTestInput = document.querySelector(`input[name="${examType.tests[0]?.name}"]`);
+                          const targetElement = methodField || firstTestInput;
+                          if (targetElement) {
+                            targetElement.focus();
+                          }
                         }, 120);
                       }}
                     >
@@ -1117,52 +1107,69 @@ export default function ExamenesPage() {
         )}
 
         <Modal
-          title="Enviar mensaje"
+          title="Documento de resultados"
           isOpen={isMessageModalOpen}
+          size="xl"
           onClose={() => {
             setResultsToken(null);
             setIsMessageModalOpen(false);
-          } 
-          
-          }
+          }}
         >
-          <div className="flex gap-4">
-            <button
-              title="Enviar por correo"
-              onClick={() => loadingMessage || handleMessage()}
-              className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
-            >
-              {loadingMessage ? (
-                <CircularProgress size={20} />
-              ) : (
-                <Icon icon="line-md:email-twotone" className="w-10 h-10"></Icon>
-              )}
-              <span className="text-sm">
-                {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
-              </span>
-            </button>
+          {resultsToken ? (
+            <div className="flex flex-col justify-center">
+              <div className="flex gap-4 w-full justify-center mb-6">
+                <button
+                  title="Enviar por correo"
+                  onClick={() => loadingMessage || handleMessage()}
+                  className="hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2 "
+                >
+                  {loadingMessage ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <Icon
+                      icon="line-md:email-twotone"
+                      className="w-10 h-10"
+                    ></Icon>
+                  )}
+                  <span className="text-sm">
+                    {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
+                  </span>
+                </button>
 
-            <a
-              title="Enviar por WhatsApp"
-              onClick={() => {
-                setIsMessageModalOpen(false);
-                setIsMessageSentModalOpen(true);
-              }}
-              href={`https://wa.me/${messageData?.patient?.phone_number.replace(
-                /[ -]/g,
-                ""
-              )}?text=Hola ${
-                messageData?.patient?.first_name
-              }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
-                window.location.origin
-              }/results/${resultsToken || "cargando..."}`}
-              target="_blank"
-              className="hover:bg-color1 hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
-            >
-              <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
-              <span className="text-sm">Enviar por WhatsApp</span>
-            </a>
-          </div>
+                <a
+                  title="Enviar por WhatsApp"
+                  onClick={() => {
+                    setIsMessageModalOpen(false);
+                    setIsMessageSentModalOpen(true);
+                  }}
+                  href={`https://wa.me/${messageData?.patient?.phone_number.replace(
+                    /[ -]/g,
+                    ""
+                  )}?text=Hola ${
+                    messageData?.patient?.first_name
+                  }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
+                    window.location.origin
+                  }/results/${resultsToken || "cargando..."}`}
+                  target="_blank"
+                  className="hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2 "
+                >
+                  <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
+                  <span className="text-sm">Enviar por WhatsApp</span>
+                </a>
+              </div>
+
+              <PrintPage
+                data={messageData}
+                examinationTypes={examinationTypes}
+                token={resultsToken}
+                isHidden={false}
+              />
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+          )}
         </Modal>
 
         <Modal

@@ -4,6 +4,6 @@ import { protect } from "../middlewares/auth.middleware.js";
 
 const examsTypesRouter = Router();
 
-examsTypesRouter.get("/", protect, getExaminationTypes);
+examsTypesRouter.get("/",  getExaminationTypes);
 
 export default examsTypesRouter;
