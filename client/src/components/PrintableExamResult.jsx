@@ -116,7 +116,8 @@ const PrintableContent = forwardRef((props, ref) => {
                   return <></>;
                 } else {
                   return (
-                    <>
+                    <React.Fragment key={`fragment-${i}-${examination_type_id}`}> {/* <-- ¡Añadir la clave aquí! */}
+
                       {i === 0 && examination_type_id == 7 && (
                         <tr className="flex justify-between items-center col-span-2">
                           <td colSpan={3} className="text-md font-bold text-gray-700 ml-2">
@@ -180,7 +181,7 @@ const PrintableContent = forwardRef((props, ref) => {
                           ) : null}
                         </td>
                       </tr>
-                    </>
+                    </React.Fragment>
                   );
                 }
               })}
