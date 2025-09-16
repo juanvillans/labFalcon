@@ -431,7 +431,7 @@ export default function ExamenesPage() {
   );
 
   const handleMessage = async () => {
-    if (messageData.patient.email.length < 5) {
+    if (messageData?.patient?.email.length < 5) {
       showError("El paciente no tiene correo electrónico");
       return;
     }
@@ -1127,7 +1127,7 @@ export default function ExamenesPage() {
                  <button
                    title="Enviar por correo"
                    onClick={() => loadingMessage || handleMessage()}
-                   className={`${messageData.patient.email.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2`}
+                   className={`${messageData?.patient?.email.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2`}
                  >
                    {loadingMessage ? (
                      <CircularProgress size={20} />
@@ -1165,7 +1165,7 @@ export default function ExamenesPage() {
                      window.location.origin
                    }/results/${resultsToken || "cargando..."}`}
                    target="_blank"
-                   className={`${messageData.patient.phone_number.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2`}
+                   className={`${messageData?.patient?.phone_number.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2`}
                  >
                    <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
                    <span className="text-sm">Enviar por WhatsApp</span>
