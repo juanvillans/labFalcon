@@ -61,7 +61,7 @@ const MemoizedTestField = React.memo(
 
 export default function ExamenesPage() {
   const [loading, setLoading] = useState(false);
-  const { showError, showSuccess } = useFeedback();
+  const { showError, showSuccess, showInfo } = useFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isMessageSentModalOpen, setIsMessageSentModalOpen] = useState(false);
@@ -399,15 +399,16 @@ export default function ExamenesPage() {
                 title="Documento de resultados"
                 className="mx-1 p-1 hover:p-2 duration-75 text-gray-600  hover:bg-green-100 hover:text-green-600 rounded-full"
                 onClick={async () => {
+                  setIsMessageModalOpen(true);
+                  setMessageData(data);
+
                   if (!data.all_validated) {
-                    showError("El examen no está validado");
+                    showInfo("El examen no está validado");
                   } else {
                     const token = await generateResultsToken(data.id);
                     setResultsToken(token);
 
                   }
-                  setMessageData(data);
-                  setIsMessageModalOpen(true);
                   // Generate token for WhatsApp link
 
                 }}
@@ -723,6 +724,8 @@ export default function ExamenesPage() {
     }
   }, 280);
 
+  console.log({messageData});
+  
   return (
     <>
       <title>Exámenes Médicos - LabFalcón</title>
@@ -1117,9 +1120,17 @@ export default function ExamenesPage() {
           onClose={() => {
             setResultsToken(null);
             setIsMessageModalOpen(false);
+            setMessageData(false);
           }}
         >
-          {resultsToken || !messageData.all_validated ? (
+
+          {(messageData?.all_validated && resultsToken == null) && (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+          )}
+          {((messageData?.all_validated && resultsToken != null ) || ( messageData.hasOwnProperty('all_validated') && messageData?.all_validated == false ) )&& (
+
             <div className="flex flex-col justify-center">
               {messageData?.all_validated ? (
                  <div className="flex gap-4 w-full justify-center mb-6">
@@ -1185,10 +1196,7 @@ export default function ExamenesPage() {
                 isHidden={false}
               />
             </div>
-          ) : (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            </div>
+          
           )}
         </Modal>
 

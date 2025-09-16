@@ -25,7 +25,7 @@ function FeedbackMessage({ message, type, onClose }) {
         return 'bg-yellow-500';
       case MESSAGE_TYPES.INFO:
       default:
-        return 'bg-color1';
+        return 'bg-color1 ';
     }
   };
 
