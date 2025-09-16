@@ -87,7 +87,7 @@ export const sendResultsEmail = function ({ to, patientName, resultsUrl, labName
                     </p>
 
                     <p style="font-size: 16px; color: #374151; line-height: 1.6; margin-bottom: 20px;">
-                        Sus resultados de laboratorio ya están disponibles. Puede acceder a ellos de forma segura
+                        Sus resultados ya están disponibles. Puede acceder a ellos de forma segura
                         haciendo clic en el enlace a continuación:
                     </p>
 

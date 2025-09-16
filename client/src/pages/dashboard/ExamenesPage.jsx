@@ -1121,7 +1121,7 @@ export default function ExamenesPage() {
         >
           {resultsToken || !messageData.all_validated ? (
             <div className="flex flex-col justify-center">
-              {messageData.all_validated ? (
+              {messageData?.all_validated ? (
                  <div className="flex gap-4 w-full justify-center mb-6">
                   
                  <button

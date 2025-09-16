@@ -31,7 +31,7 @@ export default function ExamResultsPage() {
         await examResultsAPI.updateMessageStatus(response.data.data.id, "LEIDO");
         
       } catch (err) {
-        setError(err.message || "Error al cargar los resultados");
+        setError("Error al cargar los resultados");
       } finally {
         setLoading(false);
       }
