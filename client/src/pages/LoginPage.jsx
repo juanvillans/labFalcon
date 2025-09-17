@@ -84,7 +84,6 @@ export default function LoginPage() {
           alt="lab"
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
-
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-50"></div>
         <div className="bg-black bg-opacity-20 z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
           <div className="flex justify-start gap-3">

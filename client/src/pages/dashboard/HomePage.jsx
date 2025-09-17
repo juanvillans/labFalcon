@@ -63,6 +63,7 @@ export default function HomePage() {
             setSelectedPeriod(e.target.value);
           }}
         />
+        
 
         {chartData && (
           <div className="md:grid space-y-4 grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4">

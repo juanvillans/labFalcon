@@ -6,6 +6,7 @@ import Latidos from "../assets/latidos.png";
 import FuturisticButton from "./FuturisticButton";
 import firmaDigital from "../assets/firmaDigital.png";
 import QRCode from "react-qr-code";
+import cintillo from "../assets/cintillo.png";
 import { examResultsAPI } from "../services/api";
 
 const PrintableContent = forwardRef((props, ref) => {
@@ -19,23 +20,21 @@ const PrintableContent = forwardRef((props, ref) => {
       <div
         ref={ref}
         className="w-full mx-auto bg-white border relative"
-        style={{ padding: "10mm", width: "210mm", height: "297mm" }}
+        style={{ padding: "10mm", width: "210mm", height: "297mm", paddingTop: "0mm !important" }}
       >
         <header
           style={{
             marginBlock: "50px !important",
             marginBottom: "50px !important",
           }}
-          className="my-2 relative flex justify-center items-center py-4"
+          className="my-2 relative flex flex-col justify-center items-center py-4"
         >
-          <img src={SecretrariaLogo} alt="" className="absolute left-4 w-16" />
+          <img src={cintillo} alt="" className="w-full h-auto" />
   
-          <div className="text-center font-bold">
-            <p>Secretaria de Salud de Falcón.</p>
-            <p>Laboratorio.</p>
+          <div className="text-center font-bold  gap-3 my-3 mt-4 text-color1">
+            Secretaria de Salud del Estado Falcón - Laboratorio
           </div>
   
-          <img src={Latidos} alt="" className="absolute right-4 w-24" />
         </header>
         <table className="text-left w-full text-xs border-collapse mb-5">
           <thead>
@@ -233,7 +232,7 @@ const PrintPage = (props) => {
     documentTitle: `Examen-${props.data?.patient?.first_name}-${props.data?.patient?.last_name}-${props.data?.patient?.ci}-${props.data.created_date}`,
     pageStyle: `
       @page {
-        margin: 20mm;
+        
         size: A4;
 
       }
