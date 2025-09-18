@@ -7,6 +7,7 @@ import labFalconLogo from "../assets/logoBlue.png";
 import lab from "../assets/lab.jpg";
 import secretariaLogo from "../assets/secretaria_logo.png";
 import { Icon } from "@iconify/react";
+import cintilloCorto  from "../assets/cintilloCorto.png";
 
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
@@ -30,7 +31,7 @@ export default function LoginPage() {
       navigate("/dashboard", { replace: true });
     }
   }, [user, authLoading, navigate]);
-  
+
   const handleForgotPsw = async (e) => {
     if (!email) {
       showError("Por favor ingrese su correo electrónico");
@@ -42,7 +43,7 @@ export default function LoginPage() {
     } catch (err) {
       showError(err.message);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,54 +79,43 @@ export default function LoginPage() {
   return (
     <>
       <title>Iniciar Sesión - LabFalcón</title>
-      <div className="md:min-h-screen overflow-hidden relative flex items-center justify-end bg-gray-600 bg-cover bg-center">
+      <div className="min-h-screen overflow-hidden relative  bg-gray-600 bg-cover bg-center">
         <img
           src={lab}
           alt="lab"
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-50"></div>
-        <div className="bg-black bg-opacity-20 z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
-          <div className="flex justify-start gap-3">
-            <img
-              src={secretariaLogo}
-              alt="secretariaLogo"
-              className="w-14 h-14  aspect-square md:w-24 md:h-24 md:mr-auto"
-            />
-
-            <div className="flex items-center">
-
-              <div className="bg-color1 w-14 h-14 flex items-center justify-center aspect-square rounded-full p-3">
-                <img
-                  src={labFalconLogo}
-                  className="logo w-10 mx-auto md:hidden block"
-                  alt="logo del sistema"
-                />
-
-              </div>
-              <h1 className=" text-sm ml-2 text-white text-md font-bold text-center md:hidden block">
-                LabFalcon Login
-              </h1>
-            </div>
-          </div>
-          <h1 className="text-white mt-3 md:mt-7 w-2/3  min-w-[270px] max-w-[800px] text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-semibold">
-            Sistema de Laboratorio de la Secretaria de Salud de Falcón
-          </h1>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-10"></div>
+        <div className=" z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
+          
+         
         </div>
-        <div className="absolute md:min-w-[400px] z-50 top-64 md:top-6 px-5 pt-1 md:pt-10  sm:pt-20 right-10 loginFormContainer  bg-color1 md:h-[94%] text-gray-50 md:p-16 rounded-lg  shadow-2xl ">
-          <img
-            src={labFalconLogo}
-            className="logo w-16 mx-auto hidden md:block"
-            alt="logo del sistema"
-          />
-          <h1 className="text-lg md:text-2xl font-bold mb-6 text-center hidden md:block">
-            LabFalcon Login
+        <div
+          className="absolute w-[300px] md:min-w-[400px]  md:w-[450px] top-5  z-50 md:top-10 px-5 pt-4 md:pt-10 sm:pt-20  md:right-20  text-color1 md:p-16 rounded-3xl overflow-hidden"
+          style={{
+            background: "rgba(255, 255, 255, 0.4)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(10px)",
+          }}
+        >
+          <div className="mx-auto bg-white backdrop-blur-none w-14 h-14 flex items-center justify-center aspect-square rounded-full p-2.5">
+            <img
+              src={labFalconLogo}
+              className="logo inline-block mx-auto  "
+              alt="logo del sistema"
+            />
+          </div>
+          <h1 className="text-lg md:text-2xl font-bold  mt-4 text-center ">
+            BIENVENIDO A LABFALCON
           </h1>
+          <p className="text-dark text-xs md:text-md text-center">
+            Sistema de Laboratorio de la Secretaria de Salud de Falcón
+          </p>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4 mt-4 md:mt-10">
               <label
-                className="block text-gray-200 text-sm  mb-2"
+                className="block  text-sm  mb-1"
                 htmlFor="email"
               >
                 Email
@@ -135,14 +125,14 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-gray-100 text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-color4 text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div className="relative mb-1 ">
               <label
-                className="block text-gray-200 text-sm  mb-2"
+                className="block  text-sm  mb-1"
                 htmlFor="password"
               >
                 Contraseña
@@ -152,21 +142,28 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-gray-100  text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                className="w-full bg-color4  text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                 required
               />
-              { showPassword ? (
-                <Icon onClick={() => setShowPassword(!showPassword)} icon="majesticons:eye-line" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+              {showPassword ? (
+                <Icon
+                  onClick={() => setShowPassword(!showPassword)}
+                  icon="majesticons:eye-line"
+                  className=" w-5 h-5  absolute right-3 top-8 font-bold text-gray-900 cursor-pointer"
+                />
               ) : (
-                <Icon onClick={() => setShowPassword(!showPassword)} icon="mdi:eye-off-outline" className=" w-5 h-5  absolute right-3 top-9 font-bold text-gray-900 cursor-pointer" />
+                <Icon
+                  onClick={() => setShowPassword(!showPassword)}
+                  icon="mdi:eye-off-outline"
+                  className=" w-5 h-5  absolute right-3 top-8 font-bold text-gray-900 cursor-pointer"
+                />
               )}
-
             </div>
             <div className="flex justify-end mb-6">
               <button
                 type="button"
                 onClick={handleForgotPsw}
-                className="text-sm text-gray-300 hover:underline"
+                className="text-sm hover:underline"
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -175,25 +172,33 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mb-4 md:mb-0 bg-color4 text-color1 font-bold py-2 px-4 rounded hover:border hover:border-color3 hover:bg-color1 hover:text-color3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full mb-4 md:mb-0 bg-color1 text-color4 font-bold py-2 px-4 rounded hover:border hover:border-color3 hover:bg-color1 hover:text-color3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? "Ingresando..." : "Ingresar"}
+              {loading ? "Ingresando..." : "INGRESAR"}
             </button>
           </form>
         </div>
-        
       </div>
-      <footer className="text-color1 text-sm text-center bg-color4 py-3">
+      <footer className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-color1 text-sm z-40 w-full relative md:absolute bottom-0 text-center bg-white py-3">
+        <img src={cintilloCorto} alt="" className="max-w-[240px] h-min" />
+        <span>|</span>
         <p className="">
           &copy; {new Date().getFullYear()} LabFalcon. Todos los derechos
           reservados.
         </p>
+        <span>|</span>
         <small className="opacity-80 mt-1 block">
           Contacta con los desarrolladores:{" "}
           <a href="mailto:juanvillasmil@gmail.com" className="">
             juanvillasmil@gmail.com
           </a>
         </small>
+        <span>|</span>
+        <img
+          src={secretariaLogo}
+          alt="secretariaLogo"
+          className="w-12 h-12  aspect-square  "
+        />
       </footer>
     </>
   );

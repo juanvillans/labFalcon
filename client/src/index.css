@@ -340,3 +340,11 @@ h5 {
 .ellipse {
   clip-path: ellipse(40% 50% at 50% 50%);
 }
+.blur {
+  backdrop-filter: blur(10px);
+}
+.blur * {
+  backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.02),
+
+}
