@@ -91,7 +91,7 @@ export default function LoginPage() {
          
         </div>
         <div
-          className="absolute w-[300px] md:min-w-[400px]  md:w-[450px] top-5  z-50 md:top-10 px-5 pt-4 md:pt-10 sm:pt-20  md:right-20  text-color1 md:p-16 rounded-3xl overflow-hidden"
+          className="absolute w-[300px] md:min-w-[400px] md:w-[450px] top-5 z-50 md:top-10 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
           style={{
             background: "rgba(255, 255, 255, 0.4)",
             backdropFilter: "blur(8px)",
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-color4 text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-color4 text-gray-800 px-2 py-2 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-color4  text-gray-800 px-1 py-1 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                className="w-full bg-color4  text-gray-800 px-2 py-2 text-sm sm:px-3 sm:py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                 required
               />
               {showPassword ? (
