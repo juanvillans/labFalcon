@@ -74,7 +74,7 @@ export default function SideNav(props) {
               >
                 <div className="grid grid-cols-12  items-center">
                     <Icon className={` col-span-3 z-10`} icon={eachLink.icon} width={24} height={24} />
-                    <span className={props.isSidebarOpen ? "opacity-100" : "opacity-0" + " duration-200 z-0"}>
+                    <span className={props.isSidebarOpen ? "hidden md:block opacity-100" : "hidden md:block  opacity-0" + " duration-200 z-0"}>
                       {eachLink.name}
                     </span>
 

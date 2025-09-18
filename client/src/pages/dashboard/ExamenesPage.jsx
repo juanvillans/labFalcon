@@ -155,7 +155,6 @@ export default function ExamenesPage() {
   const [isFormInitialized, setIsFormInitialized] = useState(false);
 
 
-  console.log({formData});
   
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -724,7 +723,6 @@ export default function ExamenesPage() {
     }
   }, 280);
 
-  console.log({messageData});
   
   return (
     <>
