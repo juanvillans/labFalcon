@@ -9,6 +9,7 @@ import {
   examinationTypesAPI,
   examsAPI,
   examResultsAPI,
+  originsAPI
 } from "../../services/api";
 import externalApi from "../../services/saludfalcon.api";
 import { Icon } from "@iconify/react";
@@ -68,6 +69,7 @@ export default function ExamenesPage() {
   const [messageData, setMessageData] = useState({});
   const [resultsToken, setResultsToken] = useState(null);
   const [examinationTypes, setExaminationTypes] = useState([]);
+  const [origins, setOrigins] = useState([]);
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [printButtonId, setPrintButtonId] = useState(null);
   const { user } = useAuth();
@@ -132,6 +134,16 @@ export default function ExamenesPage() {
         { value: "Femenino", label: "Femenino" },
       ],
       className: "col-span-1",
+    },
+    {
+      name: "origin_id",
+      label: "Procedencia *",
+      type: "select",
+      options: [
+        { value: "Masculino", label: "Masculino" },
+        { value: "Femenino", label: "Femenino" },
+      ],
+      className: "col-span-2",
     },
   ]);
   const defaultFormData = {
@@ -537,19 +549,25 @@ export default function ExamenesPage() {
     setIsLoading(false);
   }, [pagination, sorting, columnFilters, globalFilter]);
 
-  const getExaminationTypes = useCallback(async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
-      const res = await examinationTypesAPI.getExaminationTypes();
-      setExaminationTypes(res.data.examinationTypes);
+      const [examTypesRes, originsRes] = await Promise.all([
+        examinationTypesAPI.getExaminationTypes(),
+        originsAPI.getOrigins()
+      ]);
+      
+      setExaminationTypes(examTypesRes.data.examinationTypes);
+      setOrigins(originsRes.data.otherData);
+      
     } catch (e) {
       console.error("Failed to fetch data", e);
     }
   }, []);
-
+  
   useEffect(() => {
-    getExaminationTypes();
-  }, [getExaminationTypes]);
-
+    fetchInitialData();
+  }, [fetchInitialData]);
+  
   useEffect(() => {
     fetchData();
   }, [fetchData]);

@@ -79,6 +79,10 @@ export const examinationTypesAPI = {
   getExaminationTypes: () => api.get('/examination-types'),
 };
 
+export const originsAPI = {
+  getOrigins: () => api.get("/origins")
+}
+
 export const examsAPI = {
   createExam: (examData) => api.post('/exams', examData),
   getExams: (params) => api.get('/exams', {params}),

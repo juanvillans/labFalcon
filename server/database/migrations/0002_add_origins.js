@@ -16,11 +16,13 @@ export async function up(knex) {
     { name: 'Externo' },
     { name: 'Hospitalizado' },
     { name: 'Jubilado' },
-    { name: 'Emergencia' },
-    { name: 'Consulta' },
-    { name: 'Referido' },
-    { name: 'Particular' },
-    { name: 'Seguro' }
+    { name: 'Familiar' },
+    { name: 'Jornada' },
+    { name: 'Caso social' },
+    { name: 'Plan Quirúrgico' },
+    { name: 'UBCH' },
+    { name: 'Otros' },
+    
   ]);
 }
 

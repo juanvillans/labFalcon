@@ -9,6 +9,7 @@ import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
 import examinationTypesRouter from "./routers/examamination_types.routers.js";
 import examsRouter from "./routers/exams.routers.js";
 import resultsRouter from "./routers/results.routers.js";
+import originsRouter from "./routers/origins.routes.js";
 
 const app = express();
 // Enable CORS (Cross-Origin Resource Sharing)
@@ -31,7 +32,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/examination-types", examinationTypesRouter);
 app.use("/api/v1/exams", examsRouter);
-app.use("/api/v1/results", resultsRouter); // Public routes for exam results
+app.use("/api/v1/results", resultsRouter); // Public routes for exam resultscv
+app.use("/api/v1/origins", originsRouter); // Public routes for exam resultscv
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Subscription API");
