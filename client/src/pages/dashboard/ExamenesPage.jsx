@@ -912,14 +912,14 @@ export default function ExamenesPage() {
                             {i === 5 && key == 7 && (
                               <div className="flex justify-between items-center mt-4 col-span-2">
                                 <h3 className="text-md font-bold text-gray-600 ml-2">
-                                  Examen Microscópico
+                                  Examen químico
                                 </h3>
                               </div>
                             )}
                             {i === 13 && key == 7 && (
                               <div className="flex justify-between items-center mt-4 col-span-2">
                                 <h3 className="text-md font-bold text-gray-600 ml-2">
-                                  Examen Químico
+                                  Examen microscópico
                                 </h3>
                               </div>
                             )}

@@ -13,7 +13,7 @@ const examinationTypesSeed = [
   {
     name: "Hematologia",
     groupedBySections: false,
-    
+
     tests: [
       {
         label: "Cuenta blanca",
@@ -85,13 +85,15 @@ const examinationTypesSeed = [
           max: 350,
         },
       },
+     
+      
     ],
   },
 
   {
     name: "Química sanguinea",
     groupedBySections: false,
-    
+
     tests: [
       {
         label: "Glucosa",
@@ -125,13 +127,13 @@ const examinationTypesSeed = [
       },
     ],
   },
-  
+
   {
     name: "Prueba de coagulación",
     tests: [
       {
-        label: "TP",
-        name: "tp",
+        label: "TP paciente",
+        name: "tp_paciente",
         type: "number",
         unit: "seg",
         reference_range: {
@@ -139,9 +141,10 @@ const examinationTypesSeed = [
           max: 14,
         },
       },
+      
       {
-        label: "TPT",
-        name: "tpt",
+        label: "TPT paciente",
+        name: "tpt_paciente",
         type: "number",
         unit: "seg",
         reference_range: {
@@ -149,25 +152,49 @@ const examinationTypesSeed = [
           max: 35,
         },
       },
+      {
+        label: "Control TP",
+        name: "control_pt",
+        type: "number",
+        unit: "seg",
+      },
+      {
+        label: "Control TPT",
+        name: "control_tpt",
+        type: "number",
+        unit: "seg",
+      },
+      {
+        label: "Razón p/c",
+        name: "razon",
+        type: "number",
+        unit: "seg",
+      },
+      {
+        label: "Diferencia p/c",
+        name: "diferencia",
+        type: "number",
+        unit: "seg",
+      },
     ],
   },
 
   {
     name: "Serología",
     groupedBySections: false,
-    
+
     tests: [
       {
         label: "HIV",
         name: "hiv",
         type: "select",
-        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "Pyloriset",
         name: "pyloriset",
         type: "select",
-        options: [{value: "Positivo"}, {value: "Negativo"}],
+        options: [{ value: "Positivo" }, { value: "Negativo" }],
       },
 
       {
@@ -193,44 +220,44 @@ const examinationTypesSeed = [
         label: "Dengue",
         name: "dengue",
         type: "select",
-        options: [{value: "Positivo"}, {value: "Negativo"}],
+        options: [{ value: "Positivo" }, { value: "Negativo" }],
       },
       {
         label: "VHA",
         name: "vha",
         type: "select",
-        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "TEST-PACK HCG",
         name: "test_pack_hcg",
         type: "select",
-        options: [{value: "Positivo"}, {value: "Negativo"}],
+        options: [{ value: "Positivo" }, { value: "Negativo" }],
       },
       {
         label: "VHB AGS",
         name: "vhb_ags",
         type: "select",
-        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
 
       {
         label: "HCV",
         name: "hcv",
         type: "select",
-        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "VHB anticore",
         name: "vhb_anticore",
         type: "select",
-        options: [{value: "Reactivo"}, {value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "Sangre oculta en heces",
         name: "sangre_oculta_en_heces",
         type: "select",
-        options: [{value: "Positivo"}, {value: "Negativo"}],
+        options: [{ value: "Positivo" }, { value: "Negativo" }],
       },
     ],
   },
@@ -238,7 +265,7 @@ const examinationTypesSeed = [
   {
     name: "Análisis de heces",
     groupedBySections: false,
-    
+
     tests: [
       {
         label: "Aspecto",
@@ -289,7 +316,6 @@ const examinationTypesSeed = [
         type: "boolean",
         labels: { true: "Presente", false: "No observado" },
       },
-      
     ],
   },
   {
@@ -299,25 +325,25 @@ const examinationTypesSeed = [
         label: "HAV",
         name: "hav",
         type: "select",
-        options: [{value: "Reactivo"},{value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "AgsHB",
         name: "agshb",
         type: "select",
-        options: [{value: "Reactivo"},{value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "CORE",
         name: "core",
         type: "select",
-        options: [{value: "Reactivo"},{value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
         label: "HCV",
         name: "hcv",
         type: "select",
-        options: [{value: "Reactivo"},{value: "No reactivo" }],
+        options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
     ],
   },
@@ -326,181 +352,175 @@ const examinationTypesSeed = [
     name: "Análisis de orina",
     groupedBySections: true,
     tests: [
-
       /////// Examen Físico
-        {
-          label: "Aspecto",
-          name: "aspecto",
-          type: "list",
-          labels: ["límpida", "Turbio", "Ligeramente Turbio", "Cristalizada"],
+      {
+        label: "Aspecto",
+        name: "aspecto",
+        type: "list",
+        labels: ["límpida", "Turbio", "Ligeramente Turbio", "Cristalizada"],
+      },
+      {
+        label: "Color",
+        name: "color",
+        type: "list",
+        labels: ["Amarillo", "Ambar", "Negro", "Rojo", "Verde"],
+      },
+      {
+        label: "Olor",
+        name: "olor",
+        type: "list",
+        labels: ["Amoniacal", "Fétido"],
+      },
+      {
+        label: "Reacción",
+        name: "reaccion",
+        type: "list",
+        labels: ["Acida", "Alcalina", "Neutral"],
+      },
+      {
+        label: "pH",
+        name: "ph",
+        type: "list",
+        unit: "pH",
+        labels: ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5"],
+        reference_range: {
+          min: 5,
+          max: 8.5,
         },
-        {
-          label: "Color",
-          name: "color",
-          type: "list",
-          labels: ["Amarillo", "Ambar", "Negro", "Rojo", "Verde"],
-        },
-        {
-          label: "Olor",
-          name: "olor",
-          type: "list",
-          labels: ["Amoniacal", "Fétido"],
-        },
-        {
-          label: "Reacción",
-          name: "reaccion",
-          type: "list",
-          labels: ["Acida", "Alcalina", "Neutral"],
-        },
-        {
-          label: "pH",
-          name: "ph",
-          type: "list",
-          unit: "pH",
-          labels: ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5"],
-          reference_range: {
-            min: 5,
-            max: 8.5,
-          },
-        },
+      },
 
+      /// Examen Químico
 
-        ///  Examen Microscópico
-
-
-        {
-          label: "Albúmina",
-          name: "albumina",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Hemoglobina",
-          name: "hemoglobina",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Urobilina",
-          name: "urobilina",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Glucosa",
-          name: "glucosa",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Acetona",
-          name: "acetona",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
+      {
+        label: "Albúmina",
+        name: "albumina",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Hemoglobina",
+        name: "hemoglobina",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Urobilina",
+        name: "urobilina",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Glucosa",
+        name: "glucosa",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Acetona",
+        name: "acetona",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
         label: "Pigmentos bilares",
-          name: "pigmentos_bilares",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Nitritos",
-          name: "nitritos",
-          type: "list",
-          labels: [
-            "Negativo",
-            "Positivo 1+",
-            "Positivo 2++",
-            "Positivo 3+++",
-            "Positivo 4++++",
-          ],
-        },
-        {
-          label: "Otros",
-          name: "otros",
-          type: "string",
-        },
+        name: "pigmentos_bilares",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Nitritos",
+        name: "nitritos",
+        type: "list",
+        labels: [
+          "Negativo",
+          "Positivo 1+",
+          "Positivo 2++",
+          "Positivo 3+++",
+          "Positivo 4++++",
+        ],
+      },
+      {
+        label: "Otros",
+        name: "otros",
+        type: "string",
+      },
 
+      ///  Examen Microscópico
 
+      {
+        section: true,
+        label: "Bacterias",
+        name: "bacterias",
+        type: "string",
+      },
+      {
+        label: "Células epiteliales",
+        name: "celulas_epiteliales",
+        type: "string",
+      },
+      {
+        label: "Leucocitos",
+        name: "leucitos",
+        type: "string",
+      },
+      {
+        label: "Hematies",
+        name: "hematies",
+        type: "string",
+      },
+      {
+        label: "Cilindros",
+        name: "cilindros",
+        type: "string",
+      },
+      {
+        label: "Cristales",
+        name: "cristales",
+        type: "string",
+      },
 
-        /// Examen Químico
-
-        {
-          section: true,
-          label: "Bacterias",
-          name: "bacterias",
-          type: "string",
-        },
-        {
-          label: "Células epiteliales",
-          name: "celulas_epiteliales",
-          type: "string",
-        },
-        {
-          label: "Leucocitos",
-          name: "leucitos",
-          type: "string",
-        },
-        {
-          label: "Hematies",
-          name: "hematies",
-          type: "string",
-        },
-        {
-          label: "Cilindros",
-          name: "cilindros",
-          type: "string",
-        },
-        {
-          label: "Cristales",
-          name: "cristales",
-          type: "string",
-        },
-
-        {
-          label: "Otros",
-          name: "otros",
-          type: "string",
-        },
-    ]
-    
+      {
+        label: "Otros",
+        name: "otros",
+        type: "string",
+      },
+    ],
   },
 ];
 
