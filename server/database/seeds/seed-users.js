@@ -17,6 +17,7 @@ const usersSeed = [
       password: "123456",
       allow_validate_exam: true,
       allow_handle_users: true,
+      allow_handle_exams: true,
       status: "activo",
     },
  
@@ -39,6 +40,7 @@ const usersSeed = [
         password: hashedPassword,
         allow_validate_exam: user.allow_validate_exam,
         allow_handle_users: user.allow_handle_users,
+        allow_handle_exams: user.allow_handle_exams,
         status: user.status,
       });
       console.log(`Seeded: ${user.first_name} ${user.last_name}`);

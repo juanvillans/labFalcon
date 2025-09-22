@@ -238,6 +238,7 @@ export const getExams = catchAsync(async (req, res, next) => {
         phone_number: analysis.phone_number,
         address: analysis.address,
         sex: analysis.sex,
+        origin_id: analysis.origin_id,
         patient_id: null
       },
       all_validated: analysis.all_validated,
