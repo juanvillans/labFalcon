@@ -202,7 +202,7 @@ const PrintableContent = forwardRef((props, ref) => {
           </div>
         ))}
         {props.data.all_validated && (
-          <div className="absolute bottom-10 left-10 right-10 flex justify-between">
+          <footer className=" bottom-10 left-10 right-10 flex justify-between">
             <div style={{ width: "min-content" }}>
               <QRCode
                 size={106}
@@ -216,7 +216,7 @@ const PrintableContent = forwardRef((props, ref) => {
               src={firmaDigital}
               alt=""
             />
-          </div>
+          </footer>
         )}
       </div>
     );
@@ -228,7 +228,7 @@ const PrintPage = (props) => {
   const componentRef = useRef(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
-    documentTitle: `Examen-${props.data?.patient?.first_name}-${props.data?.patient?.last_name}-${props.data?.patient?.ci}-${props.data.created_date}`,
+    documentTitle: `Examen-${props.data?.patient?.first_name}-${props.data?.patient?.last_name}-${props.data?.patient?.ci}-${props.data.created_date}-${props.data.created_time}`,
     pageStyle: `
       @page {
         

@@ -26,9 +26,6 @@ export const createExam = catchAsync(async (req, res, next) => {
       throw commonErrors.missingFields(["Fecha de Nacimiento"]);
     }
 
-    if (!patient.email) {
-      throw commonErrors.missingFields(["Correo Electrónico"]);
-    }
     if (!patient.sex) {
       throw commonErrors.missingFields(["Género"]);
     }

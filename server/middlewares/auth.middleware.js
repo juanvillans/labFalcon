@@ -62,6 +62,19 @@ export const requireHandleUsers = (req, res, next) => {
   }
 };
 
+export const requireHandleExams = (req, res, next) => {
+  try {
+    // Check if user has permission to handle exams
+    if (!req.user || !req.user.allow_handle_exams) {
+      throw commonErrors.forbidden();
+    }
+    
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Middleware to validate invitation tokens
 export const validateInvitationToken = catchAsync(async (req, res, next) => {
   try {

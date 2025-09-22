@@ -24,6 +24,7 @@
         table.string('last_name').notNullable();
         table.boolean('allow_validate_exam').defaultTo(false);
         table.boolean('allow_handle_users').defaultTo(false);
+        table.boolean('allow_handle_exams').defaultTo(false);
         table.string('password');
         table.string('status').notNullable();  
         table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));

@@ -39,8 +39,9 @@ export const sendInvitationEmail = function (recipient, invitationToken, url) {
     const activationLink = `${url}/activar-cuenta?token=${invitationToken}`;
     const mailOptions = {
         to: recipient.email,
-        subject: "Bienvenido a labFalcón - Activa tu cuenta",
+        subject: "Bienvenido a labFalcon - Activa tu cuenta",
         html: `
+            <img src="${process.env.APP_URL }/logoBlue.png}" alt="labFalcon" />
             <h3>Bienvenido a nuestra plataforma, ${recipient.first_name}!</h3>
             <p>Tu cuenta ha sido creada. Por favor haz clic en el enlace a continuación para establecer tu contraseña y activar tu cuenta:</p>
             <p><a href="${activationLink}">Activar cuenta</a></p>

@@ -12,6 +12,7 @@ export const createUser = catchAsync(async (req, res, next) => {
       last_name,
       allow_validate_exam,
       allow_handle_users,
+      allow_handle_exams,
     } = req.body;
 
     // Validate required fields
@@ -54,6 +55,7 @@ export const createUser = catchAsync(async (req, res, next) => {
       last_name,
       allow_validate_exam: allow_validate_exam || false,
       allow_handle_users: allow_handle_users || false,
+      allow_handle_exams: allow_handle_exams || false,
       email,
       status: "pending",
     });
@@ -158,6 +160,10 @@ export const updateUser = catchAsync(async (req, res, next) => {
     if (!user) {
       throw commonErrors.notFound("User");
     }
+    if (req.body.email && req.body.email !== user.email) {
+      throw commonErrors.invalidInput("No se puede cambiar el email");
+    }
+
     await User.updateById(req.params.id, req.body);
     res.status(200).json({
       status: "success",

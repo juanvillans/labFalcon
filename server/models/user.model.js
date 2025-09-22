@@ -11,6 +11,7 @@ class User {
     this.status = userData.status;
     this.created_at = userData.created_at;
     this.updated_at = userData.updated_at;
+    this.allow_handle_exams = userData.allow_handle_exams;
 
     // Validate and set boolean fields
     this.allow_validate_exam = this._validateBoolean(
@@ -59,6 +60,7 @@ class User {
           status: "pendiente", // Default status
           allow_validate_exam: userData.allow_validate_exam || false,
           allow_handle_users: userData.allow_handle_users || false,
+          allow_handle_exams: userData.allow_handle_exams || false,
           created_at: db.fn.now(),
           updated_at: db.fn.now(),
         })
@@ -175,11 +177,12 @@ class User {
     const fieldSanitizers = {
       first_name: (val) => val.trim(),
       last_name: (val) => val?.trim() || null,
-      email: (val) => val.toLowerCase().trim(),
+      // email: (val) => val.toLowerCase().trim(), // Remove this line
       password: (val) => val, // Note: You should hash this before updating
       status: (val) => val,
       allow_validate_exam: (val) => val,
       allow_handle_users: (val) => val,
+      allow_handle_exams: (val) => val,
     };
 
     // Build safe updates
@@ -191,7 +194,7 @@ class User {
     }
 
     if (Object.keys(updates).length === 0) {
-      throw new Error("No valid fields to update");
+      throw new Error("Campos inválidos para actualizar");
     }
 
     updates.updated_at = db.fn.now();

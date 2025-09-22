@@ -26,6 +26,7 @@ const FormField = React.memo(function FormField({
   variant = "outlined",
   className = "",
   unit,
+  multiline = false,
   ...props
 }) {
   if (type === "checkbox") {
@@ -94,6 +95,7 @@ const FormField = React.memo(function FormField({
             : value || ""
         }
         onChange={onChange}
+        
         error={!!error}
         helperText={error || helperText}
         required={required}
@@ -102,13 +104,14 @@ const FormField = React.memo(function FormField({
         fullWidth={fullWidth}
         size="small"
         variant={variant}
+        multiline={multiline}
         InputLabelProps={type === "date" ? { shrink: true } : undefined}
         InputProps={{
           onWheel:
             type === "number"
               ? (e) => e.target.blur() // 👈 disables scroll-change
               : undefined,
-          endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
+          endAdornment: unit && <InputAdornment position="end">{unit}</InputAdornment>,
         }}
         inputProps={{
 

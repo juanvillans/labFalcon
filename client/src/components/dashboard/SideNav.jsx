@@ -13,7 +13,7 @@ const links = [
     icon: "hugeicons:home-09",
   },
   {
-    permission: true,
+    permission: "allow_handle_exams",
     name: "Exámenes",
     href: "/dashboard/examenes",
     icon: "hugeicons:labs",

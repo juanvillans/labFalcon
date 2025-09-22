@@ -154,13 +154,13 @@ const examinationTypesSeed = [
       },
       {
         label: "Control TP",
-        name: "control_pt",
+        name: "tp_control",
         type: "number",
         unit: "seg",
       },
       {
         label: "Control TPT",
-        name: "control_tpt",
+        name: "tpt_control",
         type: "number",
         unit: "seg",
       },
@@ -168,13 +168,13 @@ const examinationTypesSeed = [
         label: "Razón p/c",
         name: "razon",
         type: "number",
-        unit: "seg",
+        unit: "VN",
       },
       {
-        label: "Diferencia p/c",
+        label: "Diferencia p-c",
         name: "diferencia",
         type: "number",
-        unit: "seg",
+        unit: "VN",
       },
     ],
   },
@@ -318,6 +318,7 @@ const examinationTypesSeed = [
       },
     ],
   },
+
   {
     name: "Hepatitis A, B, C",
     tests: [
@@ -347,6 +348,10 @@ const examinationTypesSeed = [
       },
     ],
   },
+
+
+
+
 
   {
     name: "Análisis de orina",
@@ -477,7 +482,7 @@ const examinationTypesSeed = [
       },
       {
         label: "Otros",
-        name: "otros",
+        name: "otros_quimicos",
         type: "string",
       },
 
@@ -517,7 +522,7 @@ const examinationTypesSeed = [
 
       {
         label: "Otros",
-        name: "otros",
+        name: "otros_microscopicos",
         type: "string",
       },
     ],
@@ -527,8 +532,10 @@ const examinationTypesSeed = [
 export async function seed(knex) {
   const count = await knex("examination_types").count("id");
   if (parseInt(count[0].count) > 0) {
-    console.log("Examination types already exist. Seeding skipped.");
-    return;
+    console.log("deleting examination types, resetting id sequence and seeding...");
+    // return;
+    await knex.raw("ALTER SEQUENCE examination_types_id_seq RESTART WITH 1");
+    await knex("examination_types").del();     // Delete all existing examination types from the database.
   }
 
   for (const examType of examinationTypesSeed) {

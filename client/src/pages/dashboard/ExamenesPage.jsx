@@ -9,7 +9,7 @@ import {
   examinationTypesAPI,
   examsAPI,
   examResultsAPI,
-  originsAPI
+  originsAPI,
 } from "../../services/api";
 import externalApi from "../../services/saludfalcon.api";
 import { Icon } from "@iconify/react";
@@ -25,12 +25,24 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
+const iconos_examenes = { 
+  1: {icon:"mdi:blood-bag", color:"#C62828"},
+  2: {icon:"mdi:test-tube", color:"#1565C0"},
+  3: {icon:"mdi:water", color:"#6A1B9A"},
+  4: {icon:"mdi:virus", color:"#EF6C00"},
+  5: {icon:"mdi:emoticon-poop", color:"#6D4C41"},
+  6: {icon:"game-icons:liver", color:"#00897B"},
+  7: {icon:"mdi:beaker", color:"#FBC02D"},
+}
+  
+
+
 let isThereLocalStorageFormData = localStorage.getItem("formData")
   ? true
   : false;
 // Memoized component for test fields to prevent unnecessary re-renders
 const MemoizedTestField = React.memo(
-  ({ field, value, onChange, testKey, fieldName, id }) => {
+  ({ field, value, onChange, testKey, fieldName, id, multiline = false }) => {
     const handleChange = useCallback(
       (e) => {
         onChange(testKey, e);
@@ -46,6 +58,7 @@ const MemoizedTestField = React.memo(
         value={value || ""}
         onChange={handleChange}
         id={id}
+        multiline={multiline}
       />
     );
   },
@@ -139,13 +152,14 @@ export default function ExamenesPage() {
       name: "origin_id",
       label: "Procedencia *",
       type: "select",
-      options: [
-        { value: "Masculino", label: "Masculino" },
-        { value: "Femenino", label: "Femenino" },
-      ],
+      options: origins?.map((origin) => ({
+        value: origin.id,
+        label: origin.name,
+      })),
       className: "col-span-2",
     },
   ]);
+
   const defaultFormData = {
     patient: {
       ci: "",
@@ -166,8 +180,6 @@ export default function ExamenesPage() {
   const [submitString, setSubmitString] = useState("Registrar");
   const [isFormInitialized, setIsFormInitialized] = useState(false);
 
-
-  
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -418,10 +430,8 @@ export default function ExamenesPage() {
                   } else {
                     const token = await generateResultsToken(data.id);
                     setResultsToken(token);
-
                   }
                   // Generate token for WhatsApp link
-
                 }}
               >
                 <Icon icon="ep:document" className="" width={20} height={20} />
@@ -553,21 +563,20 @@ export default function ExamenesPage() {
     try {
       const [examTypesRes, originsRes] = await Promise.all([
         examinationTypesAPI.getExaminationTypes(),
-        originsAPI.getOrigins()
+        originsAPI.getOrigins(),
       ]);
-      
+
       setExaminationTypes(examTypesRes.data.examinationTypes);
-      setOrigins(originsRes.data.otherData);
-      
+      setOrigins(originsRes.data.origins);
     } catch (e) {
       console.error("Failed to fetch data", e);
     }
   }, []);
-  
+
   useEffect(() => {
     fetchInitialData();
   }, [fetchInitialData]);
-  
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -611,21 +620,74 @@ export default function ExamenesPage() {
         return prev;
       }
 
-      return {
-        ...prev,
-        tests: {
-          ...prev.tests,
-          [examination_type_id]: {
-            ...prev.tests[examination_type_id],
-            testValues: {
-              ...prev.tests[examination_type_id].testValues,
-              [name]: {
-                ...prev.tests[examination_type_id].testValues[name],
-                value,
-              },
+      const updatedTests = {
+        ...prev.tests,
+        [examination_type_id]: {
+          ...prev.tests[examination_type_id],
+          testValues: {
+            ...prev.tests[examination_type_id].testValues,
+            [name]: {
+              ...prev.tests[examination_type_id].testValues[name],
+              value,
             },
           },
         },
+      };
+
+      // Auto-calculate razon when tp_paciente or control_tp changes
+      if (name === "tp_paciente" || name === "tp_control") {
+        const tpPaciente =
+          name === "tp_paciente"
+            ? parseFloat(value)
+            : parseFloat(
+                updatedTests[examination_type_id].testValues?.tp_paciente
+                  ?.value || 0
+              );
+        const controlTp =
+          name === "tp_control"
+            ? parseFloat(value)
+            : parseFloat(
+                updatedTests[examination_type_id].testValues?.tp_control
+                  ?.value || 0
+              );
+        if (tpPaciente && controlTp && controlTp !== 0) {
+          const razon = (tpPaciente / controlTp).toFixed(2);
+          updatedTests[examination_type_id].testValues.razon = {
+            ...updatedTests[examination_type_id].testValues.razon,
+            value: razon,
+          };
+        }
+      }
+
+      // Auto-calculate diferencia when tpt_paciente or control_tpt changes
+      if (name === "tpt_paciente" || name === "tpt_control") {
+        const tptPaciente =
+          name === "tpt_paciente"
+            ? parseFloat(value)
+            : parseFloat(
+                updatedTests[examination_type_id].testValues?.tpt_paciente
+                  ?.value || 0
+              );
+        const controlTpt =
+          name === "tpt_control"
+            ? parseFloat(value)
+            : parseFloat(
+                updatedTests[examination_type_id].testValues?.tpt_control
+                  ?.value || 0
+              );
+
+        if (tptPaciente && controlTpt) {
+          const diferencia = (tptPaciente - controlTpt).toFixed(2);
+          updatedTests[examination_type_id].testValues.diferencia = {
+            ...updatedTests[examination_type_id].testValues.diferencia,
+            value: diferencia,
+          };
+        }
+      }
+
+      return {
+        ...prev,
+        tests: updatedTests,
       };
     });
 
@@ -741,7 +803,6 @@ export default function ExamenesPage() {
     }
   }, 280);
 
-  
   return (
     <>
       <title>Exámenes Médicos - LabFalcón</title>
@@ -750,7 +811,6 @@ export default function ExamenesPage() {
           <h1 className="text-lg md:text-2xl font-bold mb-2 md:mb-0">
             Exámenes médicos
           </h1>
-
           <div className="flex gap-3">
             {isThereLocalStorageFormData && (
               <button
@@ -870,7 +930,12 @@ export default function ExamenesPage() {
                       className="bg-color4 p-3 rounded-xl shadow-md mb-1 bg-opacity-5"
                     >
                       <div className="flex justify-between items-center ">
-                        <h3 className="text-lg font-bold text-color1 mb-4">
+                        <h3 className="text-lg font-bold text-color1 items-center mb-4 flex gap-2">
+                          <Icon
+                            icon={iconos_examenes[key].icon}
+                            className="text-2xl"
+                            color={iconos_examenes[key].color}
+                          />
                           {formData.tests[key]?.testTypeName}
                         </h3>
                         <button
@@ -963,6 +1028,7 @@ export default function ExamenesPage() {
                           onChange={() => handleObservationChange(key, event)}
                           testKey={"observation"}
                           fieldName={"observation"}
+                          multiline={true}
                         />
                       </div>
                       <div className="cursor-pointer   ml-auto col-span-2 flex items-center gap-3">
@@ -1009,7 +1075,7 @@ export default function ExamenesPage() {
                   ))}
                 </>
               )}
-              <div className="flex flex-col md:grid  md:grid-cols-2 gap-3 md:gap-6">
+              <div className="flex flex-col md:grid  md:grid-cols-2 gap-2.5 md:gap-6">
                 {examinationTypes.map((examType) => {
                   if (formData.tests[examType.id]) {
                     return null;
@@ -1018,7 +1084,7 @@ export default function ExamenesPage() {
                     <button
                       type="button"
                       key={examType.id}
-                      className="hover bg-gray-200 py-2 md:py-5 hover:bg-gray-300 rounded "
+                      className="hover neuphormism text-sm py-2 md:py-5 hover:bg-gray-100 hover:shadow-inner hovershadow-3xl hover:shadow-gray-300 duration-75 rounded "
                       onClick={() => {
                         const newtestValues = examType.tests.reduce(
                           (acc, test) => {
@@ -1040,14 +1106,22 @@ export default function ExamenesPage() {
                               testTypeId: examType.id,
                               validated: false,
                               method: "",
+                              observation:
+                                examType.id == 5
+                                  ? "No se observaron formas evolutivas parasitarias"
+                                  : "",
                             },
                             ...prev.tests,
                           },
                         }));
                         setTimeout(() => {
                           // Try to focus on the method field first, then fallback to first test input
-                          const methodField = document.querySelector(`#method-${examType.id}`);
-                          const firstTestInput = document.querySelector(`input[name="${examType.tests[0]?.name}"]`);
+                          const methodField = document.querySelector(
+                            `#method-${examType.id}`
+                          );
+                          const firstTestInput = document.querySelector(
+                            `input[name="${examType.tests[0]?.name}"]`
+                          );
                           const targetElement = methodField || firstTestInput;
                           if (targetElement) {
                             targetElement.focus();
@@ -1055,7 +1129,14 @@ export default function ExamenesPage() {
                         }, 120);
                       }}
                     >
-                      {examType.name}
+                      <div className="flex flex-col gap-1 items-center">
+                        <Icon
+                          icon={iconos_examenes[examType.id].icon}
+                          className="text-2xl "
+                          color={iconos_examenes[examType.id].color}
+                        />
+                        {examType.name}
+                      </div>
                     </button>
                   );
                 })}
@@ -1139,71 +1220,83 @@ export default function ExamenesPage() {
             setMessageData(false);
           }}
         >
-
-          {(messageData?.all_validated && resultsToken == null) && (
+          {messageData?.all_validated && resultsToken == null && (
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
             </div>
           )}
-          {((messageData?.all_validated && resultsToken != null ) || ( messageData.hasOwnProperty('all_validated') && messageData?.all_validated == false ) )&& (
-
+          {((messageData?.all_validated && resultsToken != null) ||
+            (messageData.hasOwnProperty("all_validated") &&
+              messageData?.all_validated == false)) && (
             <div className="flex flex-col justify-center">
               {messageData?.all_validated ? (
-                 <div className="flex gap-4 w-full justify-center mb-6">
-                  
-                 <button
-                   title="Enviar por correo"
-                   onClick={() => loadingMessage || handleMessage()}
-                   className={`${messageData?.patient?.email.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2`}
-                 >
-                   {loadingMessage ? (
-                     <CircularProgress size={20} />
-                   ) : (
-                     <Icon
-                       icon="line-md:email-twotone"
-                       className="w-10 h-10"
-                     ></Icon>
-                   )}
-                   <span className="text-sm">
-                     {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
-                   </span>
-                 </button>
- 
-                 <a
-                   title="Enviar por WhatsApp"
-                   onClick={() => {
-                     
-                     setIsMessageModalOpen(false);
-                     setIsMessageSentModalOpen(true);
-                 
-                   }}
-                   href={`https://wa.me/${(() => {
-                     let phoneNumber = messageData?.patient?.phone_number.replace(/[ -]/g, "");
-                     if (!phoneNumber || phoneNumber.length < 9) return "";
-                     // If number doesn't start with country code, add Venezuelan code
-                     if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("58")) {
-                       phoneNumber = "58" + phoneNumber;
-                     }
-                     // Remove + if present since WhatsApp API doesn't need it
-                     return phoneNumber.replace("+", "") || "";
-                   })()}?text=Hola ${
-                     messageData?.patient?.first_name
-                   }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
-                     window.location.origin
-                   }/results/${resultsToken || "cargando..."}`}
-                   target="_blank"
-                   className={`${messageData?.patient?.phone_number.length > 9 ? "" : "opacity-40 cursor-not-allowed"} hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2`}
-                 >
-                   <Icon icon="logos:whatsapp-icon" className="w-10 h-10"></Icon>
-                   <span className="text-sm">Enviar por WhatsApp</span>
-                 </a>
-               </div>
+                <div className="flex gap-4 w-full justify-center mb-6">
+                  <button
+                    title="Enviar por correo"
+                    onClick={() => loadingMessage || handleMessage()}
+                    className={`${
+                      messageData?.patient?.email.length > 9
+                        ? ""
+                        : "opacity-40 cursor-not-allowed"
+                    } hover:bg-color1 w-60 hover:text-white duration-100 bg-gray-200 rounded-xl  p-3 px-4  flex items-center gap-2`}
+                  >
+                    {loadingMessage ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <Icon
+                        icon="line-md:email-twotone"
+                        className="w-10 h-10"
+                      ></Icon>
+                    )}
+                    <span className="text-sm">
+                      {loadingMessage ? "Enviando..." : "Enviar por correo"}{" "}
+                    </span>
+                  </button>
+
+                  <a
+                    title="Enviar por WhatsApp"
+                    onClick={() => {
+                      setIsMessageModalOpen(false);
+                      setIsMessageSentModalOpen(true);
+                    }}
+                    href={`https://wa.me/${(() => {
+                      let phoneNumber =
+                        messageData?.patient?.phone_number.replace(/[ -]/g, "");
+                      if (!phoneNumber || phoneNumber.length < 9) return "";
+                      // If number doesn't start with country code, add Venezuelan code
+                      if (
+                        !phoneNumber.startsWith("+") &&
+                        !phoneNumber.startsWith("58")
+                      ) {
+                        phoneNumber = "58" + phoneNumber;
+                      }
+                      // Remove + if present since WhatsApp API doesn't need it
+                      return phoneNumber.replace("+", "") || "";
+                    })()}?text=Hola ${
+                      messageData?.patient?.first_name
+                    }, le escribimos desde el laboratorio de Secretaria de Salud Falcón, para informarle que sus resultados están listos y puede acceder a ellos en el siguiente enlace:%0A${
+                      window.location.origin
+                    }/results/${resultsToken || "cargando..."}`}
+                    target="_blank"
+                    className={`${
+                      messageData?.patient?.phone_number.length > 9
+                        ? ""
+                        : "opacity-40 cursor-not-allowed"
+                    } hover:bg-color1 w-60  hover:text-white duration-100 bg-gray-200 rounded-xl p-3 px-5  flex items-center gap-2`}
+                  >
+                    <Icon
+                      icon="logos:whatsapp-icon"
+                      className="w-10 h-10"
+                    ></Icon>
+                    <span className="text-sm">Enviar por WhatsApp</span>
+                  </a>
+                </div>
               ) : (
                 <p className=" text-center mb-4">
-                  El examen no está validado, no se puede enviar ni descargar el documento
+                  El examen no está validado, no se puede enviar ni descargar el
+                  documento
                 </p>
               )}
-             
 
               <PrintPage
                 data={messageData}
@@ -1212,7 +1305,6 @@ export default function ExamenesPage() {
                 isHidden={false}
               />
             </div>
-          
           )}
         </Modal>
 
