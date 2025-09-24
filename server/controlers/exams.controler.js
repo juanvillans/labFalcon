@@ -47,7 +47,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       const analysis = await Analysis.createWithTransaction(trx, {
         patient,
         all_validated: all_validated,
-        age: calculateAge(patient.date_birth)
+        age: calculateAge(patient.date_birth),
       });
 
       const analysisId = analysis.id;
@@ -62,12 +62,9 @@ export const createExam = catchAsync(async (req, res, next) => {
           testTypeId: test.testTypeId,
           validated: test.validated,
           method: test.method,
-          observation: test.observation
+          observation: test.observation,
         });
-        analysis_exams_ids.push(
-          {analysis_id: analysisId, 
-          id_exam: exam.id}
-        );
+        analysis_exams_ids.push({ analysis_id: analysisId, id_exam: exam.id });
       }
 
       // Create all analysis_exams relationships within transaction
@@ -93,31 +90,30 @@ export const getExams = catchAsync(async (req, res, next) => {
     const {
       page = 1,
       limit = 25,
-      sortField = 'created_at',
-      sortOrder = 'desc',
+      sortField = "created_at",
+      sortOrder = "desc",
       filters,
-      search = ''
+      search = "",
     } = req.query;
 
     const offset = (page - 1) * limit;
 
     // Build base query for analyses
-    let analysisQuery = db("analysis")
-      .select(
-        "*",
-        db.raw("to_char(date_birth, 'YYYY-MM-DD') as date_birth"),
-        db.raw("to_char(created_at, 'YYYY-MM-DD') as created_date"),
-        db.raw("to_char(created_at, 'HH12:MI AM') as created_time")
-      );
+    let analysisQuery = db("analysis").select(
+      "*",
+      db.raw("to_char(date_birth, 'YYYY-MM-DD') as date_birth"),
+      db.raw("to_char(created_at, 'YYYY-MM-DD') as created_date"),
+      db.raw("to_char(created_at, 'HH12:MI AM') as created_time")
+    );
 
     // Apply global search if provided
     if (search && search.trim()) {
-      analysisQuery = analysisQuery.where(function() {
-        this.whereILike('first_name', `%${search}%`)
-          .orWhereILike('last_name', `%${search}%`)
-          .orWhereILike('ci', `%${search}%`)
-          .orWhereILike('email', `%${search}%`)
-          .orWhereILike('phone_number', `%${search}%`);
+      analysisQuery = analysisQuery.where(function () {
+        this.whereILike("first_name", `%${search}%`)
+          .orWhereILike("last_name", `%${search}%`)
+          .orWhereILike("ci", `%${search}%`)
+          .orWhereILike("email", `%${search}%`)
+          .orWhereILike("phone_number", `%${search}%`);
       });
     }
 
@@ -128,53 +124,63 @@ export const getExams = catchAsync(async (req, res, next) => {
         Object.entries(parsedFilters).forEach(([field, value]) => {
           if (value && value.trim()) {
             // Handle nested field paths (e.g., "patient.first_name")
-            if (field.includes('.')) {
-              const fieldName = field.split('.')[1]; // Get the actual field name
-              if (fieldName === 'first_name' || fieldName === 'last_name' || fieldName === 'ci' || fieldName === 'sex') {
-                analysisQuery = analysisQuery.whereILike(fieldName, `%${value}%`);
+            if (field.includes(".")) {
+              const fieldName = field.split(".")[1]; // Get the actual field name
+              if (
+                fieldName === "first_name" ||
+                fieldName === "last_name" ||
+                fieldName === "ci" ||
+                fieldName === "sex"
+              ) {
+                analysisQuery = analysisQuery.whereILike(
+                  fieldName,
+                  `%${value}%`
+                );
               }
             } else {
               // Handle direct fields
-              if (field === 'all_validated') {
-                analysisQuery = analysisQuery.where(field, value === 'true');
-              } else if (field === 'age') {
+              if (field === "all_validated") {
+                analysisQuery = analysisQuery.where(field, value === "true");
+              } else if (field === "age") {
                 // Handle age filtering (you might want to implement range filtering here)
                 const ageValue = parseInt(value);
                 if (!isNaN(ageValue)) {
-                  analysisQuery = analysisQuery.where('age', ageValue);
+                  analysisQuery = analysisQuery.where("age", ageValue);
                 }
-              } else if (field === 'message_status') {
+              } else if (field === "message_status") {
                 analysisQuery = analysisQuery.where(field, value);
-              }
-               else {
+              } else {
                 analysisQuery = analysisQuery.whereILike(field, `%${value}%`);
               }
             }
           }
         });
       } catch (error) {
-        console.error('Error parsing filters:', error);
+        console.error("Error parsing filters:", error);
       }
     }
 
     // Get total count for pagination
-    const totalCountQuery = analysisQuery.clone().clearSelect().count('* as count').first();
+    const totalCountQuery = analysisQuery
+      .clone()
+      .clearSelect()
+      .count("* as count")
+      .first();
 
     // Handle sorting with field mapping
     let actualSortField = sortField;
 
     // Map frontend field names to database field names
     const fieldMapping = {
-      'id': 'id',
-      'patient.first_name': 'first_name',
-      'patient.last_name': 'last_name',
-      'patient.ci': 'ci',
-      'patient.sex': 'sex',
-      'age': 'age',
-      'created_date': 'created_at',
-      'created_time': 'created_at',
-      'all_validated': 'all_validated'
-
+      id: "id",
+      "patient.first_name": "first_name",
+      "patient.last_name": "last_name",
+      "patient.ci": "ci",
+      "patient.sex": "sex",
+      age: "age",
+      created_date: "created_at",
+      created_time: "created_at",
+      all_validated: "all_validated",
     };
 
     if (fieldMapping[sortField]) {
@@ -188,32 +194,37 @@ export const getExams = catchAsync(async (req, res, next) => {
       .offset(offset);
 
     // Get analysis IDs for the current page
-    const analysisIds = analyses.map(a => a.id);
+    const analysisIds = analyses.map((a) => a.id);
 
     // Get all exams for these analyses with examination type information
-    const examsData = analysisIds.length > 0 ? await db("analysis_exams")
-      .join("exams", "analysis_exams.id_exam", "exams.id")
-      .join("examination_types", "exams.examination_type_id", "examination_types.id")
-      .whereIn("analysis_exams.analysis_id", analysisIds)
-      .select(
-        "analysis_exams.analysis_id",
-        "exams.*",
-        "examination_types.name as examination_type_name"
-      ) : [];
-
-  
+    const examsData =
+      analysisIds.length > 0
+        ? await db("analysis_exams")
+            .join("exams", "analysis_exams.id_exam", "exams.id")
+            .join(
+              "examination_types",
+              "exams.examination_type_id",
+              "examination_types.id"
+            )
+            .whereIn("analysis_exams.analysis_id", analysisIds)
+            .select(
+              "analysis_exams.analysis_id",
+              "exams.*",
+              "examination_types.name as examination_type_name"
+            )
+        : [];
 
     const safeJsonParse = (jsonString) => {
       try {
-        if (typeof jsonString === 'object' && jsonString !== null) {
+        if (typeof jsonString === "object" && jsonString !== null) {
           return jsonString;
         }
-        if (typeof jsonString === 'string') {
+        if (typeof jsonString === "string") {
           return JSON.parse(jsonString);
         }
         return {};
       } catch (error) {
-        console.error('JSON parse error:', error, 'Input:', jsonString);
+        console.error("JSON parse error:", error, "Input:", jsonString);
         return {};
       }
     };
@@ -226,7 +237,7 @@ export const getExams = catchAsync(async (req, res, next) => {
     }, {});
 
     // Combine data
-    const result = analyses.map(analysis => ({
+    const result = analyses.map((analysis) => ({
       id: analysis.id,
       patient: {
         ci: analysis.ci,
@@ -238,7 +249,7 @@ export const getExams = catchAsync(async (req, res, next) => {
         address: analysis.address,
         sex: analysis.sex,
         origin_id: analysis.origin_id,
-        patient_id: null
+        patient_id: null,
       },
       all_validated: analysis.all_validated,
       message_status: analysis.message_status,
@@ -252,10 +263,10 @@ export const getExams = catchAsync(async (req, res, next) => {
           testTypeId: exam.examination_type_id,
           validated: exam.validated,
           method: exam.method,
-          observation: exam.observation
+          observation: exam.observation,
         };
         return acc;
-      }, {})
+      }, {}),
     }));
 
     const { count } = await totalCountQuery;
@@ -273,8 +284,8 @@ export const getExams = catchAsync(async (req, res, next) => {
           appliedFilters: filters ? JSON.parse(filters) : {},
           sortField: actualSortField,
           sortOrder,
-          recordsOnPage: result.length
-        }
+          recordsOnPage: result.length,
+        },
       },
     });
   } catch (error) {
@@ -321,28 +332,39 @@ export const updateExam = catchAsync(async (req, res, next) => {
       throw commonErrors.missingFields(["Fecha de Nacimiento"]);
     }
 
-   
     // Check if analysis exists and if message_status allows updates
-    const existingAnalysis = await db("analysis").where("id", analysisId).first();
+    const existingAnalysis = await db("analysis")
+      .where("id", analysisId)
+      .first();
     if (!existingAnalysis) {
       throw commonErrors.notFound("Analysis");
     }
 
-    if (existingAnalysis.message_status === "LEIDO" && existingAnalysis.all_validated) {
-      throw commonErrors.forbidden("No se puede actualizar un examen que ya ha sido leído");
+    if (
+      existingAnalysis.message_status === "LEIDO" &&
+      existingAnalysis.all_validated
+    ) {
+      throw commonErrors.forbidden(
+        "No se puede actualizar un examen que ya ha sido leído"
+      );
     }
 
     // Use database transaction for data integrity
     const result = await db.transaction(async (trx) => {
       // Step 1: Update the analysis using the model method
-      const updatedAnalysis = await Analysis.updateWithTransaction(trx, analysisId, {
-        patient,
-        all_validated,
-        age: calculateAge(patient.date_birth)
-      });
+      const updatedAnalysis = await Analysis.updateWithTransaction(
+        trx,
+        analysisId,
+        {
+          patient,
+          all_validated,
+          age: calculateAge(patient.date_birth),
+        }
+      );
 
       // Step 2: Delete old relationships and get exam IDs to delete
-      const existingExamIds = await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
+      const existingExamIds =
+        await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
 
       // Step 3: Delete old exams using model method
       await Exams.deleteMultipleWithTransaction(trx, existingExamIds);
@@ -358,12 +380,9 @@ export const updateExam = catchAsync(async (req, res, next) => {
           testTypeId: test.testTypeId,
           validated: test.validated,
           method: test.method,
-          observation: test.observation
+          observation: test.observation,
         });
-        analysis_exams_ids.push(
-          {analysis_id: analysisId, 
-          id_exam: exam.id}
-        );
+        analysis_exams_ids.push({ analysis_id: analysisId, id_exam: exam.id });
       }
 
       // Step 6: Create new analysis_exams relationships using the model method
@@ -389,7 +408,9 @@ export const deleteExam = catchAsync(async (req, res, next) => {
     const analysisId = req.params.id; // This is the analysis ID
 
     // Check if analysis exists
-    const existingAnalysis = await db("analysis").where("id", analysisId).first();
+    const existingAnalysis = await db("analysis")
+      .where("id", analysisId)
+      .first();
     if (!existingAnalysis) {
       throw commonErrors.notFound("Analysis");
     }
@@ -397,15 +418,14 @@ export const deleteExam = catchAsync(async (req, res, next) => {
     // Use database transaction for data integrity
     await db.transaction(async (trx) => {
       // Step 1: Delete relationships and get exam IDs using model method
-      const existingExamIds = await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
+      const existingExamIds =
+        await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
 
       // Step 2: Delete exams using model method
       await Exams.deleteMultipleWithTransaction(trx, existingExamIds);
 
       // Step 3: Delete the analysis
-      await trx("analysis")
-        .where("id", analysisId)
-        .del();
+      await trx("analysis").where("id", analysisId).del();
     });
 
     res.status(200).json({
@@ -439,6 +459,67 @@ export const getChartData = catchAsync(async (req, res, next) => {
 
     const total = await Exams.getDetailedCountByPeriod(period);
     const perType = await Exams.getTotalPerExaminationTypeByPeriod(period);
+
+    const normalitiesTests = {};
+    const totalByEachTest = {}
+
+    let numberPerExamType = {}
+
+    for (let i = 0; i < perType.length; i++) {
+      const exam = perType[i];
+      if (numberPerExamType[exam.label]) {
+        numberPerExamType[exam.label].value += 1;
+      } else {
+        numberPerExamType[exam.label] = {label: exam.label, id: exam.id, value: 1};
+      }
+
+      console.log(exam.label in numberPerExamType);
+      console.log(numberPerExamType)
+      Object.entries(exam.tests_values).forEach(([test_key, valueObj]) => {
+        if (valueObj.value.toString().trim() === "") return;
+        if ("reference_range" in valueObj) {
+          let normality = "";
+          if (+valueObj.value > valueObj.reference_range.max) {
+            //alto
+            normality = 2;
+          } else if (+valueObj.value < valueObj.reference_range.min) {
+            //bajo
+            normality = 0;
+          } else {
+            // normal
+            normality = 1;
+          }
+          normalitiesTests[exam.label] = normalitiesTests[exam.label] || {};
+          normalitiesTests[exam.label][test_key] = normalitiesTests[exam.label][
+            test_key
+          ] || [
+            { label: "Bajo", id: "Bajo", number: 0},
+            { label: "Normal", id: "Normal", number: 0},
+            { label: "Alto", id: "Alto", number: 0},
+          ];
+          normalitiesTests[exam.label][test_key][normality].number += 1;
+          totalByEachTest[exam.label] = totalByEachTest[exam.label] || {};
+          totalByEachTest[exam.label][test_key] =
+            (totalByEachTest[exam.label][test_key] || 0) + 1;
+        }
+      });
+      
+
+      // add porcentage into porcentage
+      Object.entries(normalitiesTests).forEach(([exam_key, exam_value]) => {
+        Object.entries(exam_value).forEach(([test_key, arr_test_value]) => {
+          arr_test_value.forEach((item) => {
+            item.value = Math.round(
+              (item.number / totalByEachTest[exam_key][test_key]) * 100
+            );
+          });
+        });
+      });
+    }
+
+
+
+    numberPerExamType = Object.values(numberPerExamType);
     const analyses = await Analysis.getChartDataByPeriod(period);
     const origins = await Origin.getStatsForPeriod(period);
 
@@ -446,7 +527,8 @@ export const getChartData = catchAsync(async (req, res, next) => {
       status: "success",
       data: {
         total,
-        perType,
+        numberPerExamType,
+        normalitiesTests,
         analyses,
         origins,
       },
@@ -455,5 +537,3 @@ export const getChartData = catchAsync(async (req, res, next) => {
     next(error);
   }
 });
-
-

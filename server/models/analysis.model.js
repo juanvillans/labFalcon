@@ -186,56 +186,11 @@ class Analysis {
 
 
     // Get results distribution (High vs Normal vs Low)
-    const examsWithRanges = await db("analysis_exams")
-      .join("exams", "analysis_exams.id_exam", "exams.id")
-      .join("examination_types", "exams.examination_type_id", "examination_types.id")
-      .join("analysis", "analysis_exams.analysis_id", "analysis.id")
-      .where("exams.validated", true)
-      .whereIn("analysis.id", 
-        query.clone().select("id")
-      )
-      .select(
-        "exams.tests_values",
-        "examination_types.tests"
-      );
-      console.log(examsWithRanges);
-    let totalTests = 0;
-    let highResults = 0;
-    let normalResults = 0;
-    let lowResults = 0;
-
-    examsWithRanges.forEach(exam => {
-      const testValues = typeof exam.tests_values === 'string' 
-        ? JSON.parse(exam.tests_values) 
-        : exam.tests_values;
-      
-      const testTemplates = typeof exam.tests === 'string'
-        ? JSON.parse(exam.tests)
-        : exam.tests;
-
-      testTemplates.forEach(template => {
-        if (template.reference_range && testValues[template.name]?.value) {
-          const value = parseFloat(testValues[template.name].value);
-          const { min, max } = template.reference_range;
-          
-          if (!isNaN(value) && min !== undefined && max !== undefined) {
-            totalTests++;
-            if (value < min) lowResults++;
-            else if (value > max) highResults++;
-            else normalResults++;
-          }
-        }
-      });
-    });
+    
 
     return {
       ...basicStats,
       ageGenderDistribution: ageGenderStats,
-      resultsDistribution: [
-        { id: "normal", label: "Normal", value: normalResults },
-        { id: "alto", label: "Alto", value: highResults },
-        { id: "bajo", label: "Bajo", value: lowResults }
-      ]
     };
   }
 }

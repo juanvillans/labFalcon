@@ -89,7 +89,6 @@ class Exams {
         db.raw("COUNT(*) as total"),
         db.raw("COUNT(CASE WHEN validated = true THEN 1 END) as validated"),
         db.raw("COUNT(CASE WHEN validated = false THEN 1 END) as not_validated"),
-       
       )
       .first();
 
@@ -138,10 +137,11 @@ class Exams {
     query.select(
       db.raw("examination_types.name as id"), // Utiliza 'name' como 'id'
       db.raw("examination_types.name as label"), // Renombra 'name' a 'label'
-      db.raw("COUNT(*) as value") // Renombra 'total' a 'value'
+      db.raw("COUNT(*) as value"), // Renombra 'total' a 'value' //get the test_value json
+      db.raw("exams.tests_values as tests_values")
   )
-   .groupBy("examination_types.name");
-
+   .groupBy("examination_types.name", "exams.tests_values");
+     
     return query;
   }
 
