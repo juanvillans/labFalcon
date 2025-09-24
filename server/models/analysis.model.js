@@ -39,6 +39,7 @@ class Analysis {
           sex: examData.patient.sex,
           origin_id: examData.patient.origin_id,
           all_validated: examData.all_validated,
+          age: examData.age,
         })
         .returning("*");
 
@@ -59,55 +60,42 @@ class Analysis {
     return exam ? new Analysis(exam) : null;
   }
 
-  static async update(id, updateData) {
-    const updates = {};
-
+  static async updateWithTransaction(trx, id, updateData) {
+    const { patient, all_validated } = updateData;
+    const updates = {
+        ci: patient.ci,
+        first_name: patient.first_name,
+        last_name: patient.last_name,
+        date_birth: patient.date_birth,
+        email: patient.email,
+        phone_number: patient.phone_number,
+        address: patient.address,
+        sex: patient.sex,
+        all_validated: all_validated,
+        origin_id: patient.origin_id,
+        age: updateData.age,
+        updated_at: trx.fn.now()
+      };
     // Flatten patient info if present
-    if (updateData.patient) {
-      const {
-        ci,
-        first_name,
-        last_name,
-        date_birth,
-        email,
-        phone_number,
-        address,
-        sex,
-      } = updateData.patient;
-
-      updates.ci = ci;
-      updates.first_name = first_name;
-      updates.last_name = last_name;
-      updates.date_birth = date_birth;
-      updates.email = email;
-      updates.phone_number = phone_number;
-      updates.address = address;
-      updates.sex = sex;
-    }
-
+ 
     // Handle direct updates
-    if (updateData.testsValues !== undefined)
-      updates.test_values = JSON.stringify(updateData.testsValues);
-
-    if (updateData.all_validated !== undefined)
+    if (updateData.all_validated !== undefined) {
       updates.all_validated = updateData.all_validated;
-
-    if (updateData.testTypeId !== undefined)
-      updates.examination_type_id = updateData.testTypeId;
+    }
 
     if (Object.keys(updates).length === 0) {
       throw new Error("No valid fields to update");
     }
 
-    updates.updated_at = db.fn.now();
+    updates.updated_at = trx.fn.now();
 
     try {
-      const [updatedExam] = await db("analysis")
+      const [updatedAnalysis] = await trx("analysis")
         .where("id", id)
         .update(updates)
         .returning("*");
 
-      return new Analysis(updatedExam);
+      return new Analysis(updatedAnalysis);
     } catch (error) {
       throw error;
     }
@@ -151,8 +139,9 @@ class Analysis {
         throw new Error("Invalid period specified");
     }
 
-    // Single query approach - more efficient
-    const result = await query
+    // Get basic stats
+    const basicStats = await query
+      .clone()
       .select(
         db.raw("COUNT(DISTINCT ci) as total_patients"),
         db.raw(
@@ -167,7 +156,87 @@ class Analysis {
       )
       .first();
 
-    return result;
+    // Get age and gender distribution
+    const ageGenderStats = await query
+      .clone()
+      .select(
+        db.raw(`
+          CASE 
+            WHEN age BETWEEN 0 AND 1 THEN '0-1'
+            WHEN age BETWEEN 2 AND 5 THEN '2-5'
+            WHEN age BETWEEN 6 AND 11 THEN '6-11'
+            WHEN age BETWEEN 12 AND 17 THEN '12-17'
+            WHEN age BETWEEN 18 AND 29 THEN '18-29'
+            WHEN age BETWEEN 30 AND 44 THEN '30-44'
+            WHEN age BETWEEN 45 AND 59 THEN '45-59'
+            WHEN age >= 60 THEN '60+'
+            ELSE 'Unknown'
+          END as age_range
+        `),
+        db.raw("COUNT(CASE WHEN sex = 'Masculino' THEN 1 END) as MASCULINO"),
+        db.raw("COUNT(CASE WHEN sex = 'Femenino' THEN 1 END) as FEMENINO")
+      )
+      .groupBy('age_range');
+             
+      // order ageGenderStats by age_range
+      ageGenderStats.sort((a, b) => {
+        const ageRanges = ['0-1', '2-5', '6-11', '12-17', '18-29', '30-44', '45-59', '60+', 'Unknown'];
+        return ageRanges.indexOf(a.age_range) - ageRanges.indexOf(b.age_range);
+      });
+
+
+    // Get results distribution (High vs Normal vs Low)
+    const examsWithRanges = await db("analysis_exams")
+      .join("exams", "analysis_exams.id_exam", "exams.id")
+      .join("examination_types", "exams.examination_type_id", "examination_types.id")
+      .join("analysis", "analysis_exams.analysis_id", "analysis.id")
+      .where("exams.validated", true)
+      .whereIn("analysis.id", 
+        query.clone().select("id")
+      )
+      .select(
+        "exams.tests_values",
+        "examination_types.tests"
+      );
+      console.log(examsWithRanges);
+    let totalTests = 0;
+    let highResults = 0;
+    let normalResults = 0;
+    let lowResults = 0;
+
+    examsWithRanges.forEach(exam => {
+      const testValues = typeof exam.tests_values === 'string' 
+        ? JSON.parse(exam.tests_values) 
+        : exam.tests_values;
+      
+      const testTemplates = typeof exam.tests === 'string'
+        ? JSON.parse(exam.tests)
+        : exam.tests;
+
+      testTemplates.forEach(template => {
+        if (template.reference_range && testValues[template.name]?.value) {
+          const value = parseFloat(testValues[template.name].value);
+          const { min, max } = template.reference_range;
+          
+          if (!isNaN(value) && min !== undefined && max !== undefined) {
+            totalTests++;
+            if (value < min) lowResults++;
+            else if (value > max) highResults++;
+            else normalResults++;
+          }
+        }
+      });
+    });
+
+    return {
+      ...basicStats,
+      ageGenderDistribution: ageGenderStats,
+      resultsDistribution: [
+        { id: "normal", label: "Normal", value: normalResults },
+        { id: "alto", label: "Alto", value: highResults },
+        { id: "bajo", label: "Bajo", value: lowResults }
+      ]
+    };
   }
 }
 

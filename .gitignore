@@ -27,6 +27,9 @@ pids
 *.seed
 *.pid.lock
 
+# User seed files
+**/seed-users.js
+
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov
@@ -191,3 +194,4 @@ Dockerfile.dev
 connect.lock
 typings/
 .angular/
+

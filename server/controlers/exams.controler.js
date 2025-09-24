@@ -3,12 +3,23 @@ import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import Analysis from "../models/analysis.model.js";
 import Exams from "../models/exams.model.js";
 import AnalysisExams from "../models/analysis_exams.model.js";
+import Origin from "../models/origin.model.js";
 import { db } from "../database/postgre.js";
+
+const calculateAge = (dateOfBirth) => {
+  const dob = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age;
+};
 
 export const createExam = catchAsync(async (req, res, next) => {
   try {
-    const { patient, tests, all_validated, method } = req.body;
-
+    const { patient, tests, all_validated } = req.body;
     // Validate required fields
     if (!patient.ci) {
       throw commonErrors.missingFields(["Cédula de Identidad"]);
@@ -36,6 +47,7 @@ export const createExam = catchAsync(async (req, res, next) => {
       const analysis = await Analysis.createWithTransaction(trx, {
         patient,
         all_validated: all_validated,
+        age: calculateAge(patient.date_birth)
       });
 
       const analysisId = analysis.id;
@@ -129,10 +141,7 @@ export const getExams = catchAsync(async (req, res, next) => {
                 // Handle age filtering (you might want to implement range filtering here)
                 const ageValue = parseInt(value);
                 if (!isNaN(ageValue)) {
-                  analysisQuery = analysisQuery.whereRaw(
-                    `EXTRACT(YEAR FROM AGE(CURRENT_DATE, date_birth)) = ?`,
-                    [ageValue]
-                  );
+                  analysisQuery = analysisQuery.where('age', ageValue);
                 }
               } else if (field === 'message_status') {
                 analysisQuery = analysisQuery.where(field, value);
@@ -161,7 +170,7 @@ export const getExams = catchAsync(async (req, res, next) => {
       'patient.last_name': 'last_name',
       'patient.ci': 'ci',
       'patient.sex': 'sex',
-      'age': db.raw('EXTRACT(YEAR FROM AGE(CURRENT_DATE, date_birth))'),
+      'age': 'age',
       'created_date': 'created_at',
       'created_time': 'created_at',
       'all_validated': 'all_validated'
@@ -192,17 +201,7 @@ export const getExams = catchAsync(async (req, res, next) => {
         "examination_types.name as examination_type_name"
       ) : [];
 
-    // Helper functions
-    const calculateAge = (dateOfBirth) => {
-      const dob = new Date(dateOfBirth);
-      const today = new Date();
-      let age = today.getFullYear() - dob.getFullYear();
-      const m = today.getMonth() - dob.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-        age--;
-      }
-      return age;
-    };
+  
 
     const safeJsonParse = (jsonString) => {
       try {
@@ -245,7 +244,7 @@ export const getExams = catchAsync(async (req, res, next) => {
       message_status: analysis.message_status,
       created_date: analysis.created_date,
       created_time: analysis.created_time,
-      age: calculateAge(analysis.date_birth),
+      age: analysis.age,
       tests: (examsByAnalysis[analysis.id] || []).reduce((acc, exam) => {
         acc[exam.examination_type_id] = {
           testValues: safeJsonParse(exam.tests_values),
@@ -335,24 +334,12 @@ export const updateExam = catchAsync(async (req, res, next) => {
 
     // Use database transaction for data integrity
     const result = await db.transaction(async (trx) => {
-      // Step 1: Update the analysis within transaction
-      const updates = {
-        ci: patient.ci,
-        first_name: patient.first_name,
-        last_name: patient.last_name,
-        date_birth: patient.date_birth,
-        email: patient.email,
-        phone_number: patient.phone_number,
-        address: patient.address,
-        sex: patient.sex,
-        all_validated: all_validated,
-        updated_at: trx.fn.now()
-      };
-
-      const [updatedAnalysis] = await trx("analysis")
-        .where("id", analysisId)
-        .update(updates)
-        .returning("*");
+      // Step 1: Update the analysis using the model method
+      const updatedAnalysis = await Analysis.updateWithTransaction(trx, analysisId, {
+        patient,
+        all_validated,
+        age: calculateAge(patient.date_birth)
+      });
 
       // Step 2: Delete old relationships and get exam IDs to delete
       const existingExamIds = await AnalysisExams.deleteByAnalysisIdWithTransaction(trx, analysisId);
@@ -453,6 +440,7 @@ export const getChartData = catchAsync(async (req, res, next) => {
     const total = await Exams.getDetailedCountByPeriod(period);
     const perType = await Exams.getTotalPerExaminationTypeByPeriod(period);
     const analyses = await Analysis.getChartDataByPeriod(period);
+    const origins = await Origin.getStatsForPeriod(period);
 
     res.status(200).json({
       status: "success",
@@ -460,6 +448,7 @@ export const getChartData = catchAsync(async (req, res, next) => {
         total,
         perType,
         analyses,
+        origins,
       },
     });
   } catch (error) {

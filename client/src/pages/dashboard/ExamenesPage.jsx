@@ -185,7 +185,7 @@ export default function ExamenesPage() {
     setLoading(true);
 
     try {
-      // Prepare both requests
+      // Prepare both requestsF
       const internalRequest =
         submitString === "Actualizar"
           ? examsAPI.updateExam(formData.id, formData)
@@ -426,7 +426,6 @@ export default function ExamenesPage() {
                   setMessageData(data);
 
                   if (!data.all_validated) {
-                    showInfo("El examen no está validado");
                   } else {
                     const token = await generateResultsToken(data.id);
                     setResultsToken(token);

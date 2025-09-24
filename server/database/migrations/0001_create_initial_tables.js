@@ -55,6 +55,7 @@
         table.string('phone_number');
         table.string('address');
         table.string('sex');
+        table.integer('age').notNullable();
         table.boolean('all_validated').defaultTo(false);
         table.enum('message_status', ['NO_ENVIADO', 'ENVIADO', 'LEIDO']).defaultTo('NO_ENVIADO');
         table.timestamp('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));

@@ -1,9 +1,79 @@
 import React, { useEffect, useState } from "react";
 import { examsAPI } from "../../services/api";
-import { Pie, ResponsivePie } from "@nivo/pie";
+import { ResponsiveBar } from "@nivo/bar";
+import { ResponsivePie } from "@nivo/pie";
 import { Icon } from "@iconify/react";
 import FormField from "../../components/forms/FormField";
 
+
+
+const MyBar = ({ data }) => (
+  <ResponsiveBar
+    data={data}
+    keys={['masculino', 'femenino']}
+    indexBy="age_range"
+    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+    padding={0.3}
+    valueScale={{ type: 'linear' }}
+    indexScale={{ type: 'band', round: true }}
+    colors={{ scheme: 'nivo' }}
+    borderColor={{
+      from: 'color',
+      modifiers: [['darker', 1.6]]
+    }}
+    axisTop={null}
+    axisRight={null}
+    axisBottom={{
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: 'Rango de edades',
+      legendPosition: 'middle',
+      legendOffset: 32
+    }}
+    axisLeft={{
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: 'Género',
+      legendPosition: 'middle',
+      legendOffset: -40
+    }}
+    labelSkipWidth={12}
+    labelSkipHeight={12}
+    labelTextColor={{
+      from: 'color',
+      modifiers: [['darker', 1.6]]
+    }}
+    legends={[
+      {
+        dataFrom: 'keys',
+        anchor: 'bottom-right',
+        direction: 'column',
+        justify: false,
+        translateX: 120,
+        translateY: 0,
+        itemsSpacing: 2,
+        itemWidth: 100,
+        itemHeight: 20,
+        itemDirection: 'left-to-right',
+        itemOpacity: 0.85,
+        symbolSize: 20,
+        effects: [
+          {
+            on: 'hover',
+            style: {
+              itemOpacity: 1
+            }
+          }
+        ]
+      }
+    ]}
+    role="application"
+    ariaLabel="Nivo bar chart demo"
+    barAriaLabel={e => e.id + ": " + e.formattedValue + " in country: " + e.indexValue}
+  />
+) 
 const PieChart = ({ data }) => (
   <ResponsivePie
     data={data}
@@ -33,6 +103,7 @@ export default function HomePage() {
       try {
         const res = await examsAPI.getChartData(selectedPeriod);
         setChartData(res.data);
+        console.log(res.data);
       } catch (e) {
         console.error("Failed to fetch chart data", e);
       }
@@ -41,7 +112,6 @@ export default function HomePage() {
     fetchChartData();
   }, [selectedPeriod]);
 
-  
   return (
     <>
       <title>Dashboard - LabFalcón</title>
@@ -59,11 +129,9 @@ export default function HomePage() {
             { value: "this_year", label: "Este año" },
           ]}
           onChange={(e) => {
-
             setSelectedPeriod(e.target.value);
           }}
         />
-        
 
         {chartData && (
           <div className="md:grid space-y-4 grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4">
@@ -104,8 +172,14 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Procedencia de pacientes</p>
+              <PieChart data={chartData?.origins} />
+            </div>
+
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Estado de examenes</p>
-              <PieChart data={[
+              <PieChart
+                data={[
                   {
                     id: "validados",
                     label: "Validados",
@@ -118,18 +192,17 @@ export default function HomePage() {
                   },
                 ]}
               />
-              
             </div>
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Tipo de exámenes realizados</p>
               <PieChart data={chartData?.perType} />
-             
             </div>
 
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Mensaje de resultados validados</p>
-              <PieChart data={[
+              <PieChart
+                data={[
                   {
                     id: "Enviado",
                     label: "Enviado",
@@ -145,13 +218,14 @@ export default function HomePage() {
                     label: "Leído",
                     value: chartData?.analyses.message_read,
                   },
-
-                  ]}
+                ]}
               />
             </div>
 
-
-        
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Distribución de edades y género</p>
+              <MyBar data={chartData?.analyses.ageGenderDistribution} />
+            </div>
           </div>
         )}
       </div>
