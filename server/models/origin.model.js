@@ -16,6 +16,7 @@ class Origin {
       .join("origins", "analysis.origin_id", "origins.id")
       .select(
         "origins.name as label",
+        "origins.name as id",
         db.raw("COUNT(*) as value")
       )
       .groupBy("origins.id", "origins.name");

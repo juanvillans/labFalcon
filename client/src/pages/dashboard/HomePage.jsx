@@ -74,7 +74,7 @@ const MyBar = ({ data }) => (
     }
   />
 );
-const PieChart = ({ data }) => (
+const PieChart = ({ data, inPorcentage }) => (
   <ResponsivePie
     data={data}
     innerRadius={0.5}
@@ -85,6 +85,7 @@ const PieChart = ({ data }) => (
     arcLinkLabelsSkipAngle={10}
     arcLinkLabelsTextColor="#333333"
     arcLinkLabelsThickness={2}
+    valueFormat={(value) => `${Number(value)} ${inPorcentage ? '%' : ''}`}
     arcLinkLabelsColor={{ from: "color" }}
     arcLabelsSkipAngle={10}
     arcLabelsTextColor={{
@@ -176,6 +177,11 @@ export default function HomePage() {
               <PieChart data={chartData?.origins} />
             </div>
 
+             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Distribución de edades y género</p>
+              <MyBar data={chartData?.analyses.ageGenderDistribution} />
+            </div>
+
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Estado de examenes</p>
               <PieChart
@@ -199,22 +205,26 @@ export default function HomePage() {
               <PieChart data={chartData?.numberPerExamType} />
             </div>
 
-            <div className="col-span-4 md:grid space-y-4 grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4">
+            <div className="col-span-4 ">
               {Object.entries(chartData?.normalitiesTests).map(
                 ([exam_key, exam_value]) => (
-                  <div key={exam_key} className="">
-                    <h3>{exam_key}</h3>
+
+                  <div key={exam_key} className="mb-10">
+                    
+                    <h3 className="text-lg font-bold mb-4 ">{exam_key}</h3>
+                    <div className="grid grid-cols-4 md:grid-cols-4 gap-3 md:gap-6 mt-4">
                     {Object.entries(exam_value).map(
                       ([test_key, arr_test_value]) => (
                         <div
                           key={test_key}
-                          className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none"
+                          className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-1 neuphormism hover:shadow-none"
                         >
                           <h4>{test_key}</h4>
-                          <PieChart data={arr_test_value} />
+                          <PieChart data={arr_test_value} inPorcentage={true} />
                         </div>
                       )
                     )}
+                    </div>
                   </div>
                 )
               )}
@@ -243,10 +253,7 @@ export default function HomePage() {
               />
             </div>
 
-            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
-              <p>Distribución de edades y género</p>
-              <MyBar data={chartData?.analyses.ageGenderDistribution} />
-            </div>
+           
           </div>
         )}
       </div>

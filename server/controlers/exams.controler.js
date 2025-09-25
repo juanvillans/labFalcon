@@ -509,9 +509,7 @@ export const getChartData = catchAsync(async (req, res, next) => {
       Object.entries(normalitiesTests).forEach(([exam_key, exam_value]) => {
         Object.entries(exam_value).forEach(([test_key, arr_test_value]) => {
           arr_test_value.forEach((item) => {
-            item.value = Math.round(
-              (item.number / totalByEachTest[exam_key][test_key]) * 100
-            );
+            item.value = Math.round(item.number / totalByEachTest[exam_key][test_key] * 100) ;
           });
         });
       });
