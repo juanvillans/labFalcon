@@ -455,10 +455,10 @@ export const validateExam = catchAsync(async (req, res, next) => {
 
 export const getChartData = catchAsync(async (req, res, next) => {
   try {
-    const { period } = req.params;
+    const { period, start_date, end_date } = req.params;
 
-    const total = await Exams.getDetailedCountByPeriod(period);
-    const perType = await Exams.getTotalPerExaminationTypeByPeriod(period);
+    const total = await Exams.getDetailedCountByPeriod(period, start_date, end_date);
+    const perType = await Exams.getTotalPerExaminationTypeByPeriod(period, start_date, end_date);
 
     const normalitiesTests = {};
     const totalByEachTest = {}
@@ -490,17 +490,17 @@ export const getChartData = catchAsync(async (req, res, next) => {
             normality = 1;
           }
           normalitiesTests[exam.label] = normalitiesTests[exam.label] || {};
-          normalitiesTests[exam.label][test_key] = normalitiesTests[exam.label][
-            test_key
+          normalitiesTests[exam.label][valueObj.label] = normalitiesTests[exam.label][
+            valueObj.label
           ] || [
             { label: "Bajo", id: "Bajo", number: 0},
             { label: "Normal", id: "Normal", number: 0},
             { label: "Alto", id: "Alto", number: 0},
           ];
-          normalitiesTests[exam.label][test_key][normality].number += 1;
+          normalitiesTests[exam.label][valueObj.label][normality].number += 1;
           totalByEachTest[exam.label] = totalByEachTest[exam.label] || {};
-          totalByEachTest[exam.label][test_key] =
-            (totalByEachTest[exam.label][test_key] || 0) + 1;
+          totalByEachTest[exam.label][valueObj.label] =
+            (totalByEachTest[exam.label][valueObj.label] || 0) + 1;
         }
       });
       
@@ -518,8 +518,8 @@ export const getChartData = catchAsync(async (req, res, next) => {
 
 
     numberPerExamType = Object.values(numberPerExamType);
-    const analyses = await Analysis.getChartDataByPeriod(period);
-    const origins = await Origin.getStatsForPeriod(period);
+    const analyses = await Analysis.getChartDataByPeriod(period, start_date, end_date );
+    const origins = await Origin.getStatsForPeriod(period, start_date, end_date );
 
     res.status(200).json({
       status: "success",

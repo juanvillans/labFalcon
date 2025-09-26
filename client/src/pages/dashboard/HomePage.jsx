@@ -85,7 +85,7 @@ const PieChart = ({ data, inPorcentage }) => (
     arcLinkLabelsSkipAngle={10}
     arcLinkLabelsTextColor="#333333"
     arcLinkLabelsThickness={2}
-    valueFormat={(value) => `${Number(value)} ${inPorcentage ? '%' : ''}`}
+    valueFormat={(value) => `${Number(value)}${inPorcentage ? ' %' : ''}`}
     arcLinkLabelsColor={{ from: "color" }}
     arcLabelsSkipAngle={10}
     arcLabelsTextColor={{
@@ -99,16 +99,27 @@ export default function HomePage() {
   const [chartData, setChartData] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("this_week");
 
-  useEffect(() => {
-    async function fetchChartData() {
-      try {
-        const res = await examsAPI.getChartData(selectedPeriod);
-        setChartData(res.data);
-        console.log(res.data);
-      } catch (e) {
-        console.error("Failed to fetch chart data", e);
-      }
+
+  const [start_date, setStartDate] = useState(null);
+  const [end_date, setEndDate] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function fetchChartData() {
+   if (selectedPeriod === "range" && !start_date || !end_date) {
+      return;
     }
+    try {
+      const res = await examsAPI.getChartData(selectedPeriod, {
+        start_date,
+        end_date
+      });
+      setChartData(res.data);
+      console.log(res.data);
+    } catch (e) {
+      console.error("Failed to fetch chart data", e);
+    }
+  }
+  useEffect(() => {
 
     fetchChartData();
   }, [selectedPeriod]);
@@ -118,21 +129,52 @@ export default function HomePage() {
       <title>Dashboard - LabFalcón</title>
       <div>
         <h1 className="text-lg md:text-2xl font-bold mb-4 ">Dashboard</h1>
-        <FormField
-          name={"sex"}
-          type={"select"}
-          className={"w-fit"}
-          value={selectedPeriod}
-          options={[
-            { value: "today", label: "Hoy" },
-            { value: "this_week", label: "Esta semana" },
-            { value: "this_month", label: "Este mes" },
-            { value: "this_year", label: "Este año" },
-          ]}
-          onChange={(e) => {
-            setSelectedPeriod(e.target.value);
-          }}
-        />
+        <div className="flex gap-5">
+          <FormField
+            name={"sex"}
+            type={"select"}
+            className={"w-fit"}
+            value={selectedPeriod}
+            options={[
+              { value: "today", label: "Hoy" },
+              { value: "this_week", label: "Esta semana" },
+              { value: "this_month", label: "Este mes" },
+              { value: "this_year", label: "Este año" },
+              { value: "range", label: "Rango personalizado" },
+            ]}
+            onChange={(e) => {
+              setSelectedPeriod(e.target.value);
+            }}
+          />
+          {selectedPeriod === "range" && (
+            <div className="grid grid-cols-2 gap-4 ">
+              <FormField
+                name={"start_date"}
+                type={"date"}
+                label={"Fecha de inicio"}
+                className={"w-full"}
+                value={start_date}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                }}
+              />
+              <FormField
+                name={"end_date"}
+                type={"date"}
+                label={"Fecha de fin"}
+                className={"w-full"}
+                value={end_date}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                }}
+              />
+                <button onClick={fetchChartData}>
+                  Aplicar
+                </button>
+            </div>
+          )}
+
+        </div>
 
         {chartData && (
           <div className="md:grid space-y-4 grid-cols-1 md:grid-cols-4 gap-3 md:gap-6 mt-4">
@@ -182,6 +224,39 @@ export default function HomePage() {
               <MyBar data={chartData?.analyses.ageGenderDistribution} />
             </div>
 
+           
+
+            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
+              <p>Tipo de exámenes realizados</p>
+              <PieChart data={chartData?.numberPerExamType} />
+            </div>
+
+            <div className="col-span-4 ">
+              {Object.entries(chartData?.normalitiesTests).map(
+                ([exam_key, exam_value]) => (
+
+                  <div key={exam_key} className="mb-10">
+                    
+                    <h3 className="text-lg font-bold mb-4 ">{exam_key}</h3>
+                    <div className="grid md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-2 mt-4 neuphormism">
+                    {Object.entries(exam_value).map(
+                      ([test_key, arr_test_value]) => (
+                        <div
+                          key={test_key}
+                          className="rounded-md p-3 xl:p-5 min-h-[300px] relative col-span-1  hover:shadow-none"
+                        >
+                          <h4 className="text-center">{test_key}</h4>
+                          <PieChart data={arr_test_value} inPorcentage={true} />
+                        </div>
+                      )
+                    )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+
+
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Estado de examenes</p>
               <PieChart
@@ -200,36 +275,7 @@ export default function HomePage() {
               />
             </div>
 
-            <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
-              <p>Tipo de exámenes realizados</p>
-              <PieChart data={chartData?.numberPerExamType} />
-            </div>
-
-            <div className="col-span-4 ">
-              {Object.entries(chartData?.normalitiesTests).map(
-                ([exam_key, exam_value]) => (
-
-                  <div key={exam_key} className="mb-10">
-                    
-                    <h3 className="text-lg font-bold mb-4 ">{exam_key}</h3>
-                    <div className="grid grid-cols-4 md:grid-cols-4 gap-3 md:gap-6 mt-4">
-                    {Object.entries(exam_value).map(
-                      ([test_key, arr_test_value]) => (
-                        <div
-                          key={test_key}
-                          className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-1 neuphormism hover:shadow-none"
-                        >
-                          <h4>{test_key}</h4>
-                          <PieChart data={arr_test_value} inPorcentage={true} />
-                        </div>
-                      )
-                    )}
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-
+            
             <div className="rounded-md p-4 md:p-7 min-h-[300px] relative col-span-2 neuphormism hover:shadow-none">
               <p>Mensaje de resultados validados</p>
               <PieChart

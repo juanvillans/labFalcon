@@ -110,7 +110,7 @@ class Analysis {
     }
   }
 
-  static async getChartDataByPeriod(period) {
+  static async getChartDataByPeriod(period, start_date, end_date) {
     let query = db("analysis");
     const today = new Date();
 
@@ -134,6 +134,9 @@ class Analysis {
         const startOfYear = new Date(today.getFullYear(), 0, 1);
         startOfYear.setHours(0, 0, 0, 0);
         query.where("created_at", ">=", startOfYear);
+        break;
+      case "range":
+        query.whereBetween("created_at", [start_date, end_date]);
         break;
       default:
         throw new Error("Invalid period specified");

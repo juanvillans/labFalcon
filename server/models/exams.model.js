@@ -51,7 +51,7 @@ class Exams {
     return exams.map((exam) => new Exams(exam));
   }
 
-  static async getDetailedCountByPeriod(period) {
+  static async getDetailedCountByPeriod(period, start_date, end_date) {
     let query = db("exams");
     const today = new Date();
 
@@ -80,6 +80,9 @@ class Exams {
         firstDayOfYear.setHours(0, 0, 0, 0);
         query.where("created_at", ">=", firstDayOfYear);
         break;
+      case "range":
+        query.whereBetween("created_at", [start_date, end_date]);
+        break;
       default:
         throw new Error("Invalid period specified");
     }
@@ -99,7 +102,7 @@ class Exams {
     };
   }
 
-  static async getTotalPerExaminationTypeByPeriod(period) {
+  static async getTotalPerExaminationTypeByPeriod(period,  start_date, end_date) {
     let query = db("exams")
       .join(
         "examination_types",
@@ -130,6 +133,9 @@ class Exams {
         const startOfYear = new Date(today.getFullYear(), 0, 1);
         startOfYear.setHours(0, 0, 0, 0);
         query.where("exams.created_at", ">=", startOfYear);
+        break;
+      case "range":
+        query.whereBetween("exams.created_at", [start_date, end_date]);
         break;
       default:
         throw new Error("Invalid period specified");
