@@ -90,7 +90,9 @@ export const examsAPI = {
   updateExam: (id, examData) => api.put(`/exams/${id}`, examData),
   deleteExam: (id) => api.delete(`/exams/${id}`),
   validateExam: (id) => api.put('/exams/validate-exam', { id }),
-  getChartData: (period, params) => api.get(`/exams/chart-data/${period}`, {params}),
+  getChartData: (period, params) => {
+    console.log(params, period);
+    return api.get(`/exams/chart-data/${period}`, {params})},
 };
 
 // Public API for exam results (no authentication required)

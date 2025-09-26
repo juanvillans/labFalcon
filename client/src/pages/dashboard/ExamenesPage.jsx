@@ -295,10 +295,7 @@ export default function ExamenesPage() {
         filterFn: "equals",
         enableColumnFilter: true,
         enableSorting: true,
-        Cell: ({ cell }) => {
-          const value = cell.getValue();
-          return new Date(value).toLocaleDateString();
-        },
+
       },
       {
         accessorKey: "created_time",

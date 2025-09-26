@@ -455,7 +455,9 @@ export const validateExam = catchAsync(async (req, res, next) => {
 
 export const getChartData = catchAsync(async (req, res, next) => {
   try {
-    const { period, start_date, end_date } = req.params;
+    const { period } = req.params;
+    const { start_date, end_date } = req.query;
+    console.log(period, start_date, end_date);
 
     const total = await Exams.getDetailedCountByPeriod(period, start_date, end_date);
     const perType = await Exams.getTotalPerExaminationTypeByPeriod(period, start_date, end_date);
@@ -473,8 +475,6 @@ export const getChartData = catchAsync(async (req, res, next) => {
         numberPerExamType[exam.label] = {label: exam.label, id: exam.id, value: 1};
       }
 
-      console.log(exam.label in numberPerExamType);
-      console.log(numberPerExamType)
       Object.entries(exam.tests_values).forEach(([test_key, valueObj]) => {
         if (valueObj.value.toString().trim() === "") return;
         if ("reference_range" in valueObj) {

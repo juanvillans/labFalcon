@@ -105,7 +105,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
 
   async function fetchChartData() {
-   if (selectedPeriod === "range" && !start_date || !end_date) {
+    console.log(selectedPeriod);
+   if (selectedPeriod === "range" && (!start_date || !end_date)) {
       return;
     }
     try {
@@ -147,7 +148,7 @@ export default function HomePage() {
             }}
           />
           {selectedPeriod === "range" && (
-            <div className="grid grid-cols-2 gap-4 ">
+            <div className="flex gap-4 ">
               <FormField
                 name={"start_date"}
                 type={"date"}
@@ -168,7 +169,7 @@ export default function HomePage() {
                   setEndDate(e.target.value);
                 }}
               />
-                <button onClick={fetchChartData}>
+                <button className="bg-color1 text-white rounded-md p-2 hover:bg-color2 hover:text-white" onClick={fetchChartData}>
                   Aplicar
                 </button>
             </div>
