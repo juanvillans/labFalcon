@@ -13,7 +13,7 @@ export default defineConfig({
           charts: ['@nivo/bar', '@nivo/pie', '@nivo/core'],
           utils: ['axios', 'lodash.debounce']
         }
-      }
+      }  
     },
     minify: 'esbuild', // Más rápido que terser
     target: 'es2015'
