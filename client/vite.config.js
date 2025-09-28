@@ -15,16 +15,12 @@ export default defineConfig({
         }
       }
     },
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    }
+    minify: 'esbuild', // Más rápido que terser
+    target: 'es2015'
   },
   optimizeDeps: {
     include: ['@mui/material', '@nivo/bar', '@nivo/pie']
   }
 });
+
 
