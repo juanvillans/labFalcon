@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "analyze": "vite build --mode analyze",
-    "build": "vite build --minify terser",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
