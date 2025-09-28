@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "analyze": "vite build --mode analyze",
+    "build": "vite build --minify terser",
     "lint": "eslint .",
     "preview": "vite preview"
   },

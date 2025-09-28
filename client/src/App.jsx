@@ -5,8 +5,11 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import PermissionGate from './components/auth/PermissionGate';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import LoginPage from './pages/LoginPage';
-import HomePage from './pages/dashboard/HomePage';
-import ExamenesPage from './pages/dashboard/ExamenesPage';
+import { lazy, Suspense } from 'react';
+
+// Lazy load heavy components
+const HomePage = lazy(() => import('./pages/dashboard/HomePage'));
+const ExamenesPage = lazy(() => import('./pages/dashboard/ExamenesPage'));
 import UsuariosPage from './pages/dashboard/UsuariosPage';
 import ActivateAccountPage from './pages/ActivateAccountPage';
 import ExamResultsPage from './pages/ExamResultsPage';

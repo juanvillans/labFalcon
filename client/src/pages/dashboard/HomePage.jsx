@@ -5,7 +5,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { Icon } from "@iconify/react";
 import FormField from "../../components/forms/FormField";
 
-const MyBar = ({ data }) => (
+const MyBar = React.memo(({ data }) => (
   <ResponsiveBar
     data={data}
     keys={["masculino", "femenino"]}
@@ -73,8 +73,8 @@ const MyBar = ({ data }) => (
       e.id + ": " + e.formattedValue + " in country: " + e.indexValue
     }
   />
-);
-const PieChart = ({ data, inPorcentage }) => (
+));
+const PieChart = React.memo(({ data, inPorcentage }) => (
   <ResponsivePie
     data={data}
     innerRadius={0.5}
@@ -93,7 +93,7 @@ const PieChart = ({ data, inPorcentage }) => (
       modifiers: [["darker", 4]],
     }}
   />
-);
+));
 
 export default function HomePage() {
   const [chartData, setChartData] = useState(null);

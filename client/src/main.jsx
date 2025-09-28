@@ -4,21 +4,10 @@ import './index.css'
 import App from './App.jsx'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+// Consider using @mui/system for smaller bundle
 const theme = createTheme({
   typography: {
     fontFamily: '"Inter", sans-serif',
-    allVariants: {
-      fontFamily: '"Inter", sans-serif',
-    },
-  },
-  components: {
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          fontFamily: '"Inter", sans-serif !important',
-        },
-      },
-    },
   },
 });
 

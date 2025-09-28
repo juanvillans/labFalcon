@@ -10,7 +10,7 @@ import cintillo from "../assets/cintillo.jpeg";
 import { examResultsAPI } from "../services/api";
 
 const PrintableContent = forwardRef((props, ref) => {
-  if (!'patient' in props.data) {
+  if (!('patient' in props.data)) {
     return <div className="flex justify-center">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
   </div>
