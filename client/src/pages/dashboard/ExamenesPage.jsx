@@ -321,7 +321,7 @@ export default function ExamenesPage() {
           ) : (
             <Icon
               icon="octicon:unverifed-24"
-              className="text-gray-600 w-4 h-4"
+              className="text-gray-400 w-4 h-4"
             />
           ),
         filterVariant: "select",

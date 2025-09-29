@@ -8,11 +8,17 @@ import LoginPage from './pages/LoginPage';
 import { lazy, Suspense } from 'react';
 
 // Lazy load heavy components
-const HomePage = lazy(() => import('./pages/dashboard/HomePage'));
-const ExamenesPage = lazy(() => import('./pages/dashboard/ExamenesPage'));
+const HomePage = lazy(() => import(/* webpackChunkName: "home" */ './pages/dashboard/HomePage'));
+const ExamenesPage = lazy(() => import(/* webpackChunkName: "examenes" */ './pages/dashboard/ExamenesPage'));
 import UsuariosPage from './pages/dashboard/UsuariosPage';
 import ActivateAccountPage from './pages/ActivateAccountPage';
-import ExamResultsPage from './pages/ExamResultsPage';
+const ExamResultsPage = lazy(() => import(/* webpackChunkName: "results" */ './pages/ExamResultsPage'));
+
+const PageLoader = () => (
+  <div className="flex justify-center items-center h-screen bg-white">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+  </div>
+);
 
 function App() {
   // Get user from localStorage (instead of useAuth)
@@ -25,7 +31,11 @@ function App() {
             {/* Public routes */}
             <Route path="/" element={<LoginPage />} />
             <Route path="/activar-cuenta" element={<ActivateAccountPage />} />
-            <Route path="/results/:token" element={<ExamResultsPage />} />
+            <Route path="/results/:token" element={
+              <Suspense fallback={<PageLoader />}>
+                <ExamResultsPage />
+              </Suspense>
+            } />
 
             {/* Protected dashboard routes */}
             <Route 
@@ -37,7 +47,12 @@ function App() {
               }
             >
               <Route index element={<HomePage />} />
-              <Route path="examenes" element={<ExamenesPage />} />
+              <Route path="examenes" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <ExamenesPage />
+                  </Suspense>
+                } 
+                />
               {/* Only show "usuarios" if user has permission */}
               <Route 
                 path="usuarios" 

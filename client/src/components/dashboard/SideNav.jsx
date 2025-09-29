@@ -1,4 +1,4 @@
-import labFalconLogo from "../../assets/logoBlue.png";
+import labFalconLogo from "../../assets/logoblue.webp";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 
@@ -47,7 +47,7 @@ export default function SideNav(props) {
         <div className="w-32 relative duration-150 text-white md:w-40 flex flex-row justify-between items-end">
           <img
             src={labFalconLogo}
-            className="logo w-12 duration-150"
+            className="logo w-12 duration-150 h-12"
             alt="logo del sistema"
           />
           

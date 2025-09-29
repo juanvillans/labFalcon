@@ -6,7 +6,7 @@ import { examinationTypesAPI } from "../services/api";
 import { useFeedback } from "../context/FeedbackContext";
 
 import SecretrariaLogo from "../assets/secretaria_logo.png";
-import logoBlue from "../assets/logoBlue.png";
+import logoBlue from "../assets/logoblue.webp";
 
 export default function ExamResultsPage() {
   const { token } = useParams();

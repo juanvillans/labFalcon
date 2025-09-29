@@ -10,17 +10,36 @@ import examinationTypesRouter from "./routers/examamination_types.routers.js";
 import examsRouter from "./routers/exams.routers.js";
 import resultsRouter from "./routers/results.routers.js";
 import originsRouter from "./routers/origins.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  
 
 const app = express();
 // Enable CORS (Cross-Origin Resource Sharing)
 app.use(
   cors({
-    origin: APP_URL, // Replace with your frontend URL
+    origin: [APP_URL, "http://localhost:4173"], // Replace with your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Enable if using cookies/sessions
   })
 );
+
+// ✅ Point Express to client/dist
+const clientDist = path.join(__dirname, "../client/dist");
+
+// Serve static assets with long cache
+app.use(
+  "/assets",
+  express.static(path.join(clientDist, "assets"), {
+    maxAge: "1y",
+    immutable: true,
+  })
+);
+
+
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
@@ -39,6 +58,14 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Subscription API");
 });
 
+
+// Serve the rest of frontend (index.html, manifest, sw.js, etc.)
+app.use(express.static(clientDist));
+
+// Fallback for React Router (SPA)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDist, "index.html"));
+});
 // Handle undefined routes (404 errors)
 app.all("*", notFound);
 

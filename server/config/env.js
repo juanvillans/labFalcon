@@ -31,7 +31,6 @@ export const {
   POSTGRES_USER,
   POSTGRES_PORT,
   APP_URL,
-  CLIENT_URL, // Agregar esta nueva variable
 } = process.env;
  
 

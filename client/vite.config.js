@@ -8,16 +8,16 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: "CacheFirst",
+            handler: "StaleWhileRevalidate", // Better for fonts
             options: {
-              cacheName: "google-fonts-cache",
+              cacheName: "google-fonts-css",
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 1 week
               },
             },
           },
@@ -25,9 +25,9 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "gstatic-fonts-cache",
+              cacheName: "gstatic-fonts",
               expiration: {
-                maxEntries: 10,
+                maxEntries: 30,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
               },
             },
@@ -72,10 +72,16 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: "/screenshot.png",
+            src: "/screenshot.webp",
             sizes: "1359x647",
-            type: "image/png",
-            form_factor: "wide", // or "narrow"
+            type: "image/webp",
+            form_factor: "wide",
+          },
+          {
+            src: "/narrowScreenshot.webp",
+            sizes: "1359x647",
+            type: "image/webp",
+            form_factor: "narrow",
           },
         ],
       },
