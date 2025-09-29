@@ -4,6 +4,20 @@ import './index.css'
 import App from './App.jsx'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+// PWA Update logic
+import { registerSW } from 'virtual:pwa-register'
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm('Nueva versión disponible. ¿Actualizar?')) {
+      updateSW(true)
+    }
+  },
+  onOfflineReady() {
+    console.log('La app está lista para usar sin conexión.')
+  },
+})
+
 // Consider using @mui/system for smaller bundle
 const theme = createTheme({
   typography: {

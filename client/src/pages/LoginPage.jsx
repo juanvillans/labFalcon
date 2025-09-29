@@ -83,7 +83,7 @@ export default function LoginPage() {
         <img
           src={lab}
           alt="lab"
-          className="absolute top-0 left-0 w-full h-full object-cover"
+          className="absolute  left-0 w-full h-full object-cover "
         />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-10"></div>
         <div className=" z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
@@ -91,9 +91,9 @@ export default function LoginPage() {
          
         </div>
         <div
-          className="absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-10 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
+          className="absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-16 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(255, 255, 255, 0.4)",
+            background: "rgba(255, 255, 255, 0.2)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(10px)",
           }}
@@ -179,26 +179,31 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
-      <footer className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-color1 text-sm z-40 w-full relative md:absolute bottom-0 text-center bg-white py-3">
-        <img src={cintilloCorto} alt="" className="max-w-[240px] h-min" />
-        <span>|</span>
-        <p className="">
-          &copy; {new Date().getFullYear()} LabFalcon. Todos los derechos
-          reservados.
-        </p>
-        <span>|</span>
-        <small className="opacity-80 mt-1 block">
-          Contacta con los desarrolladores:{" "}
-          <a href="mailto:juanvillasmil@gmail.com" className="">
-            juanvillasmil@gmail.com
-          </a>
-        </small>
-        <span>|</span>
+      <header className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-color1 text-sm z-40 w-full relative md:absolute top-0 text-center -100 py-2">
+        <img src={cintilloCorto} alt="" className="max-w-[240px] h-min rounded-xl " />
+    
         <img
           src={secretariaLogo}
           alt="secretariaLogo"
           className="w-12 h-12  aspect-square  "
         />
+      </header>
+      <footer className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-dark text-sm z-40 w-full relative md:absolute bottom-0 text-center -100 py-1">
+        <p className="text-xs">
+          &copy; {new Date().getFullYear()} LabFalcon. Todos los derechos
+          reservados.
+        </p>
+        <p className="text-xs">
+          Desarrollado por{" "}
+          <a
+            href="https://www.linkedin.com/in/juanvillasmil/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            Juan Villasmil
+          </a>
+        </p>
       </footer>
     </>
   );
