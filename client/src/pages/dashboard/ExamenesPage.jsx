@@ -1222,7 +1222,7 @@ export default function ExamenesPage() {
             </div>
           )}
           {((messageData?.all_validated && resultsToken != null) ||
-            (messageData.hasOwnProperty("all_validated") &&
+            (messageData?.hasOwnProperty("all_validated") &&
               messageData?.all_validated == false)) && (
             <div className="flex flex-col justify-center">
               {messageData?.all_validated ? (

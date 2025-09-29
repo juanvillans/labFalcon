@@ -10,16 +10,23 @@ import cintillo from "../assets/cintillo.jpeg";
 import { examResultsAPI } from "../services/api";
 
 const PrintableContent = forwardRef((props, ref) => {
-  if (!('patient' in props.data)) {
-    return <div className="flex justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-  </div>
+  if (!("patient" in props.data)) {
+    return (
+      <div className="flex justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      </div>
+    );
   } else {
     return (
       <div
         ref={ref}
         className="w-full mx-auto bg-white border relative"
-        style={{ padding: "10mm", width: "210mm", height: "297mm", paddingTop: "0mm !important" }}
+        style={{
+          padding: "10mm",
+          width: "210mm",
+          height: "297mm",
+          paddingTop: "0mm !important",
+        }}
       >
         <header
           style={{
@@ -29,11 +36,10 @@ const PrintableContent = forwardRef((props, ref) => {
           className="my-2 relative flex flex-col justify-center items-center py-4"
         >
           <img src={cintillo} alt="" className="w-full h-auto" />
-  
+
           <div className="text-center font-bold  gap-3 my-3 mt-4 text-color1">
             Secretaria de Salud del Estado Falcón - Laboratorio
           </div>
-  
         </header>
         <table className="text-left w-full text-xs border-collapse mb-5">
           <thead>
@@ -71,136 +77,152 @@ const PrintableContent = forwardRef((props, ref) => {
         <p>C.I: {props.data?.patient?.ci}</p>
         <p>Fecha de Nacimiento: {props.data?.patient?.date_birth}</p>
         <p>Sexo: {props.data?.patient?.sex}</p> */}
-        {Object.entries(props?.data?.tests).map(([examination_type_id, exam]) => (
-          <div key={examination_type_id} className="mb-7 border rounded-xl pb-0">
-            <h1
-              style={{
-                WebkitPrintColorAdjust: "exact",
-                printColorAdjust: "exact", // Firefox support
-              }}
-              className="pt-1  font-semibold uppercase text-lg bg-gray-50 text-center text-gray-800 rounded-t-xl"
+        {Object.entries(props?.data?.tests).map(
+          ([examination_type_id, exam]) => (
+            <div
+              key={examination_type_id}
+              className="mb-7 border rounded-xl pb-0"
             >
-              <span className="text-gray-300 mx-1">--</span> {exam.testTypeName}{" "}
-              <span className="text-gray-300 mx-1">--</span>
-            </h1>
-            {exam.method ? (
-              <p
+              <h1
                 style={{
                   WebkitPrintColorAdjust: "exact",
                   printColorAdjust: "exact", // Firefox support
                 }}
-                className="bg-gray-50 text-center text-sm px-2 py-0.5 "
+                className="pt-1  font-semibold uppercase text-lg bg-gray-50 text-center text-gray-800 rounded-t-xl"
               >
-                {" "}
-                {exam.method}
-              </p>
-            ) : (
-              ""
-            )}
-            {/* <p className="text-center text-gray-200">|</p>  */}
-  
-            <table className="mb-1 text-sm w-full text-left">
-              <thead
-                style={{
-                  WebkitPrintColorAdjust: "exact",
-                  printColorAdjust: "exact", // Firefox support
-                }}
-                className="bg-gray-50 w-full text-gray-700"
-              >
-                <tr className="py-1">
-                  <th className="px-3 w-1/3">Prueba</th>
-                  <th className="px-3 w-1/3">Resultado</th>
-                  <th className="px-3 w-1/3">Rango de Referencia</th>
-                </tr>
-              </thead>
-              <tbody>
-                {props.examinationTypes[examination_type_id-1].tests.map(({name}, i) => {
-                  const testValObj = exam.testValues[name];
-                  if (testValObj.value.trim() === "") {
-                    return <></>;
-                  } else {
-                    return (
-                      <React.Fragment key={`fragment-${i}-${examination_type_id}`}> {/* <-- ¡Añadir la clave aquí! */}
-  
-                        {i === 0 && examination_type_id == 7 && (
-                          <tr className="flex justify-between items-center col-span-2">
-                            <td colSpan={3} className="text-md font-bold text-gray-700 ml-2">
-                              Examen Físico
-                            </td>
-                          </tr>
-                        )}
-                        {i === 5 && examination_type_id == 7 && (
-                          <tr className="flex justify-between items-center mt-4 col-span-2">
-                            <td colSpan={3} className="text-md font-bold text-gray-700 ml-2">
-                              Examen químico
-                            </td>
-                          </tr>
-                        )}
-                        {i === 13 && examination_type_id == 7 && (
-                          <tr className="flex justify-between items-center mt-4 col-span-2">
-                            <td colSpan={3} className="text-md font-bold text-gray-700 ml-2">
-                              Examen microscópico
-                            </td>
-                          </tr>
-                        )}
-                        <tr key={name+"_test"+"_"+examination_type_id} className="py-5">
-                          <td
-                            style={{
-                              paddingInline: "12px",
-                              paddingBlock: "1.5px",
-                            }}
-                            className="w-1/3"
+                <span className="text-gray-300 mx-1">--</span>{" "}
+                {exam.testTypeName}{" "}
+                <span className="text-gray-300 mx-1">--</span>
+              </h1>
+              {exam.method ? (
+                <p
+                  style={{
+                    WebkitPrintColorAdjust: "exact",
+                    printColorAdjust: "exact", // Firefox support
+                  }}
+                  className="bg-gray-50 text-center text-sm px-2 py-0.5 "
+                >
+                  {" "}
+                  {exam.method}
+                </p>
+              ) : null}
+              {/* <p className="text-center text-gray-200">|</p>  */}
+
+              <table className="mb-1 text-sm w-full text-left">
+                <thead
+                  style={{
+                    WebkitPrintColorAdjust: "exact",
+                    printColorAdjust: "exact", // Firefox support
+                  }}
+                  className="bg-gray-50 w-full text-gray-700"
+                >
+                  <tr className="py-1">
+                    <th className="px-3 w-1/3">Prueba</th>
+                    <th className="px-3 w-1/3">Resultado</th>
+                    <th className="px-3 w-1/3">Rango de Referencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {props.examinationTypes[examination_type_id - 1].tests.map(
+                    ({ name }, i) => {
+                      const testValObj = exam.testValues[name];
+                      if (!testValObj.value || testValObj.value.trim() === "") {
+                        return null;
+                      } else {
+                        return (
+                          <React.Fragment
+                            key={`fragment-${i}-${examination_type_id}`}
                           >
-                            {testValObj.label}
-                          </td>
-                          <td
-                            style={{
-                              paddingInline: "12px",
-                              paddingBlock: "1.5px",
-                            }}
-                            className="w-1/3"
-                          >
-                            {testValObj.value}{" "}
-                            {testValObj.unit ? (
-                              <span className="text-sm">
-                                {" "}
-                                {testValObj.unit}
-                              </span>
-                            ) : null}
-                          </td>
-                          <td
-                            style={{
-                              paddingInline: "12px",
-                              paddingBlock: "1.5px",
-                            }}
-                            className="w-1/3"
-                          >
-                            {testValObj.reference_range?.min || ""} -{" "}
-                            {testValObj.reference_range?.max || ""}
-                            {testValObj.unit ? (
-                              <span className="text-sm">
-                                {" "}
-                                {testValObj.unit}
-                              </span>
-                            ) : null}
-                          </td>
-                        </tr>
-                      </React.Fragment>
-                    );
-                  }
-                })}
-              </tbody>
-            </table>
-  
-            {exam.observation ? (
-              <p className="text-sm px-2 mt-2 pb-1">
-                <b>Observación:</b> {exam.observation}
-              </p>
-            ) : (
-              ""
-            )}
-          </div>
-        ))}
+                           
+                            {/* <-- ¡Añadir la clave aquí! */}
+                            {i === 0 && examination_type_id == 7 && (
+                              <tr className="flex justify-between items-center col-span-2">
+                                <td
+                                  colSpan={3}
+                                  className="text-md font-bold text-gray-700 ml-2"
+                                >
+                                  Examen Físico
+                                </td>
+                              </tr>
+                            )}
+                            {i === 5 && examination_type_id == 7 && (
+                              <tr className="flex justify-between items-center mt-4 col-span-2">
+                                <td
+                                  colSpan={3}
+                                  className="text-md font-bold text-gray-700 ml-2"
+                                >
+                                  Examen químico
+                                </td>
+                              </tr>
+                            )}
+                            {i === 13 && examination_type_id == 7 && (
+                              <tr className="flex justify-between items-center mt-4 col-span-2">
+                                <td
+                                  colSpan={3}
+                                  className="text-md font-bold text-gray-700 ml-2"
+                                >
+                                  Examen microscópico
+                                </td>
+                              </tr>
+                            )}
+                            <tr
+                              key={name + "_test" + "_" + examination_type_id}
+                              className="py-5"
+                            >
+                              <td
+                                style={{
+                                  paddingInline: "12px",
+                                  paddingBlock: "1.5px",
+                                }}
+                                className="w-1/3"
+                              >
+                                {testValObj.label}
+                              </td>
+                              <td
+                                style={{
+                                  paddingInline: "12px",
+                                  paddingBlock: "1.5px",
+                                }}
+                                className="w-1/3"
+                              >
+                                {testValObj.value}
+                                {testValObj.unit ? (
+                                  <span className="text-sm"> {testValObj.unit}</span>
+                                ) : null}
+                              </td>
+                              <td
+                                style={{
+                                  paddingInline: "12px",
+                                  paddingBlock: "1.5px",
+                                }}
+                                className="w-1/3"
+                              >
+                                {testValObj.reference_range?.min ?? ""} <span>-</span>
+                                {testValObj.reference_range?.max ?? ""}
+                                {testValObj.unit ? (
+                                  <span className="text-sm">
+                          
+                                    {testValObj.unit}
+                                  </span>
+                                ) : null}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        );
+                      }
+                    }
+                  )}
+                </tbody>
+              </table>
+
+              {exam.observation ? (
+                <p className="text-sm px-2 mt-2 pb-1">
+                  <b>Observación:</b> {exam.observation}
+                </p>
+              ) : null}
+            </div>
+          )
+        )}
         {props.data.all_validated && (
           <footer className=" bottom-10 left-10 right-10 flex justify-between">
             <div style={{ width: "min-content" }}>
@@ -208,7 +230,9 @@ const PrintableContent = forwardRef((props, ref) => {
                 size={106}
                 value={`${window.location.origin}/results/${props.token}`}
               />
-              <p className="text-xs text-center mt-2 pr-1">Validar resultados</p>
+              <p className="text-xs text-center mt-2 pr-1">
+                Validar resultados
+              </p>
             </div>
             <img
               draggable={false}
@@ -220,7 +244,6 @@ const PrintableContent = forwardRef((props, ref) => {
         )}
       </div>
     );
-
   }
 });
 
@@ -280,7 +303,6 @@ const PrintPage = (props) => {
             size="A4"
           />
         )}
-      
       </div>
     </div>
   );
