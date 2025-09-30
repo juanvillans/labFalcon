@@ -41,7 +41,7 @@ export const sendInvitationEmail = function (recipient, invitationToken, url) {
         to: recipient.email,
         subject: "Bienvenido a labFalcon - Activa tu cuenta",
         html: `
-            <img src="${process.env.APP_URL }/logoblue.webp}" alt="labFalcon" />
+            <img src="${process.env.APP_URL }/logoBlue.webp}" alt="labFalcon" />
             <h3>Bienvenido a nuestra plataforma, ${recipient.first_name}!</h3>
             <p>Tu cuenta ha sido creada. Por favor haz clic en el enlace a continuación para establecer tu contraseña y activar tu cuenta:</p>
             <p><a href="${activationLink}">Activar cuenta</a></p>
