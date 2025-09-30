@@ -47,7 +47,7 @@ export default function SideNav(props) {
         <div className="w-32 relative duration-150 text-white md:w-40 flex flex-row justify-between items-end">
           <img
             src={labFalconLogo}
-            className="logo w-12 duration-150 h-12"
+            className={`${props.isSidebarOpen ? 'w-12 h-12' : 'w-10 h-8'} logo w-12 duration-150 `}
             alt="logo del sistema"
           />
           
