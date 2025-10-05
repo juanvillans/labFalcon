@@ -347,3 +347,25 @@ h5 {
   background: rgba(255, 255, 255, 0.02),
 
 }
+
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeInUp {
+    animation: fadeInUp .5s ease-out forwards;
+}
+.fadeInUp-delay-1 {
+    /* Define cuánto tiempo quieres esperar. Por ejemplo, 0.4s */
+    animation-delay: 0.4s; 
+    /* Necesitas que esté inicialmente invisible mientras espera */
+    opacity: 0; 
+}

@@ -7,7 +7,7 @@ import labFalconLogo from "../assets/logoBlue.webp";
 import lab from "../assets/lab.webp";
 import secretariaLogo from "../assets/secretaria_logo.png";
 import { Icon } from "@iconify/react";
-import cintilloCorto  from "../assets/cintilloCorto.png";
+import cintilloCorto from "../assets/cintilloCorto.png";
 
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
@@ -86,19 +86,15 @@ export default function LoginPage() {
           className="absolute  left-0 w-full h-full object-cover "
         />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-10"></div>
-        <div className=" z-50 absolute top-0 left-0 w-full h-full p-5 sm:p-10">
-          
-         
-        </div>
         <div
-          className="absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-16 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
+          className="fadeInUp absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-16 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
           style={{
             background: "rgba(255, 255, 255, 0.2)",
             backdropFilter: "blur(8px)",
             WebkitBackdropFilter: "blur(10px)",
           }}
         >
-          <div className="mx-auto bg-white backdrop-blur-none w-14 h-14 flex items-center justify-center aspect-square rounded-full p-2.5">
+          <div className="mx-auto bg-color1 fadeInUp-delay-1 fadeInUp   backdrop-blur-none w-16 h-16 md:w-20 md:h-20 flex items-center justify-center aspect-square rounded-full p-2.5 md:p-4">
             <img
               src={labFalconLogo}
               className="logo inline-block mx-auto  "
@@ -114,10 +110,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4 mt-4 md:mt-10">
-              <label
-                className="block  text-sm  mb-1"
-                htmlFor="email"
-              >
+              <label className="block  text-sm  mb-1" htmlFor="email">
                 Email
               </label>
               <input
@@ -131,10 +124,7 @@ export default function LoginPage() {
             </div>
 
             <div className="relative mb-1 ">
-              <label
-                className="block  text-sm  mb-1"
-                htmlFor="password"
-              >
+              <label className="block  text-sm  mb-1" htmlFor="password">
                 Contraseña
               </label>
               <input
@@ -179,9 +169,13 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
-      <header className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-color1 text-sm z-40 w-full relative md:absolute top-0 text-center -100 py-2">
-        <img src={cintilloCorto} alt="" className="max-w-[240px] h-min rounded-xl " />
-    
+      <header className="flex gap-1 flex-col md:flex-row items-center px-10 justify-between text-color1 text-sm z-40 w-full relative md:absolute  top-0 text-center -100 py-2 lg:py-5">
+        <img
+          src={cintilloCorto}
+          alt=""
+          className="max-w-[240px] h-min rounded-xl "
+        />
+
         <img
           src={secretariaLogo}
           alt="secretariaLogo"
@@ -193,17 +187,14 @@ export default function LoginPage() {
           &copy; {new Date().getFullYear()} LabFalcon. Todos los derechos
           reservados.
         </p>
-        <p className="text-xs text-opacity-65">
-          Desarrollado por{" "}
-          <a
-            href="https://www.linkedin.com/in/juanvillasmil/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            Juan Villasmil
-          </a>
-        </p>
+        <a
+          href="https://www.linkedin.com/in/juan-francisco-villasmil-tovar-50a3a1161/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:opacity-100 text-xs opacity-65 cursor-pointer"
+        >
+          Desarrollado por Juan Villasmil
+        </a>
       </footer>
     </>
   );
