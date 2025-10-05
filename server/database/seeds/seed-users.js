@@ -1,13 +1,4 @@
-import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-
-
-// Load environment variables based on NODE_ENV
-const envFile = process.env.NODE_ENV === "production" 
-  ? ".env.production" 
-  : ".env.development.local";
-
-dotenv.config({ path: envFile });
 
 const usersSeed = [
     {
@@ -43,7 +34,6 @@ const usersSeed = [
         allow_handle_exams: user.allow_handle_exams,
         status: user.status,
       });
-      console.log(`Seeded: ${user.first_name} ${user.last_name}`);
     }
   }
   

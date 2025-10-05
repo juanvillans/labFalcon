@@ -193,7 +193,7 @@ export default function LoginPage() {
           &copy; {new Date().getFullYear()} LabFalcon. Todos los derechos
           reservados.
         </p>
-        <p className="text-xs">
+        <p className="text-xs text-opacity-65">
           Desarrollado por{" "}
           <a
             href="https://www.linkedin.com/in/juanvillasmil/"
