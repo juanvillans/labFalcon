@@ -34,12 +34,12 @@ const clientDist = path.join(__dirname, "../client/dist");
 app.use(
   "/assets",
   express.static(path.join(clientDist, "assets"), {
-    maxAge: "1y",
-    immutable: true,
+    setHeaders: (res, filePath) => {
+      // Explicitly set cache headers
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    },
   })
 );
-
-
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
