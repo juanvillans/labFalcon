@@ -87,7 +87,7 @@ export default function LoginPage() {
         />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-color1 to-transparent opacity-10"></div>
         <div
-          className="fadeInUp absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-12 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
+          className=" absolute w-[300px] md:min-w-[400px] md:w-[450px] pb-3 top-20 z-50 md:top-12 px-5 pt-4 md:pt-10 sm:pt-20 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:right-20 text-color1 md:p-16 rounded-3xl overflow-hidden"
           style={{
             background: "rgba(255, 255, 255, 0.2)",
             backdropFilter: "blur(8px)",
@@ -101,15 +101,15 @@ export default function LoginPage() {
               alt="logo del sistema"
             />
           </div>
-          <h1 className="text-lg md:text-2xl font-bold  mt-4 text-center ">
+          <h1 className="fadeInUp  fadeInUp-delay-0-5 text-lg md:text-2xl font-bold  mt-4 text-center ">
             BIENVENIDO A LABFALCON
           </h1>
-          <p className="text-dark text-xs md:text-md text-center">
+          <p className="fadeInUp fadeInUp-delay-0-5  text-dark text-xs md:text-md text-center">
             Sistema de Laboratorio de la Secretaria de Salud de Falcón
           </p>
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4 mt-4 md:mt-10">
+          <form onSubmit={handleSubmit} className="fadeInUp ">
+            <div className="mb-4 mt-4 md:mt-10 ">
               <label className="block  text-sm  mb-1" htmlFor="email">
                 Email
               </label>

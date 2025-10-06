@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -108,7 +107,7 @@ h5 {
   border-color: white !important;
 }
 .css-13sd685-MuiFormLabel-root-MuiInputLabel-root {
-  background: rgb(250, 250, 250) ;
+  background: rgb(250, 250, 250);
   padding-inline: 4px !important;
 }
 /* AG Grid - Remove border and add light shadow */
@@ -344,28 +343,31 @@ h5 {
 }
 .blur * {
   backdrop-filter: none !important;
-  background: rgba(255, 255, 255, 0.02),
-
+  background: rgba(255, 255, 255, 0.02);
 }
 
-
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fadeInUp {
-    animation: fadeInUp .5s ease-out forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 .fadeInUp-delay-1 {
-    /* Define cuánto tiempo quieres esperar. Por ejemplo, 0.4s */
-    animation-delay: 0.4s; 
-    /* Necesitas que esté inicialmente invisible mientras espera */
-    opacity: 0; 
+  /* Define cuánto tiempo quieres esperar. Por ejemplo, 0.4s */
+  animation-delay: 0.4s;
+  /* Necesitas que esté inicialmente invisible mientras espera */
+  opacity: 0;
+}
+.fadeInUp-delay-0-5 {
+  animation-delay: 0.2s;
+  /* Necesitas que esté inicialmente invisible mientras espera */
+  opacity: 0;
 }
