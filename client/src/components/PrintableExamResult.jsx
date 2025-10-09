@@ -133,7 +133,6 @@ const PrintableContent = forwardRef((props, ref) => {
                           <React.Fragment
                             key={`fragment-${i}-${examination_type_id}`}
                           >
-                           
                             {/* <-- ¡Añadir la clave aquí! */}
                             {i === 0 && examination_type_id == 7 && (
                               <tr className="flex justify-between items-center col-span-2">
@@ -187,7 +186,10 @@ const PrintableContent = forwardRef((props, ref) => {
                               >
                                 {testValObj.value}
                                 {testValObj.unit ? (
-                                  <span className="text-sm"> {testValObj.unit}</span>
+                                  <span className="text-sm">
+                                    {" "}
+                                    {testValObj.unit}
+                                  </span>
                                 ) : null}
                               </td>
                               <td
@@ -197,11 +199,11 @@ const PrintableContent = forwardRef((props, ref) => {
                                 }}
                                 className="w-1/3"
                               >
-                                {testValObj.reference_range?.min ?? ""} <span>-</span>
+                                {testValObj.reference_range?.min ?? ""}{" "}
+                                <span>-</span>
                                 {testValObj.reference_range?.max ?? ""}
                                 {testValObj.unit ? (
                                   <span className="text-sm">
-                          
                                     {testValObj.unit}
                                   </span>
                                 ) : null}
@@ -216,9 +218,16 @@ const PrintableContent = forwardRef((props, ref) => {
               </table>
 
               {exam.observation ? (
-                <p className="text-sm px-2 mt-2 pb-1">
-                  <b>Observación:</b> {exam.observation}
-                </p>
+                <>
+                  <p className="text-sm px-2 mt-2 pb-1">
+                  {examination_type_id == 5 && (
+                    <p className="text-md font-bold text-gray-600 ml-2 ">
+                      Examen Microscópico:
+                    </p>
+                  )}
+                    <b>Observación:</b> {exam.observation}
+                  </p>
+                </>
               ) : null}
             </div>
           )

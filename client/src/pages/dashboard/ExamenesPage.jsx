@@ -1014,6 +1014,11 @@ export default function ExamenesPage() {
                         ))}
                       </div>
 
+                        {key == 5 && (
+                          <h3 className="text-md font-bold text-gray-600 ml-2 mb-2.5">
+                            Examen Microscópico
+                          </h3>
+                      )}
                       <div className="mb-2 col-span-2">
                         <MemoizedTestField
                           field={{

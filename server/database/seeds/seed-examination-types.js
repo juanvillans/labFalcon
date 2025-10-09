@@ -274,7 +274,7 @@ const examinationTypesSeed = [
         label: "Consistencia",
         name: "consistencia",
         type: "list",
-        labels: ["Blanda", "Dura", "Pastoza", "Diarreica"],
+        labels: ["Blanda", "Dura", "Pastosa", "Diarreica"],
       },
 
       {
@@ -320,14 +320,14 @@ const examinationTypesSeed = [
         options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
-        label: "AgsHB",
+        label: "AgSHB",
         name: "agshb",
         type: "select",
         options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
       {
-        label: "CORE",
-        name: "core",
+        label: "Anticore",
+        name: "anticore",
         type: "select",
         options: [{ value: "Reactivo" }, { value: "No reactivo" }],
       },
