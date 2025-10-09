@@ -197,17 +197,7 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
       }
     };
 
-    // Calculate age
-    const calculateAge = (dateOfBirth) => {
-      const dob = new Date(dateOfBirth);
-      const today = new Date();
-      let age = today.getFullYear() - dob.getFullYear();
-      const m = today.getMonth() - dob.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-        age--;
-      }
-      return age;
-    };
+
 
     // Format response
     const result = {
@@ -225,13 +215,15 @@ export const getExamResultsByToken = catchAsync(async (req, res, next) => {
       all_validated: analysis.all_validated,
       created_date: analysis.created_date,
       created_time: analysis.created_time,
-      age: calculateAge(analysis.date_birth),
+      age: analysis.age,
       tests: examsData.reduce((acc, exam) => {
         acc[exam.examination_type_id] = {
           testValues: safeJsonParse(exam.tests_values),
           testTypeName: exam.examination_type_name,
           testTypeId: exam.examination_type_id,
-          validated: exam.validated
+          validated: exam.validated,
+          method: exam.method,
+          observation: exam.observation,
         };
         return acc;
       }, {})

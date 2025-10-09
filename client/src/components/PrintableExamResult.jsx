@@ -221,9 +221,9 @@ const PrintableContent = forwardRef((props, ref) => {
                 <>
                   <p className="text-sm px-2 mt-2 pb-1">
                   {examination_type_id == 5 && (
-                    <p className="text-md font-bold text-gray-600 ml-2 ">
+                    <b className="text-md block font-bold text-gray-600 ml-2 ">
                       Examen Microscópico:
-                    </p>
+                    </b>
                   )}
                     <b>Observación:</b> {exam.observation}
                   </p>

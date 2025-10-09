@@ -44,6 +44,7 @@ export default function ExamResultsPage() {
       try {
         setLoading(true);
         const response = await examResultsAPI.getByToken(token);
+        console.log(response.data.data);
         setExamData(response.data.data);
         await examResultsAPI.updateMessageStatus(
           response.data.data.id,
