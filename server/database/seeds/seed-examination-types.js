@@ -116,6 +116,13 @@ const examinationTypesSeed = [
           max: 1.1,
         },
       },
+      {
+        label: "GPP",
+        name: "gpp",
+        type: "number",
+        unit: "mg/dl",
+     
+      },
     ],
   },
 

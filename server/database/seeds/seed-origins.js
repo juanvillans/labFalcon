@@ -9,7 +9,6 @@ const originsSeed = [
   { name: "Plan Quirúrgico" },
   { name: "UBCH" },
   { name: "Otros" },
-  { name: "Uno más" },
 ];
 
 export async function seed(knex) {
