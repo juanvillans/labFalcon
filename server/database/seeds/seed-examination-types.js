@@ -2,8 +2,8 @@
 // Examination types seed data
 const examinationTypesSeed = [
   {
+    id: 1,
     name: "Hematologia",
-    groupedBySections: false,
 
     tests: [
       {
@@ -82,8 +82,8 @@ const examinationTypesSeed = [
   },
 
   {
+    id: 2,
     name: "Química sanguinea",
-    groupedBySections: false,
 
     tests: [
       {
@@ -120,6 +120,7 @@ const examinationTypesSeed = [
   },
 
   {
+    id: 3,
     name: "Prueba de coagulación",
     tests: [
       {
@@ -171,8 +172,8 @@ const examinationTypesSeed = [
   },
 
   {
+    id: 4,
     name: "Serología",
-    groupedBySections: false,
 
     tests: [
       {
@@ -254,8 +255,8 @@ const examinationTypesSeed = [
   },
 
   {
+    id: 5,
     name: "Análisis de heces",
-    groupedBySections: false,
 
     tests: [
       {
@@ -311,6 +312,7 @@ const examinationTypesSeed = [
   },
 
   {
+    id: 6,
     name: "Hepatitis A, B, C",
     tests: [
       {
@@ -345,8 +347,8 @@ const examinationTypesSeed = [
 
 
   {
+    id: 7,
     name: "Análisis de orina",
-    groupedBySections: true,
     tests: [
       /////// Examen Físico
       {
@@ -521,19 +523,46 @@ const examinationTypesSeed = [
 ];
 
 export async function seed(knex) {
-  const count = await knex("examination_types").count("id");
-  if (parseInt(count[0].count) > 0) {
-    console.log("deleting examination types, resetting id sequence and seeding...");
-    // return;
-    await knex.raw("ALTER SEQUENCE examination_types_id_seq RESTART WITH 1");
-    await knex("examination_types").del();     // Delete all existing examination types from the database.
-  }
-
+  const inserts = [];
+  const updates = [];
+  
+  // Get all existing IDs for efficient lookup
+  const existingRecords = await knex("examination_types").select("id");
+  const existingIds = new Set(existingRecords.map(record => record.id));
+  
   for (const examType of examinationTypesSeed) {
-    await knex("examination_types").insert({
-      name: examType.name,
-      tests: JSON.stringify(examType.tests),
-    });
-    console.log(`Seeded: ${examType.name}`);
+    if (existingIds.has(examType.id)) {
+      // Record exists, prepare update
+      updates.push(
+        knex("examination_types")
+          .where("id", examType.id)
+          .update({
+            name: examType.name,
+            tests: JSON.stringify(examType.tests),
+          })
+      );
+    } else {
+      // New record, prepare insert
+      inserts.push({
+        id: examType.id, // Include the stable ID
+        name: examType.name,
+        tests: JSON.stringify(examType.tests),
+      });
+    }
+  }
+  
+  // Execute all operations in parallel
+  if (updates.length > 0) {
+    await Promise.all(updates);
+    console.log(`Updated ${updates.length} examination types`);
+  }
+  
+  if (inserts.length > 0) {
+    await knex("examination_types").insert(inserts);
+    console.log(`Inserted ${inserts.length} new examination types`);
+  }
+  
+  if (updates.length === 0 && inserts.length === 0) {
+    console.log("No changes needed - data is already in sync");
   }
 }

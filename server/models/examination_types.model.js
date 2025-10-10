@@ -8,7 +8,7 @@ class ExaminationType {
   }
 
   static async getAllExaminationTypes() {
-    const examinationTypes = await db("examination_types").select("*");
+    const examinationTypes = await db("examination_types").select("*").orderBy("id", "asc"); // Add this line;
     return examinationTypes.map((examinationType) => new ExaminationType(examinationType));
   }
 }
