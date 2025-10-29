@@ -184,7 +184,7 @@ const PrintableContent = forwardRef((props, ref) => {
                                 }}
                                 className="w-1/3"
                               >
-                                {testValObj.value}
+                                {testValObj.value || null}
                                 {testValObj.unit ? (
                                   <span className="text-sm">
                                     {" "}
