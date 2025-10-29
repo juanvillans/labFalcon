@@ -126,7 +126,7 @@ const PrintableContent = forwardRef((props, ref) => {
                   {props.examinationTypes[examination_type_id - 1].tests.map(
                     ({ name }, i) => {
                       const testValObj = exam.testValues[name];
-                      if (!testValObj.value || testValObj.value?.trim() === "") {
+                      if (!testValObj || !testValObj.value || testValObj.value?.trim() === "") {
                         return null;
                       } else {
                         return (
