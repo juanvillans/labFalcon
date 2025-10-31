@@ -121,7 +121,6 @@ const examinationTypesSeed = [
         name: "gpp",
         type: "number",
         unit: "mg/dl",
-     
       },
     ],
   },

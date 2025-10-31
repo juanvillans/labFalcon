@@ -20,7 +20,7 @@ const PrintableContent = forwardRef((props, ref) => {
     return (
       <div
         ref={ref}
-        className="w-full mx-auto bg-white border relative"
+        className="w-full mx-auto bg-white relative"
         style={{
           padding: "10mm",
           width: "210mm",
@@ -30,14 +30,14 @@ const PrintableContent = forwardRef((props, ref) => {
       >
         <header
           style={{
-            marginBlock: "50px !important",
-            marginBottom: "50px !important",
+            marginBlock: "30px !important",
+            marginBottom: "30px !important",
           }}
-          className="my-2 relative flex flex-col justify-center items-center py-4"
+          className="my-2  mb-0 relative flex flex-col justify-center items-center py-4"
         >
           <img src={cintillo} alt="" className="w-full h-auto" />
 
-          <div className="text-center font-bold  gap-3 my-3 mt-4 text-color1">
+          <div className="text-center font-bold  gap-3 my-3  mt-2 text-color1">
             Secretaria de Salud del Estado Falcón - Laboratorio
           </div>
         </header>
@@ -88,7 +88,7 @@ const PrintableContent = forwardRef((props, ref) => {
                   WebkitPrintColorAdjust: "exact",
                   printColorAdjust: "exact", // Firefox support
                 }}
-                className="pt-1  font-semibold uppercase text-lg bg-gray-50 text-center text-gray-800 rounded-t-xl"
+                className="pt-1  font-semibold uppercase text-lg text-center text-gray-800 rounded-t-xl"
               >
                 <span className="text-gray-300 mx-1">--</span>{" "}
                 {exam.testTypeName}{" "}
@@ -100,7 +100,7 @@ const PrintableContent = forwardRef((props, ref) => {
                     WebkitPrintColorAdjust: "exact",
                     printColorAdjust: "exact", // Firefox support
                   }}
-                  className="bg-gray-50 text-center text-sm px-2 py-0.5 "
+                  className="text-center text-sm px-2 py-0.5 "
                 >
                   {" "}
                   {exam.method}
@@ -114,7 +114,7 @@ const PrintableContent = forwardRef((props, ref) => {
                     WebkitPrintColorAdjust: "exact",
                     printColorAdjust: "exact", // Firefox support
                   }}
-                  className="bg-gray-50 w-full text-gray-700"
+                  className=" w-full text-gray-700"
                 >
                   <tr className="py-1">
                     <th className="px-3 w-1/3">Prueba</th>
@@ -126,7 +126,11 @@ const PrintableContent = forwardRef((props, ref) => {
                   {props.examinationTypes[examination_type_id - 1].tests.map(
                     ({ name }, i) => {
                       const testValObj = exam.testValues[name];
-                      if (!testValObj || !testValObj.value || testValObj.value?.trim() === "") {
+                      if (
+                        !testValObj ||
+                        !testValObj.value ||
+                        testValObj.value?.trim() === ""
+                      ) {
                         return null;
                       } else {
                         return (
@@ -186,8 +190,7 @@ const PrintableContent = forwardRef((props, ref) => {
                               >
                                 {testValObj.value || null}
                                 {testValObj.unit ? (
-                                  <span className="text-sm">
-                                    {" "}
+                                  <span className="text-sm text-gray-600 ml-1">
                                     {testValObj.unit}
                                   </span>
                                 ) : null}
@@ -199,13 +202,15 @@ const PrintableContent = forwardRef((props, ref) => {
                                 }}
                                 className="w-1/3"
                               >
-                                {testValObj.reference_range?.min ?? ""}{" "}
-                                <span>-</span>
-                                {testValObj.reference_range?.max ?? ""}
-                                {testValObj.unit ? (
-                                  <span className="text-sm">
-                                    {testValObj.unit}
-                                  </span>
+                                {testValObj.reference_range ? (
+                                  <>
+                                    {testValObj.reference_range?.min ?? ""}{" "}
+                                    <span>-</span>
+                                    {testValObj.reference_range?.max ?? ""}
+                                    <span className="text-sm text-gray-600 ml-1">
+                                      {testValObj.unit}
+                                    </span>
+                                  </>
                                 ) : null}
                               </td>
                             </tr>
@@ -220,11 +225,11 @@ const PrintableContent = forwardRef((props, ref) => {
               {exam.observation ? (
                 <>
                   <p className="text-sm px-2 mt-2 pb-1">
-                  {examination_type_id == 5 && (
-                    <b className="text-md block font-bold text-gray-600 ml-2 ">
-                      Examen Microscópico:
-                    </b>
-                  )}
+                    {examination_type_id == 5 && (
+                      <b className="text-md block font-bold text-gray-600 ml-2 ">
+                        Examen Microscópico:
+                      </b>
+                    )}
                     <b>Observación:</b> {exam.observation}
                   </p>
                 </>
@@ -236,16 +241,19 @@ const PrintableContent = forwardRef((props, ref) => {
           <footer className=" bottom-10 left-10 right-10 flex justify-between">
             <div style={{ width: "min-content" }}>
               <QRCode
-                size={106}
+                size={90}
                 value={`${window.location.origin}/results/${props.token}`}
               />
-              <p className="text-xs text-center mt-2 pr-1">
+              <p className="text-center mt-2 pr-1" style={{
+                fontSize: "9px",
+                lineHeight: "10px",
+              }}>
                 Validar resultados
               </p>
             </div>
             <img
               draggable={false}
-              className="w-28 min-w-[132px] h-max"
+              className="w-24 min-w-[100px] h-max"
               src={firmaDigital}
               alt=""
             />
