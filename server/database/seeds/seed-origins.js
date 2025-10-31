@@ -1,5 +1,6 @@
 // Datos de origenes
 const originsSeed = [
+  { name: "Otros" },
   { name: "Externo" },
   { name: "Hospitalizado" },
   { name: "Jubilado" },
@@ -8,7 +9,6 @@ const originsSeed = [
   { name: "Caso social" },
   { name: "Plan Quirúrgico" },
   { name: "UBCH" },
-  { name: "Otros" },
   { name: "Trabajador" },
 ];
 

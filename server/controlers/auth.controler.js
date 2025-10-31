@@ -2,8 +2,9 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { commonErrors, catchAsync } from "../middlewares/error.middleware.js";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+import { JWT_EXPIRES_IN, JWT_SECRET, APP_URL } from "../config/env.js";
 import { tokenBlacklist } from "../utils/token-blacklist.js";
+import { sendPasswordResetEmail } from "./mailjet.controler.js";
 
 export const signIn = catchAsync(async (req, res, next) => {
   try {
@@ -156,7 +157,7 @@ export const changePassword = catchAsync(async (req, res, next) => {
 export const forgotPassword = catchAsync(async (req, res, next) => {
   try {
     const { email } = req.body;
-    
+    console.log({email, body: req.body});
     if (!email) {
       throw commonErrors.missingFields(['email']);
     }
@@ -197,7 +198,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       await sendPasswordResetEmail(
         { name: user.name, email: user.email },
         resetToken,
-        "http://localhost:3000/"
+        APP_URL
       );
       
       res.status(200).json({

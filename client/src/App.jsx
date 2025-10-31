@@ -31,6 +31,8 @@ function App() {
             {/* Public routes */}
             <Route path="/" element={<LoginPage />} />
             <Route path="/activar-cuenta" element={<ActivateAccountPage />} />
+            <Route path="/olvide-contraseña?" element={<ActivateAccountPage />} />
+
             <Route path="/results/:token" element={
               <Suspense fallback={<PageLoader />}>
                 <ExamResultsPage />

@@ -25,6 +25,7 @@ export default function LoginPage() {
   const { user, login, loading: authLoading } = useAuth();
   const { showError, showSuccess } = useFeedback();
 
+  const [loadingReset, setLoadingReset] = useState(false);
   // Redirect to dashboard if user is already logged in
   useEffect(() => {
     if (!authLoading && user) {
@@ -33,6 +34,7 @@ export default function LoginPage() {
   }, [user, authLoading, navigate]);
 
   const handleForgotPsw = async (e) => {
+    setLoadingReset(true)
     if (!email) {
       showError("Por favor ingrese su correo electrónico");
       return;
@@ -42,6 +44,8 @@ export default function LoginPage() {
       showSuccess("Se ha enviado un enlace para restablecer la contraseña");
     } catch (err) {
       showError(err.message);
+    } finally {
+      setLoadingReset(false);
     }
   };
 
@@ -150,6 +154,9 @@ export default function LoginPage() {
               )}
             </div>
             <div className="flex justify-end mb-6">
+              {loadingReset ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mx-auto"></div>
+              ) : 
               <button
                 type="button"
                 onClick={handleForgotPsw}
@@ -157,6 +164,8 @@ export default function LoginPage() {
               >
                 ¿Olvidaste tu contraseña?
               </button>
+              
+              }
             </div>
 
             <button

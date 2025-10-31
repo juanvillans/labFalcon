@@ -65,6 +65,9 @@ export const authAPI = {
     api.get(`/auth/verify-invitation?token=${token}`),
   activateAccount: (token, password) =>
     api.post("/auth/activate-account", { token, password }),
+  verifyResetToken: (token) => api.get(`/auth/verify-reset-token?token=${token}`),
+  resetPassword: (token, password) =>
+    api.post("/auth/reset-password", { token, password }),
 };
 
 // Users API endpoints

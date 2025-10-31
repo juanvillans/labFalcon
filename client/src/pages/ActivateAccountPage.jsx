@@ -21,18 +21,27 @@ export default function ActivateAccountPage() {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
+  const pathname = window.location.pathname; 
+
+  console.log(pathname);
+
   // Verify token on component mount
   useEffect(() => {
     async function verifyToken() {
       if (!token) {
-        showError("Token de activación no proporcionado");
+        showError("Token no proporcionado");
         setVerifying(false);
         setLoading(false);
         return;
       }
 
       try {
-        const response = await authAPI.verifyInvitationToken(token);
+        let response;
+        if (pathname === "/activar-cuenta") {
+          response = await authAPI.verifyInvitationToken(token);
+        } else if (pathname === "/olvide-contraseña") {
+          response = await authAPI.verifyResetToken(token);
+        }
         setUserData(response.data.user);
         setVerifying(false);
         setLoading(false);
@@ -109,8 +118,17 @@ export default function ActivateAccountPage() {
               Enlace Inválido
             </h1>
             <p className="text-gray-600 mt-2">
-              El enlace de activación es inválido o ha expirado. Por favor,
-              contacta al administrador para solicitar un nuevo enlace.
+              {pathname === "/activar-cuenta" ? (
+                <span>
+                  El enlace de activación es inválido o ha expirado. Por favor,
+                  contacta al administrador para solicitar un nuevo enlace.
+                </span>
+              ) : (
+                <span>
+                  El enlace de restablecimiento de contraseña es inválido o ha
+                  expirado.
+                </span>
+              )}
             </p>
           </div>
           <button
@@ -146,11 +164,19 @@ export default function ActivateAccountPage() {
               <Icon icon="heroicons:user" className="w-8 h-8 text-blue-500" />
             </div>
             <h1 className="text-lg md:text-2xl font-bold text-gray-800">
-              Activar Cuenta
+              {pathname === "/activar-cuenta" ? "Activar Cuenta" : "Restablecer Contraseña"}
             </h1>
             <p className="text-gray-600 mt-2">
-              !Hola {userData.name}!, establece tu contraseña para activar tu
-              cuenta.
+              {pathname === "/activar-cuenta" ? (
+                <span>
+                  !Hola {userData.name}!, establece tu contraseña para activar tu
+                  cuenta.
+
+                </span> ) : (
+                <span>
+                  Establece tu nueva contraseña.
+                </span>
+              )}
             </p>
           </div>
 

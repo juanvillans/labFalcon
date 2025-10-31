@@ -54,13 +54,13 @@ export const sendInvitationEmail = function (recipient, invitationToken, url) {
 }
 
 export const sendPasswordResetEmail = function (recipient, resetToken, url) {
-    const resetLink = `${url}/reset-password?token=${resetToken}`;
+    const resetLink = `${url}/olvide-contraseña?token=${resetToken}`;
 
     const mailOptions = {
         to: recipient.email,
-        subject: "Solicitud de restablecimiento de contraseña",
+        subject: "labFalcon - Solicitud de restablecimiento de contraseña",
         html: `
-            <h3>Restablecimiento de Contraseña</h3>
+            <h3>Restablecimiento de Contraseña en labFalcon</h3>
             <p>Has solicitado restablecer tu contraseña. Por favor haz clic en el enlace a continuación para restablecer tu contraseña:</p>
         <p><a href="${resetLink}">Restablecer contraseña</a></p>
             <p>El enlace caducará en 1 hora.</p>
