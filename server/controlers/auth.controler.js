@@ -59,7 +59,7 @@ export const signIn = catchAsync(async (req, res, next) => {
 
 export const signOut = catchAsync(async (req, res, next) => {
   try {
-
+    tokenBlacklist.add(req.headers.authorization.split(" ")[1]);
     res.status(200).json({
       status: "success",
       message: "Cerrar sesión",
@@ -237,8 +237,7 @@ export const verifyResetToken = catchAsync(async (req, res, next) => {
 // Reset password with token
 export const resetPassword = catchAsync(async (req, res, next) => {
   try {
-    const { password } = req.body;
-    
+    const { password, token } = req.body;
     if (!password) {
       throw commonErrors.missingFields(['password']);
     }
@@ -259,6 +258,9 @@ export const resetPassword = catchAsync(async (req, res, next) => {
         user: user.toJSON()
       }
     });
+
+    // delete reset token
+    tokenBlacklist.add(token);
   } catch (error) {
     next(error);
   }

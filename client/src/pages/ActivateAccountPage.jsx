@@ -39,9 +39,10 @@ export default function ActivateAccountPage() {
         let response;
         if (pathname === "/activar-cuenta") {
           response = await authAPI.verifyInvitationToken(token);
-        } else if (pathname === "/olvide-contraseña") {
+        } else if (pathname === "/olvide-contrasena") {
+          console.log("no se hizo")
           response = await authAPI.verifyResetToken(token);
-        }
+        } 
         setUserData(response.data.user);
         setVerifying(false);
         setLoading(false);
@@ -83,12 +84,17 @@ export default function ActivateAccountPage() {
     setLoading(true);
 
     try {
-      await authAPI.activateAccount(token, password);
-      showSuccess("Cuenta activada con éxito. Ahora puedes iniciar sesión.");
+      if (pathname === "/activar-cuenta") {
+        await authAPI.activateAccount(token, password);
+        showSuccess("Cuenta activada con éxito. Ahora puedes iniciar sesión.");
+      } else if (pathname === "/olvide-contrasena") {
+        await authAPI.resetPassword(token, password);
+        showSuccess("Contraseña restablecida con éxito. Ahora puedes iniciar sesión.");
+      }
       navigate("/");
     } catch (error) {
       console.error("Error activating account:", error);
-      showError(error.message || "Error al activar la cuenta");
+      showError(error.message || pathname === "/activar-cuenta" ? "Error al activar la cuenta" : "Error al restablecer la contraseña");
       setLoading(false);
     }
   };
@@ -156,7 +162,11 @@ export default function ActivateAccountPage() {
           alt=" secretariaLogo"
         />
       </div>
-      <title>Activar Cuenta - LabFalcón</title>
+      {pathname === "/activar-cuenta" ? (
+        <title>Activar Cuenta - LabFalcón</title>
+      ) : (
+        <title>Restablecer Contraseña - LabFalcón</title>
+      )}
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <div className="text-center mb-6">

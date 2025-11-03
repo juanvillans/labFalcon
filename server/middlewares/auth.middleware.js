@@ -43,6 +43,7 @@ export const protect = catchAsync(async (req, res, next) => {
 
     // Grant access to protected route
     req.user = currentUser;
+    req.token = token;
     next();
   } catch (error) {
     next(error);
@@ -150,6 +151,9 @@ export const validateResetToken = catchAsync(async (req, res, next) => {
     // Check token purpose
     if (decoded.purpose !== 'reset') {
       throw commonErrors.invalidInput("Invalid token type");
+    }
+    if (tokenBlacklist.has(token)) {
+      throw commonErrors.invalidInput("Token is blacklisted");
     }
     
     // Find user by email from token

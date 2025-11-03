@@ -54,7 +54,7 @@ export const sendInvitationEmail = function (recipient, invitationToken, url) {
 }
 
 export const sendPasswordResetEmail = function (recipient, resetToken, url) {
-    const resetLink = `${url}/olvide-contraseña?token=${resetToken}`;
+    const resetLink = `${url}/olvide-contrasena?token=${resetToken}`;
 
     const mailOptions = {
         to: recipient.email,

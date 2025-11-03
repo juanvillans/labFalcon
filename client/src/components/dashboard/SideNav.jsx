@@ -1,5 +1,6 @@
 import labFalconLogo from "../../assets/logoBlue.webp";
 import { useAuth } from "../../context/AuthContext";
+import { authAPI } from "../../services/api";
 import { useState } from "react";
 
 import { NavLink, Link } from "react-router-dom";
@@ -28,8 +29,13 @@ const links = [
 
 export default function SideNav(props) {
   const { logout } = useAuth();
-  function handleLogout() {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout();
+      logout();
+    } catch (error) {
+      console.error("Failed to logout", error);
+    }
   }
 
   const { user } = useAuth();
@@ -40,6 +46,7 @@ export default function SideNav(props) {
       onMouseEnter={() => props.handleSidebarToggle()}
       onMouseLeave={() => props.handleSidebarToggle()}
     >
+
       <Link
         className={`duration-150 hidden  mb-4 font-exo2 md:flex h-20 items-end justify-end rounded-md bg-white bg-opacity-5   md:h-28 ${props.isSidebarOpen ? 'p-4' : 'p-1'}`}
         href="/"
@@ -85,7 +92,6 @@ export default function SideNav(props) {
         })}
         <div className="hidden h-auto w-full grow rounded-md md:block"></div>
         <div className="flex gap-2 justify-start items-center">
-        
         
           <button
             onClick={handleLogout}
