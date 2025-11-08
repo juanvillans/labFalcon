@@ -25,17 +25,15 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
-const iconos_examenes = { 
-  1: {icon:"mdi:blood-bag", color:"#C62828"},
-  2: {icon:"mdi:test-tube", color:"#1565C0"},
-  3: {icon:"mdi:water", color:"#6A1B9A"},
-  4: {icon:"mdi:virus", color:"#EF6C00"},
-  5: {icon:"mdi:emoticon-poop", color:"#6D4C41"},
-  6: {icon:"game-icons:liver", color:"#00897B"},
-  7: {icon:"mdi:beaker", color:"#FBC02D"},
-}
-  
-
+const iconos_examenes = {
+  1: { icon: "mdi:blood-bag", color: "#C62828" },
+  2: { icon: "mdi:test-tube", color: "#1565C0" },
+  3: { icon: "mdi:water", color: "#6A1B9A" },
+  4: { icon: "mdi:virus", color: "#EF6C00" },
+  5: { icon: "mdi:emoticon-poop", color: "#6D4C41" },
+  6: { icon: "game-icons:liver", color: "#00897B" },
+  7: { icon: "mdi:beaker", color: "#FBC02D" },
+};
 
 let isThereLocalStorageFormData = localStorage.getItem("formData")
   ? true
@@ -295,7 +293,6 @@ export default function ExamenesPage() {
         filterFn: "equals",
         enableColumnFilter: true,
         enableSorting: true,
-
       },
       {
         accessorKey: "created_time",
@@ -331,45 +328,60 @@ export default function ExamenesPage() {
         ],
       },
       {
-        accessorKey: "message_status",
-        header: "Estado de envio",
+        accessorKey: "tests",
+        header: "Examenes",
         size: 100,
+        Cell: ({ cell }) => {
+          const value = cell.getValue();
+          return Object.entries(value).map(([key, value]) => {
+            return (
+              <Icon
+                icon={iconos_examenes[key].icon}
+                className="text-lg inline"
+                color={iconos_examenes[key].color}
+              />
+            );
+          });
+        },
+        enableSorting: false,
+      },
+      {
+        accessorKey: "message_status",
+        header: "Envío",
+        size: 30, 
         Cell: ({ cell }) => {
           const value = cell.getValue();
           if (value === "ENVIADO") {
             return (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center">
                 <Icon
                   className="text-gray-500"
                   icon="iconamoon:check-fill"
                   width={20}
                   height={20}
                 />
-                <p>Enviado</p>
               </div>
             );
           } else if (value === "LEIDO") {
             return (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center">
                 <Icon
                   className="text-color3"
                   icon={"line-md:check-all"}
                   width={20}
                   height={20}
                 />
-                <p>Leído</p>
               </div>
             );
           } else {
             return (
-              <div className="flex items-center gap-2 opacity-50">
+              <div className="flex items-center opacity-50">
                 <Icon
                   className="text-gray-300"
                   icon={"line-md:close"}
                   width={20}
                   height={20}
                 />
-                <p>No Enviado</p>
               </div>
             );
           }
@@ -1014,10 +1026,10 @@ export default function ExamenesPage() {
                         ))}
                       </div>
 
-                        {key == 5 && (
-                          <h3 className="text-md font-bold text-gray-600 ml-2 mb-2.5">
-                            Examen Microscópico
-                          </h3>
+                      {key == 5 && (
+                        <h3 className="text-md font-bold text-gray-600 ml-2 mb-2.5">
+                          Examen Microscópico
+                        </h3>
                       )}
                       <div className="mb-2 col-span-2">
                         <MemoizedTestField
